@@ -56,20 +56,24 @@ const BoardView = (props) => {
     },[route])
 
     const onFav = () => {
-        if(!JSON.parse(boardDTO[0].fav).includes(state.user.userSeq)) {
-            onLoading(true)
-            const jsonFav = JSON.stringify([...JSON.parse(boardDTO[0].fav),state.user.userSeq]);
-            axios.put(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/board/fav`, 
-                { boardSeq :boardDTO[0].boardSeq, fav: jsonFav} )
-            .then(() => {
-                onLoading(false)
-                setBoardDTO([{...boardDTO[0],fav:jsonFav},boardDTO[1]])
-            }).catch(() => {
-                setAlertTxt('추천 중 에러발생')
-                onLoading(false)
-            })
+        if(state.user.userSeq === -1) {
+            if(!JSON.parse(boardDTO[0].fav).includes(state.user.userSeq)) {
+                onLoading(true)
+                const jsonFav = JSON.stringify([...JSON.parse(boardDTO[0].fav),state.user.userSeq]);
+                axios.put(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/board/fav`, 
+                    { boardSeq :boardDTO[0].boardSeq, fav: jsonFav} )
+                .then(() => {
+                    onLoading(false)
+                    setBoardDTO([{...boardDTO[0],fav:jsonFav},boardDTO[1]])
+                }).catch(() => {
+                    setAlertTxt('추천 중 에러발생')
+                    onLoading(false)
+                })
+            } else {
+                setAlertTxt('이미 추천한 글입니다')
+            }
         } else {
-            setAlertTxt('이미 추천한 글입니다')
+            setAlertTxt('로그인 후 추천 가능')
         }
     }
 

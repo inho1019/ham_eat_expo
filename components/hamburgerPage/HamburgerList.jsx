@@ -93,10 +93,11 @@ const HamburgerList = (props) => {
             </ScrollView>}
             <FlatList
                 style={styles.burgerFlat}
-                data={burgers.filter(bgs => (bgs[0].name.includes(search) || 
-                                            bgs[0].content.includes(search) || 
-                                            (bgs[1] && bgs[1].name.includes(search)) || 
-                                            (strPick === -1 && stores.filter(str => str.name.includes(search)).map(stt => stt.storeSeq).includes(bgs[0].storeSeq)))
+                data={burgers.filter(bgs => ( bgs[0].name.includes(search) ||
+                                            search.includes(bgs[0].name) || 
+                                            search.includes(bgs[0].content) || 
+                                            (bgs[1] && search.includes(bgs[1].name)) || 
+                                            (strPick === -1 && stores.filter(str => search.includes(str.name)).map(stt => stt.storeSeq).includes(bgs[0].storeSeq)))
                                             && (strPick >= 0 ? bgs[0].storeSeq === strPick : bgs)
                                             )}
                 renderItem={(data) => {

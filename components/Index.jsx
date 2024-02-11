@@ -74,7 +74,7 @@ const Index = () => {
                 transparent={true}
                 visible={state.loading}>
                 <View style={styles.modalView}>
-                    <Image source={loadingImg} style={{width:120,height:120}}/>
+                    <Image source={loadingImg} style={{width:150,height:150}}/>
                 </View>
             </Modal>
         </View>

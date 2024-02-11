@@ -100,19 +100,16 @@ const HamburgerHome = (props) => {
                     <View style={{flexDirection:'row'}}>
                         <View style={[styles.itemSkel,{height:'100%'}]}>
                         <Skel height={'100%'} width={windowWidth*0.45}/></View>
-                        <View>
-                            <View style={[styles.itemSkel,{marginLeft:'10%',height:'30%'}]}>
+                        <View style={{marginLeft:'5%'}}>
+                            <View style={[styles.itemSkel,{height:'32%'}]}>
                                 <Skel height={'100%'} width={windowWidth*0.45}/>
                             </View>
-                            <View style={[styles.itemSkel,{marginLeft:'10%',height:'30%'}]}>
+                            <View style={[styles.itemSkel,{height:'26%',marginVertical:'4%'}]}>
                                 <Skel height={'100%'} width={windowWidth*0.45}/>
                             </View>
-                            <View style={[styles.itemSkel,{marginLeft:'10%',height:'30%'}]}>
+                            <View style={[styles.itemSkel,{height:'27%'}]}>
                                 <Skel height={'100%'} width={windowWidth*0.45}/>
                             </View>
-                            {/* <View style={[styles.itemSkel,{marginLeft:'10%'}]}>
-                                <Skel height={'100%'} width={windowWidth*0.45}/>
-                            </View> */}
                         </View>
                     </View>
                 </View> :

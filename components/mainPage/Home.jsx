@@ -38,7 +38,9 @@ const styles = StyleSheet.create({
     h2 : {
         fontSize: 25,
         fontWeight: 'bold',
-        margin: '2%'
+        marginHorizontal: '2%',
+        marginTop: 20,
+        marginBottom: 5
     },
     searchContainer : {
         marginVertical: 5,

@@ -71,8 +71,9 @@ const BoardList = (props) => {
             <FlatList
                 style={{height:'92%'}}
                 data={boardList.filter(bdl => (bdl[0].title.includes(search) || 
-                                            bdl[0].content.includes(search) || 
-                                            (bdl[1] && bdl[1].name.includes(search))))}
+                                            search.includes(bdl[0].title) || 
+                                            search.includes(bdl[0].content) || 
+                                            (bdl[1] && search.includes(bdl[1].name))))}
                 renderItem={(data) => <Pressable
                     onPress={() => navigation.navigate('View',{ boardSeq : data.item[0].boardSeq })}
                     style={({pressed}) => [styles.item,{backgroundColor: pressed ? 'whitesmoke' : 'white'}]}>
