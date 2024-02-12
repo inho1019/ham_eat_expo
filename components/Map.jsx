@@ -37,7 +37,7 @@ const Map = (props) => {
             <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=92439ca62b22c5ec0136bd7978c09894"></script>
         </head>
         <body style="margin:0;">
-            <div id="map" style="width:90%; aspect-ratio: 1/1; margin-left:5%; border-radius:5%; margin-top:5%;"></div>
+            <div id="map" style="width:90%; aspect-ratio: 1/1; margin-left:5%; border-radius:5%;"></div>
             <script>
                 kakao.maps.load(function () {
     `;
@@ -283,10 +283,11 @@ const Map = (props) => {
             </View>}
             {loading ? 
             <View style={{width:'90%',aspectRatio:1/1,overflow:'hidden',
-                marginLeft:'5%', borderRadius:20, marginTop:'5%'}}>
+                marginLeft:'5%', borderRadius:20, marginTop: type !== 0 ? '7%' : 5}}>
                 <Skel height={'100%'} width={windowWidth*0.9}/>
             </View>
                 : <WebView
+                    style={{marginTop: type !== 0 ? '7%' : 5}}
                     source={{ html: link }}
                     javaScriptEnabled={true}
                     domStorageEnabled={true}

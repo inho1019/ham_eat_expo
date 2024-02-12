@@ -9,7 +9,7 @@ const Home = (props) => {
 
     return (
         <View style={{flex:1}}>
-            <View style={{borderBottomColor: 'whitesmoke', borderBottomWidth: 10,paddingBottom: 10}}>
+            <View style={{borderBottomColor: 'whitesmoke', borderBottomWidth: 20,paddingBottom: 10}}>
                 <Image source={logo} style={styles.logo}/>
             </View>
             <Text style={styles.h2}>통합 검색</Text>
@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
         fontSize: 25,
         fontWeight: 'bold',
         marginHorizontal: '2%',
-        marginTop: 20,
+        marginTop: 10,
         marginBottom: 5
     },
     searchContainer : {

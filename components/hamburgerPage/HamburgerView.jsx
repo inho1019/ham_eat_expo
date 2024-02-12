@@ -502,7 +502,6 @@ const styles = StyleSheet.create({
         marginVertical: 20,
         marginHorizontal: '5%',
         fontSize: 16,
-        shadowColor: '#000',
         borderRadius: 10,
         paddingHorizontal: '5%',
         paddingVertical: '5%',

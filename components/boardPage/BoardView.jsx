@@ -12,7 +12,6 @@ const BoardView = (props) => {
     const onLoading = (bool) => {
         dispatch({ type: 'SET_LOADING' , payload : bool });
     };
-
      /////////////alert애니메이션//////////////
      const [alertTxt,setAlertTxt] = useState('')
 
@@ -56,7 +55,7 @@ const BoardView = (props) => {
     },[route])
 
     const onFav = () => {
-        if(state.user.userSeq === -1) {
+        if(state.user.userSeq !== -1) {
             if(!JSON.parse(boardDTO[0].fav).includes(state.user.userSeq)) {
                 onLoading(true)
                 const jsonFav = JSON.stringify([...JSON.parse(boardDTO[0].fav),state.user.userSeq]);
@@ -102,13 +101,22 @@ const BoardView = (props) => {
                 try {
                     const response = await fetch(boardDTO[0].url); // 원하는 웹사이트 URL로 변경
                     const html = await response.text();
-                    
-                    const regex = /content="http(.*?)"/g;
+
+                    const metaImg = /content="http(.*?)"/g;
+                    const tagImg = /src="http(.*?)"/g;
+
                     let match;
                     const imgArray = [];
     
-                    while ((match = regex.exec(html)) !== null) {
+                    while ((match = metaImg.exec(html)) !== null) {
                         const imagePattern = /\.(jpg|jpeg|png|gif|bmp)$/i;
+                        if (imagePattern.test(match[1])) {
+                          imgArray.push(match[1]);
+                        }
+                    }
+
+                    while ((match = tagImg.exec(html)) !== null) {
+                        const imagePattern = /\.(jpg|jpeg|png|gif)$/i;
                         if (imagePattern.test(match[1])) {
                           imgArray.push(match[1]);
                         }
@@ -133,10 +141,24 @@ const BoardView = (props) => {
             {boardDTO && <View style={{flexDirection:'column', borderBottomWidth:10,borderBottomColor:'whitesmoke'}}>
                 <View style={{borderBottomWidth:2,borderBottomColor:'lightgray',padding: 5}}>
                     <Text style={styles.h1}>{boardDTO[0].title}</Text>
-                    <View style={{flexDirection:'row',justifyContent:'space-between'}}>
-                        <View>
-                            <View style={{flexDirection:'row'}}>
+                    <View style={{flexDirection:'row'}}>
+                        <View style={{width:'100%'}}>
+                            <View style={{flexDirection:'row',justifyContent:'space-between'}}>
                                 <Text style={styles.h2}>{boardDTO[1] ? boardDTO[1].name : '탈퇴 회원'}</Text>
+                                {boardDTO[1].userSeq === state.user.userSeq && <View style={{flexDirection:'row'}}>
+                                    <View style={{flexDirection:'column'}}>
+                                        <Pressable onPress={onUpdate}
+                                            style={[styles.itemBut,{backgroundColor:'#2E8DFF'}]}>
+                                            <Text style={styles.itemButTxt}>수정</Text>
+                                        </Pressable>
+                                    </View>
+                                    <View style={{flexDirection:'column'}}>
+                                    <Pressable onPress={onDelete}
+                                        style={[styles.itemBut,{backgroundColor:'tomato'}]}>
+                                        <Text style={styles.itemButTxt}>삭제</Text>
+                                    </Pressable>
+                                    </View>
+                                </View>}
                             </View>
                             <View style={{flexDirection:'row'}}>
                                 <Text style={styles.h3}>조회 {boardDTO[0].hit}</Text>
@@ -144,29 +166,24 @@ const BoardView = (props) => {
                                 <Text style={styles.h3}> | {getToday(boardDTO[0].logTime)}</Text>
                             </View>
                         </View>
-                        {boardDTO[1].userSeq === state.user.userSeq && <View style={{flexDirection:'row'}}>
-                            <Pressable onPress={onUpdate}
-                                style={[styles.itemBut,{backgroundColor:'#2E8DFF'}]}>
-                                <Text style={styles.itemButTxt}>수정</Text>
-                            </Pressable>
-                            <Pressable onPress={onDelete}
-                                style={[styles.itemBut,{backgroundColor:'tomato'}]}>
-                                <Text style={styles.itemButTxt}>삭제</Text>
-                            </Pressable>
-                        </View>}
                     </View>
                 </View>
-                <Pressable style={styles.link}
+                {boardDTO[0].url !== '' && <Pressable style={styles.link}
                     onPress={openLink}>
                     <Text style={{color:'gray'}}>{boardDTO[0].url}</Text>
-                </Pressable>
+                </Pressable>}
                 <View style={{padding:5}}>
                     <Text style={styles.h4}>{boardDTO[0].content}</Text>
                     <View style={styles.imageSection}>
                         {imageArray.map((item,index) => 
                         <Image key={index} 
                             source={{ uri:'http' + item}}
-                            style={{width: 100/imageArray.length + '%',aspectRatio: 1/1}}
+                            resizeMode="cover"
+                            style={{width: imageArray.length > 1 ? 
+                                    (imageArray.length % 2 === 1 && index+1 === imageArray.length) ?
+                                    '100%' : '50%' : '100%',aspectRatio: imageArray.length > 1 ? 
+                                    (imageArray.length % 2 === 1 && index+1 === imageArray.length) ?
+                                    2 : 1 : 1/1}}
                         />)}
                     </View>
                 </View>
@@ -226,11 +243,10 @@ const styles = StyleSheet.create({
         backgroundColor:'lightgray'
     },
     itemBut : {
-        marginBottom:27,
-        paddingTop: 3,
         marginHorizontal: 4,
+        paddingVertical: 4,
         paddingHorizontal: 10,
-        borderRadius: 5,
+        borderRadius: 3,
     },
     itemButTxt : {
         color:'white',
@@ -238,10 +254,13 @@ const styles = StyleSheet.create({
         fontSize: 15
     },
     imageSection :{
-        marginHorizontal:10,
+        flexDirection:'row',
+        flexWrap:'wrap',
+        alignItems:'center',
+        marginHorizontal: '2.5%',
         marginTop: 30,
         overflow:'hidden',
-        borderRadius: 20
+        borderRadius: 20,
     },
     link : {
         backgroundColor:'whitesmoke',
