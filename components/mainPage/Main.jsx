@@ -13,7 +13,7 @@ const Main = (props) => {
         <NavigationContainer theme={navTheme}>
             <Stack.Navigator initialRouteName="Home">
                 <Stack.Screen name="Home" component={Home} options={{ headerShown: false }}/>
-                <Stack.Screen name="Search" component={Search} options={{ headerTitle: '검색'}}/>
+                <Stack.Screen name="Search" component={Search}/>
             </Stack.Navigator>
         </NavigationContainer>
     );

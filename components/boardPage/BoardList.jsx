@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, Image, Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Dimensions, FlatList, Image, Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useAppContext } from '../api/ContextAPI';
 import writeImg from '../../assets/board/write.png'
 import axios from 'axios';
+import { Skel } from 'react-native-ui-skel-expo'
 
 const BoardList = (props) => {
-    const {navigation,route} = props
+    const {navigation,route,searchParam} = props
 
     const { state , dispatch } = useAppContext();
 
@@ -16,6 +17,12 @@ const BoardList = (props) => {
     const onPage = (num) => {
         dispatch({ type: 'SET_PAGE' , payload : num });
     };
+
+    const onView = (num) => {
+        dispatch({ type: 'SET_VIEW' , payload : num });
+    };
+
+    const windowWidth = Dimensions.get('window').width;
      /////////////alert애니메이션//////////////
      const [alertTxt,setAlertTxt] = useState('')
 
@@ -41,41 +48,74 @@ const BoardList = (props) => {
 
     const [boardList,setBoardList] = useState([])
     const [search,setSearch] = useState('')
+    const [loading,setLoading] = useState(false)
 
     useEffect(()=>{
-        navigation.setOptions({
-            title: route.params?.type === 0 ? '자유 게시판' : 
-                   route.params?.type === 1 ? '행사/이벤트 게시판' :  
-                   route.params?.type === 2 ? '공지사항' : ''
-        });
+        if( searchParam === undefined ) {
+            navigation.setOptions({
+                title: route.params?.type === 0 ? '자유 게시판' : 
+                       route.params?.type === 1 ? '행사/이벤트 게시판' :  
+                       route.params?.type === 2 ? '공지사항' : ''
+            });
+        } else {
+            setSearch(searchParam)
+        }
         const unsubscribe = navigation.addListener('focus', () => {
             onLoading(true)
-            axios.get(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/board/list/${route.params?.type}`)
+            setLoading(true)
+            axios.get( searchParam === undefined ? 
+                `https://hameat.onrender.com/board/list/${route.params?.type}`
+                : `https://hameat.onrender.com/board/listAll`)
             .then(res => {
                 setBoardList(res.data)
                 onLoading(false)
+                setLoading(false)
             }).catch(() => {
                 setAlertTxt('불러오기 중 에러발생')
                 onLoading(false)
+                setLoading(false)
             })
         });
         return unsubscribe;
     },[navigation,route])
 
+    const onGo = (a,b) => {
+        onPage(a)
+        onView(b)
+    }
+
     return (
         <View>
-            <View style={{height: '8%',paddingTop:2,justifyContent: 'center',borderBottomWidth : 2,borderColor: 'lightgray',}}>
+            {searchParam === undefined && <View style={{height: '8%',paddingTop:2,justifyContent: 'center',borderBottomWidth : 2,borderColor: 'lightgray',}}>
                 <TextInput value={search} onChangeText={(text) => setSearch(text)} 
                     style={styles.searchBox} placeholder={'검색'}/>
-            </View>
+            </View>}
+            {(loading && searchParam !== undefined) && 
+            <View style={{width:'95%',aspectRatio:5/2, marginLeft:'2.5%'}}>
+                <View style={[styles.itemSkel,{height:'31%',marginVertical:'1%'}]}>
+                    <Skel height={'100%'} width={windowWidth*0.95}/>
+                </View>
+                <View style={[styles.itemSkel,{height:'31%',marginVertical:'1%'}]}>
+                    <Skel height={'100%'} width={windowWidth*0.95}/>
+                </View>
+                <View style={[styles.itemSkel,{height:'31%',marginVertical:'1%'}]}>
+                    <Skel height={'100%'} width={windowWidth*0.95}/>
+                </View>
+            </View>}
+            {!loading && boardList.filter(bdl => (bdl[0].title.includes(search) || 
+                        search.includes(bdl[0].title) || 
+                        search.includes(bdl[0].content) || 
+                        (bdl[1] && search.includes(bdl[1].name)))).length === 0 && 
+                        <Text style={styles.noList}>결과가 없습니다</Text>}
             <FlatList
-                style={{height:'92%'}}
+                style={{height: searchParam === undefined ? '92%' : '100%'}}
                 data={boardList.filter(bdl => (bdl[0].title.includes(search) || 
                                             search.includes(bdl[0].title) || 
                                             search.includes(bdl[0].content) || 
                                             (bdl[1] && search.includes(bdl[1].name))))}
                 renderItem={(data) => <Pressable
-                    onPress={() => navigation.navigate('View',{ boardSeq : data.item[0].boardSeq })}
+                    onPress={() =>  searchParam === undefined ? navigation.navigate('View',{ boardSeq : data.item[0].boardSeq }) 
+                    : onGo(2,data.item[0].boardSeq) }
                     style={({pressed}) => [styles.item,{backgroundColor: pressed ? 'whitesmoke' : 'white'}]}>
                     <Text style={styles.h2} numberOfLines={1} ellipsizeMode="tail">{data.item[0].title}</Text>
                     <View style={{flexDirection:'row',justifyContent:'space-between'}}>
@@ -91,7 +131,8 @@ const BoardList = (props) => {
                 </Pressable>}
                 alwaysBounceVertical={false}
             />
-            { (route.params?.type !== 2 || state.user.own === 2) && <Pressable style={styles.writeBut}
+            { searchParam === undefined && 
+                (route.params?.type !== 2 || state.user.own === 2) && <Pressable style={styles.writeBut}
                 onPress={() => state.user.userSeq === -1 ? onPage(3)
                 : navigation.navigate('Form',{ type : route.params?.type })}>
                 <Image source={writeImg} style={{width: 50, height: 50}}/>
@@ -111,6 +152,13 @@ const BoardList = (props) => {
 };
 
 const styles = StyleSheet.create({
+    noList : {
+        textAlign:'center',
+        fontSize: 17,
+        color:'gray',
+        paddingVertical: 10,
+        fontWeight:'bold'
+    },
     searchBox : {
         borderWidth: 2,
         borderRadius: 5,
@@ -140,6 +188,12 @@ const styles = StyleSheet.create({
         bottom: 10,
         right: 10,
         opacity : 0.8
+    },
+    itemSkel : {
+        height: '25%',
+        overflow: 'hidden',
+        marginVertical: 3,
+        borderRadius: 5
     },
     //alert
     alert : {

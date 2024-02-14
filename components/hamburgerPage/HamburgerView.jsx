@@ -145,20 +145,20 @@ const HamburgerView = (props) => {
             title: ''
         });
         onLoading(true)
-        axios.get(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/rating/listSeq/${route.params?.burgerSeq}`)
+        axios.get(`https://hameat.onrender.com/rating/listSeq/${route.params?.burgerSeq}`)
             .then(res => {
             setRatings(res.data)
-            axios.get(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/ingre/list`)
+            axios.get(`https://hameat.onrender.com/ingre/list`)
             .then(res => {
                 setIngres(res.data)
-                axios.get(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/burger/view/${route.params?.burgerSeq}`)
+                axios.get(`https://hameat.onrender.com/burger/view/${route.params?.burgerSeq}`)
                 .then(res => {
                     setBurgerDTO(res.data)
                     setMakeDTO(JSON.parse(res.data[0].make))
                     navigation.setOptions({
                         title: res.data[0].name
                     });
-                    axios.get(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/store/getSeq/${res.data[0].storeSeq}`)
+                    axios.get(`https://hameat.onrender.com/store/getSeq/${res.data[0].storeSeq}`)
                     .then(res => {
                         setStoreDTO(res.data)
                         onLoading(false)
@@ -198,12 +198,12 @@ const HamburgerView = (props) => {
                 type : burgerDTO[0].type,
                 ...placeDTO
             }
-            axios.post(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/rating/write`,ratingDTO)
+            axios.post(`https://hameat.onrender.com/rating/write`,ratingDTO)
             .then(() => {
                 setContent('')
                 setPlaceDTO()
                 setRate(0)
-                axios.get(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/rating/listSeq/${route.params?.burgerSeq}`)
+                axios.get(`https://hameat.onrender.com/rating/listSeq/${route.params?.burgerSeq}`)
                 .then(res => {
                     setRatings(res.data)
                     onLoading(false)
@@ -226,7 +226,7 @@ const HamburgerView = (props) => {
     }
     const onDelete = (ratingSeq) => {
         onLoading(true)
-        axios.delete(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/rating/delete/${ratingSeq}`,)
+        axios.delete(`https://hameat.onrender.com/rating/delete/${ratingSeq}`,)
         .then(() => {
             onLoading(false)
             setRatings(ratings.filter(rat => rat[0].ratingSeq !== ratingSeq))
@@ -292,7 +292,8 @@ const HamburgerView = (props) => {
                             style={{marginHorizontal:5}}>
                                 <Image source={mapIcon} style={{height:30,width:30}}/>
                             </Pressable>}
-                            {(storeDTO.type === 0 || storeDTO.type === 1) && <Pressable style={{marginHorizontal:5}}>
+                            {(storeDTO.type === 0 || storeDTO.type === 1) && <Pressable style={{marginHorizontal:5}}
+                            onPress={() => navigation.navigate('List',{ type : storeDTO.type, search: storeDTO.name })}>
                                 <Image source={searchIcon} style={{height:30,width:30}}/>
                             </Pressable>}
                         </View>}

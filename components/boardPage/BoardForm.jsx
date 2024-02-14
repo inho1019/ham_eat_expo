@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Image, Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Image, Keyboard, Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useAppContext } from '../api/ContextAPI';
 import add from '../../assets/board/board_reg.png'
 import axios from 'axios';
@@ -24,6 +24,26 @@ const BoardForm = (props) => {
             }, 2000)
         }
     },[alertTxt])
+    /////////// 키보드 활성화 여부 확인////////
+    const [key,setKey] = useState(false)
+
+    useEffect(() => {
+        const keyShow = () => {
+            setKey(true)
+        };
+    
+        const keyHide = () => {
+            setKey(false)
+        };
+    
+        const keyShowListner = Keyboard.addListener('keyboardDidShow', keyShow);
+        const keyHideListner = Keyboard.addListener('keyboardDidHide', keyHide);
+    
+        return () => {
+            keyShowListner.remove();
+            keyHideListner.remove();
+        };
+    }, []);
     ////////////////////////////////////////////
 
     const [boardDTO,setBoardDTO] = useState({
@@ -53,7 +73,7 @@ const BoardForm = (props) => {
         if(boardDTO.title.length > 0) {
             if(boardDTO.content.length > 0) {
                 onLoading(true)
-                axios.post('https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/board/write',boardDTO)
+                axios.post('https://hameat.onrender.com/board/write',boardDTO)
                 .then(res => {
                     onLoading(false)
                     navigation.goBack();
@@ -67,13 +87,13 @@ const BoardForm = (props) => {
     }
 
     return (
-        <View>
-            <View style={{height:20}}/>
+        <View style={{height:'100%'}}>
+            <View style={{height: 10}}/>
             <Text style={styles.h2}>제목</Text>
             <TextInput style={styles.titleInput} placeholder='제목 입력'
                 value={boardDTO.title} onChangeText={(text) => onInput('title',text)} maxLength={100}/>
             <Text style={styles.h2}>내용</Text>
-            <TextInput style={styles.contentInput} placeholder='내용 입력'
+            <TextInput style={[styles.contentInput,{height: key ? '30%' : 175}]} placeholder='내용 입력'
                 value={boardDTO.content} onChangeText={(text) => onInput('content',text)} 
                     multiline={true} numberOfLines={5}/>
             { route.params?.type === 1 && <View>     
@@ -122,7 +142,6 @@ const styles = StyleSheet.create({
     contentInput : {
         borderWidth: 2,
         borderRadius: 3,
-        height: 175,
         fontSize: 16,
         padding: 5,
         textAlignVertical: 'top',

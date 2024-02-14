@@ -81,10 +81,10 @@ const UserRegister = (props) => {
       Keyboard.dismiss();
       if(emailPattern(email)) {
         onLoading(true)
-        axios.post(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/user/emailCheck`, { email: email })
+        axios.post(`https://hameat.onrender.com/user/emailCheck`, { email: email })
         .then(res => {
           if(!res.data) {
-            axios.post(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/user/email`, { email: email })
+            axios.post(`https://hameat.onrender.com/user/email`, { email: email })
             .then(res => {
               setGetAuth(res.data)
               setAuthGo(true)
@@ -131,7 +131,7 @@ const UserRegister = (props) => {
 
     useEffect(() => {
       if(namePattern(userDTO.name)) {
-        axios.post(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/user/nameCheck`, { name : userDTO.name } )
+        axios.post(`https://hameat.onrender.com/user/nameCheck`, { name : userDTO.name } )
         .then(res => {
           if(res.data) setNameCheck(false)
           else setNameCheck(true)
@@ -159,7 +159,7 @@ const UserRegister = (props) => {
           if (nameCheck) {
             onLoading(true)
             const dto = {...userDTO, birth : `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`, email : email}
-            axios.post(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/user/register`, dto )
+            axios.post(`https://hameat.onrender.com/user/register`, dto )
             .then(res => {
               onLoading(false)
               if(res.data) {

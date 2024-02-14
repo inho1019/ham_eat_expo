@@ -1,13 +1,14 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { Dimensions, FlatList, Image, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Dimensions, FlatList, Image, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import star from '../../assets/burger/star.png'
 import starNone from '../../assets/burger/star_none.png'
 import won from '../../assets/burger/won.png'
 import { useAppContext } from '../api/ContextAPI';
+import { Skel } from 'react-native-ui-skel-expo'
 
 const HamburgerList = (props) => {
-    const {navigation,route} = props
+    const {navigation,route,searchParam} = props
 
     const windowWidth = Dimensions.get('window').width;
 
@@ -17,6 +18,14 @@ const HamburgerList = (props) => {
         dispatch({ type: 'SET_LOADING' , payload : bool });
     };
 
+    const onPage = (num) => {
+        dispatch({ type: 'SET_PAGE' , payload : num });
+    };
+
+
+    const onView = (num) => {
+        dispatch({ type: 'SET_VIEW' , payload : num });
+    };
      /////////////alert애니메이션//////////////
      const [alertTxt,setAlertTxt] = useState('')
 
@@ -37,53 +46,82 @@ const HamburgerList = (props) => {
     const [strPick,setStrPick] = useState(-1)
     const [search,setSearch] = useState('')
 
+    const [loading,setLoading] = useState(false)
+
     useEffect(()=>{
-        navigation.setOptions({
-            title: route.params?.type === 0 ? '프렌차이즈 버거 목록' : 
-                   route.params?.type === 1 ? '수제 버거 목록' :  
-                   route.params?.type === 2 ? 'DIY 버거 목록' : ''
-        });
-        onLoading(true)
-        axios.get(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/rating/listType/${route.params?.type}`)
-        .then(res => {
-            setRatings(res.data)
-            axios.get(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/ingre/list`)
+        if( route.params?.search ) {
+            setSearch(route.params?.search)
+        }
+        if( searchParam === undefined ) {
+            navigation.setOptions({
+                title: route.params?.type === 0 ? '프렌차이즈 버거 목록' : 
+                route.params?.type === 1 ? '수제 버거 목록' :  
+                route.params?.type === 2 ? 'DIY 버거 목록' : ''
+            });
+            setType(route.params?.type)
+        } else {
+            setSearch(searchParam)
+        }
+        const unsubscribe = navigation.addListener('focus', () => {
+            onLoading(true)
+            setLoading(true)
+            axios.get(searchParam === undefined ? `https://hameat.onrender.com/rating/listType/${route.params?.type}`
+                    : `https://hameat.onrender.com/rating/listAll`)
             .then(res => {
-                setIngres(res.data)
-                axios.get(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/store/list/${route.params?.type}`)
+                setRatings(res.data)
+                axios.get(`https://hameat.onrender.com/ingre/list`)
                 .then(res => {
-                    setStores(res.data)
-                    axios.get(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/burger/list/${route.params?.type}`)
+                    setIngres(res.data)
+                    axios.get( searchParam === undefined ? `https://hameat.onrender.com/store/list/${route.params?.type}`
+                    : `https://hameat.onrender.com/store/listAll`)
                     .then(res => {
-                        setBurgers(res.data)
-                        onLoading(false)
+                        setStores(res.data)
+                        axios.get( searchParam === undefined ? `https://hameat.onrender.com/burger/list/${route.params?.type}`
+                            : `https://hameat.onrender.com/burger/listAll`)
+                        .then(res => {
+                            setBurgers(res.data)
+                            onLoading(false)
+                            setLoading(false)
+                        }).catch(() => {
+                            setAlertTxt('불러오기 중 에러발생')
+                            onLoading(false)
+                            setLoading(false)
+                        })
                     }).catch(() => {
                         setAlertTxt('불러오기 중 에러발생')
                         onLoading(false)
+                        setLoading(false)
                     })
                 }).catch(() => {
                     setAlertTxt('불러오기 중 에러발생')
                     onLoading(false)
+                    setLoading(false)
                 })
             }).catch(() => {
                 setAlertTxt('불러오기 중 에러발생')
                 onLoading(false)
+                setLoading(false)
             })
-        }).catch(() => {
-            setAlertTxt('불러오기 중 에러발생')
-            onLoading(false)
-        })
-        setType(route.params?.type)
-    },[route])
+        });
+        return unsubscribe;
+    },[navigation,route])
+
+    const onGo = (a,b) => {
+        onPage(a)
+        onView(b)
+    }
 
     return (
-        <View>
+        <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+        >
+            {searchParam === undefined &&
             <View style={{height: '8%',paddingTop:2,justifyContent: 'center',borderBottomWidth : 2,borderColor: 'lightgray',}}>
                 <TextInput value={search} onChangeText={(text) => setSearch(text)} 
                     style={styles.searchBox} placeholder={type === 2 ? '버거 및 유저 검색' : '버거 및 가게 검색'}/>
-            </View>
-            {type !== 2 &&<ScrollView style={styles.storeBox} horizontal={strPick === -1 ? true : false}>
-                {stores.filter(str => strPick !== -1 ? str.storeSeq === strPick : str.name.includes(search))
+            </View>}
+            {searchParam === undefined && type !== 2 &&<ScrollView style={styles.storeBox} horizontal={strPick === -1 ? true : false}>
+                {stores.filter(str => strPick !== -1 ? str.storeSeq === strPick : (search.includes(str.name) || str.name.includes(search)))
                     .map((item,index) => <Pressable key={index}
                     style={[styles.storesItem,{backgroundColor : item.storeSeq === strPick ? 'darkgray' : 'lightgray'}]}
                     onPress={() => strPick === -1 ? setStrPick(item.storeSeq) : setStrPick(-1)}
@@ -91,22 +129,42 @@ const HamburgerList = (props) => {
                     <Text style={{fontSize: 17}}>#{item.name} </Text>
                 </Pressable>)}
             </ScrollView>}
+            {(loading && searchParam !== undefined) && 
+            <View style={{width:'95%',aspectRatio:5/3, marginLeft:'2.5%'}}>
+                <View style={[styles.itemSkel,{height:'48%',marginVertical:'1%'}]}>
+                    <Skel height={'100%'} width={windowWidth*0.95}/>
+                </View>
+                <View style={[styles.itemSkel,{height:'48%',marginVertical:'1%'}]}>
+                    <Skel height={'100%'} width={windowWidth*0.95}/>
+                </View>
+            </View>}
+            {!loading && burgers.filter(bgs => ( bgs[0].name.includes(search) || search.includes(bgs[0].name) || 
+                        search.includes(bgs[0].content) || bgs[0].content.includes(search) ||
+                        (bgs[1] && search.includes(bgs[1].name)) || 
+                        (strPick === -1 && stores.filter(str => search.includes(str.name) || str.name.includes(search))
+                        .map(stt => stt.storeSeq).includes(bgs[0].storeSeq)))
+                        && (strPick >= 0 ? bgs[0].storeSeq === strPick : bgs)
+                        ).length === 0 && <Text style={styles.noList}>결과가 없습니다</Text>}
             <FlatList
-                style={styles.burgerFlat}
-                data={burgers.filter(bgs => ( bgs[0].name.includes(search) ||
-                                            search.includes(bgs[0].name) || 
-                                            search.includes(bgs[0].content) || 
+                style={{height: searchParam === undefined ? '92%' : '100%'}}
+                data={burgers.filter(bgs => ( bgs[0].name.includes(search) || search.includes(bgs[0].name) || 
+                                            search.includes(bgs[0].content) || bgs[0].content.includes(search) ||
                                             (bgs[1] && search.includes(bgs[1].name)) || 
-                                            (strPick === -1 && stores.filter(str => search.includes(str.name)).map(stt => stt.storeSeq).includes(bgs[0].storeSeq)))
+                                            (strPick === -1 && stores.filter(str => search.includes(str.name) || str.name.includes(search))
+                                            .map(stt => stt.storeSeq).includes(bgs[0].storeSeq)))
                                             && (strPick >= 0 ? bgs[0].storeSeq === strPick : bgs)
                                             )}
                 renderItem={(data) => {
                 const makeDTO = JSON.parse(data.item[0].make)
 
-                return <Pressable style={({pressed})  => [styles.burgerItem,{opacity : pressed ? 0.8 : 1,
-                        borderTopColor: pressed ? 'whitesmoke' : 'white', height: data.index !== 0 ? 120 : type !== 2 ? 160 : 120,
-                        paddingTop: (type !== 2 && data.index === 0) && 40}]} 
-                        key={data.index} onPress={() => navigation.navigate('View', { burgerSeq : data.item[0].burgerSeq })}>
+                return <Pressable style={({pressed})  => [styles.burgerItem,{elevation : pressed ? 1 : 3,
+                        borderTopColor: pressed ? 'whitesmoke' : 'white', height: data.index !== 0 ? 123 : (
+                            stores.filter(str => strPick !== -1 ? str.storeSeq === strPick : (search.includes(str.name) || str.name.includes(search))).length > 0 &&
+                            searchParam === undefined && type !== 2) ? 162 : 123,
+                        paddingTop: (stores.filter(str => strPick !== -1 ? str.storeSeq === strPick : (search.includes(str.name) || str.name.includes(search))).length > 0 &&
+                            searchParam === undefined && type !== 2 && data.index === 0) && 40}]} 
+                        key={data.index} onPress={() => searchParam === undefined ? navigation.navigate('View', { burgerSeq : data.item[0].burgerSeq }) 
+                        : onGo(1,data.item[0].burgerSeq)}>
                         <View style={styles.makeContainer}>
                         {makeDTO.map((item,index) => {
                             const getIngre = ingres.find(ing => ing.ingreSeq === item)
@@ -141,17 +199,20 @@ const HamburgerList = (props) => {
                         </View>}
                         <View style={[styles.starBox,{ width: type === 2 ? '80%' : '70%',margin: type === 2 ? 10 : 5 }]}>
                             <View style={[styles.starBack,{width : 
-                                ratings.find(rat => rat[0].burgerSeq === data.item[0].burgerSeq) !== undefined &&
-                                parseFloat(ratings.filter(rat => rat[0].burgerSeq === data.item[0].burgerSeq)
-                                .reduce((acc, cur) => acc + cur[0].rate , 0)) * 20 / 
-                                ratings.filter(rat => rat[0].burgerSeq === data.item[0].burgerSeq).length + '%'}]}/>
-                            <Image source={ratings.find(rat => rat[0].burgerSeq === data.item[0].burgerSeq) !== undefined ? star : starNone} style={styles.starImg}/>
+                                ratings.find(rat =>  ( searchParam === undefined ? rat[0].burgerSeq : rat.burgerSeq ) 
+                                    === data.item[0].burgerSeq) !== undefined &&
+                                parseFloat(ratings.filter(rat => ( searchParam === undefined ? rat[0].burgerSeq : rat.burgerSeq ) 
+                                    === data.item[0].burgerSeq)
+                                .reduce((acc, cur) => acc + ( searchParam === undefined ? cur[0].rate : cur.rate ) , 0)) * 20 / 
+                                ratings.filter(rat => ( searchParam === undefined ? rat[0].burgerSeq : rat.burgerSeq )
+                                    === data.item[0].burgerSeq).length + '%'}]}/>
+                            <Image source={ratings.find(rat => ( searchParam === undefined ? rat[0].burgerSeq : rat.burgerSeq )
+                                    === data.item[0].burgerSeq) !== undefined ? star : starNone} style={styles.starImg}/>
                         </View>
                     </View>
             </Pressable>}}
                 alwaysBounceVertical={false}
             />
-            <View style={{height: 50}}/>
             <Modal 
                 animationType="fade"
                 visible={alertTxt !== ''}
@@ -162,11 +223,18 @@ const HamburgerList = (props) => {
                     </View>
                 </View>
             </Modal>
-        </View>
+        </KeyboardAvoidingView>
     );
 };
 
 const styles = StyleSheet.create({
+    noList : {
+        textAlign:'center',
+        fontSize: 17,
+        color:'gray',
+        paddingVertical: 10,
+        fontWeight:'bold'
+    },
     searchBox : {
         borderWidth: 2,
         borderRadius: 5,
@@ -181,10 +249,9 @@ const styles = StyleSheet.create({
         width: '35%',
         justifyContent: 'center',
         marginTop: 2,
-        height: 115,
-        borderRadius: 20,
-        backgroundColor: 'white',
-        elevation: 2,
+        borderRadius: 10,
+        backgroundColor:'whitesmoke',
+        overflow:'hidden',
         marginRight: 10
     },
     infoContainer: {
@@ -194,11 +261,9 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         paddingHorizontal: 20,
         overflow: 'hidden',
-        marginVertical: 1,
+        paddingVertical: 1,
+        marginBottom: 3,
         backgroundColor:'white',
-    },
-    burgerFlat : {
-        height: '92%'
     },
     itemName : {
         fontSize: 18,
@@ -242,6 +307,12 @@ const styles = StyleSheet.create({
     starBox : {
         aspectRatio: 2900 / 512,
         alignSelf: 'center',
+    },
+    itemSkel : {
+        height: '25%',
+        overflow: 'hidden',
+        marginVertical: 3,
+        borderRadius: 5
     },
     //alert
     alert : {

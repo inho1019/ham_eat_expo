@@ -30,6 +30,10 @@ const HamburgerHome = (props) => {
     const onPage = (num) => {
         dispatch({ type: 'SET_PAGE' , payload : num });
     };
+
+    const onView = (num) => {
+        dispatch({ type: 'SET_VIEW' , payload : num });
+    };
     /////////////alert애니메이션//////////////
     const [alertTxt,setAlertTxt] = useState('')
 
@@ -43,19 +47,23 @@ const HamburgerHome = (props) => {
     ////////////////////////////////////////////
 
     useEffect(()=>{
+        if(state.view !== -1) {
+            navigation.navigate('View',{ burgerSeq : state.view })
+            onView(-1)
+        }
         setAlertTxt(route.params?.alertTxt || '') 
         const unsubscribe = navigation.addListener('focus', () => {
             onLoading(true)
-            axios.get(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/ingre/list`)
+            axios.get(`https://hameat.onrender.com/ingre/list`)
             .then(res => {
                 setIngres(res.data)
-                axios.get(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/burger/listHome/0`)
+                axios.get(`https://hameat.onrender.com/burger/listHome/0`)
                 .then(res0 => {
                     setFren(res0.data)
-                    axios.get(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/burger/listHome/1`)
+                    axios.get(`https://hameat.onrender.com/burger/listHome/1`)
                     .then(res1 => {
                         setHand(res1.data)
-                        axios.get(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/burger/listHome/2`)
+                        axios.get(`https://hameat.onrender.com/burger/listHome/2`)
                         .then(res2 => {
                             setDiy(res2.data)
                             const ran = Math.floor(Math.random() * 3)
@@ -63,7 +71,7 @@ const HamburgerHome = (props) => {
                                         ran === 1 ? JSON.parse(res1.data[0].make) : JSON.parse(res2.data[0].make))
                             setBurger(ran === 0 ? res0.data[0] : 
                                         ran === 1 ? res1.data[0] : res2.data[0])
-                            axios.get(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/rating/listSeq/${
+                            axios.get(`https://hameat.onrender.com/rating/listSeq/${
                                         ran === 0 ? res0.data[0].burgerSeq : ran === 1 ? res1.data[0].burgerSeq : res2.data[0].burgerSeq}`)
                             .then(res => {
                                 setRatings(res.data)

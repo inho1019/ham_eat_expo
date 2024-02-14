@@ -14,7 +14,7 @@ const HamburgerStore = (props) => {
 
     useEffect(() => {
         onLoading(true)
-        axios.get(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/store/list/${type}`)
+        axios.get(`https://hameat.onrender.com/store/list/${type}`)
         .then(res => {
             setStores(res.data)
             onLoading(false)
@@ -29,7 +29,7 @@ const HamburgerStore = (props) => {
     useEffect(() => {
         onLoading(true)
         const unsubscribe = navigation.addListener('focus', () => {
-            axios.get(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/store/list/${type}`)
+            axios.get(`https://hameat.onrender.com/store/list/${type}`)
             .then(res => {
                 setStores(res.data)
                 onLoading(false)
@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
     },
     searchBox : {
         borderWidth: 2,
-        borderRadius: 15,
+        borderRadius: 5,
         fontSize: 20,
         paddingHorizontal: 10,
         paddingVertical: 3,

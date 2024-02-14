@@ -65,7 +65,7 @@ const UserPage = (props) => {
 
     const onChangePwd = async () => {
         onLoading(true)
-        axios.put(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/user/update`, 
+        axios.put(`https://hameat.onrender.com/user/update`, 
         { field : 1 , value : pwd, userSeq : state.user.userSeq} )
         .then(res => {
             onLoading(false)
@@ -89,7 +89,7 @@ const UserPage = (props) => {
     const onDelete = () => {
         setSecretModal(false)
         onLoading(true)
-        axios.delete(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/user/delete/${state.user.userSeq}`)
+        axios.delete(`https://hameat.onrender.com/user/delete/${state.user.userSeq}`)
         .then(res => {
             if(res.data) {
                 onUser({
@@ -124,7 +124,7 @@ const UserPage = (props) => {
 
     useEffect(() => {
         if(namePattern(name)) {
-            axios.post(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/user/nameCheck`, { name : name } )
+            axios.post(`https://hameat.onrender.com/user/nameCheck`, { name : name } )
             .then(res => {
                 if(res.data) setNameCheck(false)
                 else setNameCheck(true)
@@ -140,7 +140,7 @@ const UserPage = (props) => {
     const onChangeName = async () => {
         onLoading(true)
         const user = await AsyncStorage.getItem('user');
-        axios.put(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/user/update`, 
+        axios.put(`https://hameat.onrender.com/user/update`, 
                  { field : 0 , value : name, userSeq : state.user.userSeq} )
         .then(res => {
             onLoading(false)
@@ -188,7 +188,7 @@ const UserPage = (props) => {
 
     const onSecret = () => {
         onLoading(true)
-        axios.post(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/user/checkPwd`,
+        axios.post(`https://hameat.onrender.com/user/checkPwd`,
                   { pwd : rePwd, userSeq: state.user.userSeq })
         .then(res => {
             setRePwd('')

@@ -74,7 +74,7 @@ const Index = () => {
                 transparent={true}
                 visible={state.loading}>
                 <View style={styles.modalView}>
-                    <Image source={loadingImg} style={{width:150,height:150}}/>
+                    <Image source={loadingImg} style={{width:100,height:100}}/>
                 </View>
             </Modal>
         </View>
@@ -86,7 +86,6 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        opacity: 0.7
     },
     container : {
         flex: 1,

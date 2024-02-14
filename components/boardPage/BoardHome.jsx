@@ -8,10 +8,14 @@ import { Skel } from 'react-native-ui-skel-expo'
 const BoardHome = (props) => {
     const {navigation} = props
 
-    const { dispatch } = useAppContext();
+    const { state, dispatch } = useAppContext();
 
     const onLoading = (bool) => {
         dispatch({ type: 'SET_LOADING' , payload : bool });
+    };
+
+    const onView = (num) => {
+        dispatch({ type: 'SET_VIEW' , payload : num });
     };
 
     const windowWidth = Dimensions.get('window').width;
@@ -48,21 +52,25 @@ const BoardHome = (props) => {
     const [first,setFirst] = useState(true)
     
     useEffect(()=>{
+        if(state.view !== -1) {
+            navigation.navigate('View',{ boardSeq : state.view })
+            onView(-1)
+        }
         const unsubscribe = navigation.addListener('focus', () => {
             onLoading(true)
-            axios.get(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/board/listHome/0`)
+            axios.get(`https://hameat.onrender.com/board/listHome/0`)
             .then(res0 => {
                 setFree(res0.data)
-                axios.get(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/board/listHome/1`)
+                axios.get(`https://hameat.onrender.com/board/listHome/1`)
                 .then(res1 => {
                     setEvent(res1.data)
-                    axios.get(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/board/listHome/2`)
+                    axios.get(`https://hameat.onrender.com/board/listHome/2`)
                     .then(res2 => {
                         setNotice(res2.data)
-                        axios.get(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/board/best/0`)
+                        axios.get(`https://hameat.onrender.com/board/best/0`)
                         .then(res3 => {
                             setBestFree(res3.data)
-                            axios.get(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/board/best/1`)
+                            axios.get(`https://hameat.onrender.com/board/best/1`)
                             .then(res4 => {
                                 setBestEvent(res4.data)
                                 onLoading(false)
@@ -147,7 +155,7 @@ const BoardHome = (props) => {
 
     return (
         <ScrollView>
-            {first ? 
+            { (first || notice.length === 0) ? 
                 <View style={{width:'95%',aspectRatio:10/1, marginLeft:'2.5%', marginTop:'5%'}}>
                     <View style={[styles.itemSkel,{height:'100%'}]}>
                         <Skel height={'100%'} width={windowWidth*0.95}/>
@@ -163,7 +171,7 @@ const BoardHome = (props) => {
             <View style={styles.h1Out}>
                 <Text style={styles.h1}>실시간 인기글</Text>
             </View>
-            {first ? 
+            { (first || !bestFree) ? 
                 <View style={{width:'95%',aspectRatio:5/2, marginLeft:'2.5%', marginTop:'5%'}}>
                     <View style={[styles.itemSkel,{height:'100%'}]}>
                         <Skel height={'100%'} width={windowWidth*0.95}/>
@@ -173,10 +181,10 @@ const BoardHome = (props) => {
                 onPress={() => navigation.navigate('View',{ boardSeq : bestFree.boardSeq })}>
                 <Text style={styles.h2}>{bestFree.title}</Text>
                 <Text style={styles.recomInfo}>
-                    {getToday(bestFree.logTime)} | 추천 {JSON.parse(bestFree.fav).length} | 조회 {bestFree.hit}</Text>
+                    조회 {bestFree.hit} | 추천 {JSON.parse(bestFree.fav).length} | {getToday(bestFree.logTime)}</Text>
                 <Text numberOfLines={3} ellipsizeMode="tail" style={styles.recomTxt}>{ bestFree.content }</Text>
             </Pressable>}
-            {first ? 
+            { (first || !bestEvent) ? 
                 <View style={{width:'95%',aspectRatio:5/2, marginLeft:'2.5%', marginTop:'5%'}}>
                     <View style={[styles.itemSkel,{height:'100%'}]}>
                         <Skel height={'100%'} width={windowWidth*0.95}/>
@@ -195,7 +203,7 @@ const BoardHome = (props) => {
                         onPress={() => navigation.navigate('View',{ boardSeq : bestEvent.boardSeq })}
                         style={{aspectRatio: imageArray.length > 0 ? 3/2 : 3/1 }}>
                         <Text numberOfLines={2} ellipsizeMode="tail" style={styles.eventTitle}>{ bestEvent.title }</Text>
-                        <Text numberOfLines={3} ellipsizeMode="tail" style={styles.recomTxt}>{ bestEvent.content }</Text>
+                        <Text numberOfLines={2} ellipsizeMode="tail" style={styles.recomTxt}>{ bestEvent.content }</Text>
                     </Pressable>
                 </View>
             </View>}
@@ -273,7 +281,9 @@ const styles = StyleSheet.create({
     noticeBox : {
         flexDirection:'row',
         marginHorizontal: 10,
-        backgroundColor:'lightgray',
+        borderColor: 'lightgray',
+        backgroundColor:'whitesmoke',
+        borderWidth : 2,
         borderRadius: 10,
         paddingVertical: 5,
         paddingHorizontal: 10,

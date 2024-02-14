@@ -75,7 +75,7 @@ const HamburgerMake = (props) => {
 
     useEffect(() => {
         onLoading(true)
-        axios.get(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/ingre/list`)
+        axios.get(`https://hameat.onrender.com/ingre/list`)
         .then(res => {
             setIngres(res.data)
             onLoading(false)

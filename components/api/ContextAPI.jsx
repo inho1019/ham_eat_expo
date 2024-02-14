@@ -6,6 +6,7 @@ const initialState = {
   loading : false,
   page: 0,
   count: 0,
+  view : -1,
   user: {
     userSeq : -1,
     email : '',
@@ -31,6 +32,8 @@ const appReducer = (state, action) => {
       return { ...state, count: action.payload }
     case 'SET_USER' :
       return { ...state, user: action.payload }
+    case 'SET_VIEW' :
+      return { ...state, view: action.payload }
     default:
       return state;
   }

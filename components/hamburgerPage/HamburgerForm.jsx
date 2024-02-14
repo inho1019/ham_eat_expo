@@ -121,11 +121,11 @@ const HamburgerForm = (props) => {
         if(burgerDTO.name.length > 0) {
             if(burgerDTO.content.length > 0) {
                 onLoading(true)
-                axios.post(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/burger/write`, {...burgerDTO, userSeq : state.user.userSeq} )
+                axios.post(`https://hameat.onrender.com/burger/write`, {...burgerDTO, userSeq : state.user.userSeq} )
                 .then(res => {
                     if(bool) {
                         const ratingDTO = {...dto, burgerSeq : res.data.burgerSeq, type : burgerDTO.type, userSeq : state.user.userSeq }
-                        axios.post(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/rating/write`,ratingDTO)
+                        axios.post(`https://hameat.onrender.com/rating/write`,ratingDTO)
                         .then(() => {
                             onLoading(false)
                             navigation.navigate('Home', { alertTxt:'등록이 완료되었습니다' })

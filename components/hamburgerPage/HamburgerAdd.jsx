@@ -39,7 +39,7 @@ const HamburgerAdd = (props) => {
 
     const onIngre = () => {
         onLoading(true)
-        axios.post('https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/ingre/write',ingreDTO)
+        axios.post('https://hameat.onrender.com/ingre/write',ingreDTO)
         .then(res => {
             onLoading(false)
             setAlertTxt('재료가 등록되었습니다')
@@ -57,7 +57,7 @@ const HamburgerAdd = (props) => {
 
     const onStore = () => {
         onLoading(true)
-        axios.post('https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/store/write',storeDTO)
+        axios.post('https://hameat.onrender.com/store/write',storeDTO)
         .then(res => {
             onLoading(false)
             setAlertTxt('메장이 등록되었습니다')

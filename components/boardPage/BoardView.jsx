@@ -40,26 +40,29 @@ const BoardView = (props) => {
         navigation.setOptions({
             title: ''
         });
-        onLoading(true)
-        axios.get(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/board/view/${route.params?.boardSeq}`)
-        .then(res =>{
-            setBoardDTO(res.data)
-            navigation.setOptions({
-                title: res.data[0].title
-            });
-            onLoading(false)
-        }).catch(() => {
-            setAlertTxt('불러오기 중 에러발생')
-            onLoading(false)
+        const unsubscribe = navigation.addListener('focus', () => {
+            onLoading(true)
+            axios.get(`https://hameat.onrender.com/board/view/${route.params?.boardSeq}`)
+            .then(res =>{
+                setBoardDTO(res.data)
+                navigation.setOptions({
+                    title: res.data[0].title
+                });
+                onLoading(false)
+            }).catch(() => {
+                setAlertTxt('불러오기 중 에러발생')
+                onLoading(false)
+            })
         })
-    },[route])
+        return unsubscribe;
+    },[route,navigation])
 
     const onFav = () => {
         if(state.user.userSeq !== -1) {
             if(!JSON.parse(boardDTO[0].fav).includes(state.user.userSeq)) {
                 onLoading(true)
                 const jsonFav = JSON.stringify([...JSON.parse(boardDTO[0].fav),state.user.userSeq]);
-                axios.put(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/board/fav`, 
+                axios.put(`https://hameat.onrender.com/board/fav`, 
                     { boardSeq :boardDTO[0].boardSeq, fav: jsonFav} )
                 .then(() => {
                     onLoading(false)
@@ -77,13 +80,13 @@ const BoardView = (props) => {
     }
 
     const onUpdate = () => {
-        navigation.navigate('Form',{ update : true, data : boardDTO[0] })
+        navigation.navigate('Form',{ type : boardDTO[0].type, update : true, data : boardDTO[0] })
     }
 
     const onDelete = () => {
         if(boardDTO[1].userSeq === state.user.userSeq) {
             onLoading(true)
-            axios.delete(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/board/delete/${boardDTO[0].boardSeq}`)
+            axios.delete(`https://hameat.onrender.com/board/delete/${boardDTO[0].boardSeq}`)
             .then(() => {
                 onLoading(false)
                 navigation.navigate('List',{ type : boardDTO[0].type })

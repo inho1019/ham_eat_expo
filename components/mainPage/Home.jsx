@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Image, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import searchIcon from '../../assets/main/search.png'
 import logo from '../../assets/main/logo.png'
@@ -6,6 +6,27 @@ import Map from '../Map';
 
 const Home = (props) => {
     const{navigation} = props 
+
+    const [search,setSearch] = useState('')
+
+    const [mapStop,setMapStop] = useState(false)
+
+    useEffect(()=>{
+        const unsubscribe = navigation.addListener('focus', () => {
+            setMapStop(false)
+        })
+        unsubscribe;
+    },[navigation])
+
+    const onSearch = () => {
+        setMapStop(true)
+        requestAnimationFrame(() => navigation.navigate('Search', { search : search }))
+    }
+
+    const onMapSearch = (txt) => {
+        setMapStop(true)
+        requestAnimationFrame(() => navigation.navigate('Search', { search : txt }))
+    } 
 
     return (
         <View style={{flex:1}}>
@@ -15,15 +36,17 @@ const Home = (props) => {
             <Text style={styles.h2}>통합 검색</Text>
             <View style={styles.searchContainer}>
                 <TextInput 
+                    value={search}
                     style={styles.searchBox}
-                    onSubmitEditing={() => navigation.navigate('Search')}
+                    onChangeText={(text) => setSearch(text)}
+                    onSubmitEditing={onSearch}
                 />
-                <Pressable onPress={() => navigation.navigate('Search')}>
+                <Pressable onPress={onSearch}>
                     <Image source={searchIcon} style={styles.searchIcon}/>
                 </Pressable>
             </View>
             <Text style={styles.h2}>주변 매장</Text>
-            <Map type={0}/>
+            {!mapStop && <Map type={0} onMapSearch={onMapSearch}/>}
         </View>
     );
 };

@@ -8,7 +8,7 @@ import { useAppContext } from './api/ContextAPI';
 import { Skel } from 'react-native-ui-skel-expo'
 
 const Map = (props) => {
-    const {type,navigation,route,onPlace} = props
+    const {type,navigation,route,onPlace,searchParam,onMapSearch} = props
 
     const windowWidth = Dimensions.get('window').width;
 
@@ -71,65 +71,68 @@ const Map = (props) => {
     const [loading,setLoading] = useState(false)
 
     useEffect(() => {
-        setLoading(true)
-        const getLocationAsync = async () => {
-          try {
-            const { status } = await requestForegroundPermissionsAsync();
-            if (status !== 'granted') {
-              setAlertTxt('위치 권한이 허용되지 않았습니다');
-              setLoading(false)
-              return;
-            }
+        if(type === 3) {
+            setSearch(searchParam)
+        } else {
+            setLoading(true)
+            const getLocationAsync = async () => {
+            try {
+                const { status } = await requestForegroundPermissionsAsync();
+                if (status !== 'granted') {
+                setAlertTxt('위치 권한이 허용되지 않았습니다');
+                setLoading(false)
+                return;
+                }
+                
+                const location = await Promise.race([getCurrentPositionAsync({ accuracy: 6 }), 
+                    new Promise(() => setTimeout(() => { 
+                        if(location === undefined) {
+                            setLoading(false)
+                            setAlertTxt('위치를 찾을 수 없습니다');
+                        }
+                    }, 10000))]);
+
+
+                axios.post(`https://hameat.onrender.com/map/current`, 
+                    { search : `햄버거` , latitude : location.coords.latitude , longitude : location.coords.longitude })
+                    .then(res => {
+                        setSearchData(res.data.documents)
+                        setLink(kakaoMapFront + 
+                            ` var container = document.getElementById('map');
+                            
+                            var data = ${JSON.stringify(res.data.documents)};
             
-            const location = await Promise.race([getCurrentPositionAsync({ accuracy: 6 }), 
-                new Promise(() => setTimeout(() => { 
-                    if(location === undefined) {
+                            var options = {
+                                center: new kakao.maps.LatLng(${location.coords.latitude},${location.coords.longitude}),
+                                level: 7,
+                            };
+                            var map = new kakao.maps.Map(container, options);
+            
+            
+                            for(let i = 0;i < data.length;i++) {
+                                var marker = new kakao.maps.Marker({
+                                    position: new kakao.maps.LatLng(data[i].y,data[i].x), 
+                                    map: map
+                                });
+                                kakao.maps.event.addListener(marker, 'click', function (){
+                                    var position = this.getPosition();
+                                    window.ReactNativeWebView.postMessage(JSON.stringify(data[i]))
+                                });
+                            }`
+                        + kakaoMapBack)
                         setLoading(false)
-                        setAlertTxt('위치를 찾을 수 없습니다');
-                    }
-                }, 10000))]);
-
-
-            axios.post(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/map/current`, 
-                { search : `햄버거` , latitude : location.coords.latitude , longitude : location.coords.longitude })
-                .then(res => {
-                    setSearchData(res.data.documents)
-                    setLink(kakaoMapFront + 
-                        ` var container = document.getElementById('map');
-                        
-                        var data = ${JSON.stringify(res.data.documents)};
-        
-                        var options = {
-                            center: new kakao.maps.LatLng(${location.coords.latitude},${location.coords.longitude}),
-                            level: 7,
-                        };
-                        var map = new kakao.maps.Map(container, options);
-        
-        
-                        for(let i = 0;i < data.length;i++) {
-                            var marker = new kakao.maps.Marker({
-                                position: new kakao.maps.LatLng(data[i].y,data[i].x), 
-                                map: map
-                            });
-                            kakao.maps.event.addListener(marker, 'click', function (){
-                                var position = this.getPosition();
-                                window.ReactNativeWebView.postMessage(JSON.stringify(data[i]))
-                            });
-                        }`
-                    + kakaoMapBack)
+                })
+                .catch(() => {
                     setLoading(false)
-            })
-            .catch(() => {
+                    setAlertTxt(`불러오기 중 에러발생`);
+                })
+            } catch (error) {
                 setLoading(false)
                 setAlertTxt(`불러오기 중 에러발생`);
-            })
-          } catch (error) {
-            setLoading(false)
-            setAlertTxt(`불러오기 중 에러발생`);
-          }
-        };
-        getLocationAsync();
-
+            }
+            };
+            getLocationAsync();
+        }
       }, []);
     
     useEffect(() => {
@@ -186,7 +189,7 @@ const Map = (props) => {
                 }`
             + kakaoMapBack)
             onLoading(true)
-            axios.get(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/store/check/${selData.id}`)
+            axios.get(`https://hameat.onrender.com/store/check/${selData.id}`)
             .then(res => {
                 setDupData(res.data)
                 onLoading(false)
@@ -200,7 +203,7 @@ const Map = (props) => {
 
     useEffect(() => {
         if(search.length > 0) {
-            axios.post(`https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/map/search`, { search : search })
+            axios.post(`https://hameat.onrender.com/map/search`, { search : search })
             .then(res => {
                 setSearchData(res.data.documents)
             })
@@ -235,7 +238,7 @@ const Map = (props) => {
             latitude: data.y,
             placeId: data.id
         } 
-        axios.post('https://port-0-ham-eat-3wh3o2blr4s3qj5.sel5.cloudtype.app/store/write',storeDTO)
+        axios.post('https://hameat.onrender.com/store/write',storeDTO)
         .then(res => {
             onLoading(false)
             navigation.goBack();
@@ -263,13 +266,13 @@ const Map = (props) => {
 
     return (
         <View style={{flex:1}}>
-            {type !== 0 && <View style={{zIndex: 20}}>
+            {type !== 0 && type !== 3 && <View style={{zIndex: 20}}>
                 <TextInput style={type === 2 ? styles.searchBox2 : styles.searchBox} 
                 placeholder='매장 검색'
                 onFocus={() => setFocus(true)}
                 value={search}  onChangeText={(text) => setSearch(text)}/>
             </View>}
-            {searchData.length > 0 && focus && <View style={type === 2 ? styles.searchListOut2 : styles.searchListOut }>
+            {(type !== 0 && type !== 3) && searchData.length > 0 && focus && <View style={type === 2 ? styles.searchListOut2 : styles.searchListOut }>
             <ScrollView style={styles.searchList}>
             {searchData.map((item,index) => <Pressable key={index} 
                 onPress={() => onSel(item)}
@@ -296,19 +299,20 @@ const Map = (props) => {
             }
             {selData && <View style={styles.selItem}>
                 <View style={{flexDirection:'row',justifyContent:'space-between'}}>
-                <Text style={[styles.h2,{fontSize : type === 2 ? 18 : 23,width : type === 2 ? '80%' : 'auto'}]}>
+                <Text style={[styles.h2,{fontSize : type === 2 || type === 3 ? 18 : 23,
+                            width : type === 2 || type === 3 ? '80%' : 'auto'}]}>
                     {selData.place_name}</Text>
                     <Pressable onPress={() => setSelData()}>
                         <Image source={deleteImg} style={{width:30,height:30}}/>
                     </Pressable>
                 </View>
-                <Text style={[styles.h3,{fontSize : type === 2 ? 15 : 18}]}>{selData.address_name}</Text>
+                <Text style={[styles.h3,{fontSize : type === 2 || type === 3 ? 15 : 18}]}>{selData.address_name}</Text>
                 <View style={{flexDirection:'row'}}>
                     { type !== 2 && <Pressable onPress={() => openLink()}
-                        style={[styles.selBut,{width:'45%',backgroundColor:'lightgray'}]}>
+                        style={[styles.selBut,{width: type === 3 ? '95%' : '45%',backgroundColor:'lightgray'}]}>
                         <Text style={{fontSize:16,textAlign:'center',fontWeight:'bold'}}>자세히 보기</Text>
                     </Pressable>}
-                    { type === 0 && <Pressable onPress={() => openLink()}
+                    { type === 0 && <Pressable onPress={() => onMapSearch(selData.place_name)}
                         style={[styles.selBut,{width:'45%',backgroundColor:'#2E8DFF'}]}>
                         <Text style={{fontSize:16,textAlign:'center',fontWeight:'bold',color:'white'}}>매장 검색</Text>
                     </Pressable>}
