@@ -230,9 +230,9 @@ const UserPage = (props) => {
                     style={({ pressed }) => ({
                         backgroundColor: pressed ? 'whitesmoke' : 'white',
                     })}>
-                    <Text style={styles.myBut}>프렌차이즈 버거 매장 등록</Text>
+                    <Text style={styles.myBut}>프렌차이즈 등록</Text>
                 </Pressable>
-                <Pressable onPress={() => navigation.navigate('Map')}
+                <Pressable onPress={() => navigation.navigate('Map',{ type : 1 })}
                     style={({ pressed }) => ({
                         backgroundColor: pressed ? 'whitesmoke' : 'white',
                     })}>
@@ -271,6 +271,8 @@ const UserPage = (props) => {
                   })}>
                 <Text style={styles.myBut}>로그아웃</Text>
             </Pressable>
+            <Text style={{textAlign:'center',fontSize:17,color:'darkgray',fontWeight:'bold',marginVertical:20}}>
+                Designed By FreePik</Text>
             <Modal
                 animationType="fade"
                 visible={nameModal}

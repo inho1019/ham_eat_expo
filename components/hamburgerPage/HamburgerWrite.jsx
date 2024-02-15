@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Image, PanResponder, Pressable, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
+import { Image, PanResponder, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
 import star from '../../assets/burger/star.png'
 import backImg from '../../assets/burger/up_arrow.png'
 import burgerReg from '../../assets/burger/burger_reg.png'
@@ -32,6 +32,7 @@ const HamburgerWrite = (props) => {
     useEffect(() => {
         if(burgerDTO.type !== 0 ) setStore(false)
     },[burgerDTO])
+
 ///////////드래그 이벤트////////////
     const [starWidth, setStarWidth] = useState(0);
 
@@ -84,71 +85,73 @@ const HamburgerWrite = (props) => {
                     <Image source={backImg} style={{height:'95%',aspectRatio: 1/1, alignSelf:'center'}}/>
                 </Pressable>
             </View>
-            <View style={{flexDirection:'row'}}><Text style={styles.h3}>이름</Text></View>
-                <TextInput value={burgerDTO.name} style={styles.txtBox} onChangeText={(text) => onInput('name', text)} />
-            <View style={{flexDirection:'row'}}><Text style={styles.h3}>설명</Text></View>
-                <TextInput value={burgerDTO.content} style={styles.txtBox} onChangeText={(text) => onInput('content', text)} />
-            {burgerDTO.type !== 2 && <View>
-            <View style={{flexDirection: 'row'}}>
-                <Text style={[styles.h3,{marginTop: '3%'}]}>가격</Text>
-                <Switch 
-                    trackColor={{ false: "#767577", true: "#81b0ff" }}
-                    thumbColor={'white'}
-                    onValueChange={() => setPrice(!price)}
-                    value={price}
-                />
-            </View>
-            {price && <View>
-                    <TextInput 
-                    keyboardType="numeric"
-                    value={burgerDTO.price.toLocaleString()} 
-                    style={styles.txtBox}
-                    onChangeText={(text) => onInput('price', text.replace(/[^0-9]/g, ''))} />
-            </View>}
-            </View>}
-            <View style={{flexDirection: 'row'}}>
-                <Text style={[styles.h3,{marginTop: '3%'}]}>평가</Text>
-                <Switch 
-                    trackColor={{ false: "#767577", true: "#81b0ff" }}
-                    thumbColor={'white'}
-                    onValueChange={() => setRating(!rating)}
-                    value={rating}
-                />
-            </View>
-            {rating && <View>
-                <View style={styles.starBox} {...panResponder.panHandlers} onLayout={starLayout}>
-                    <View style={[styles.starBack,{width : rate + '%'}]}/>
-                    <Image source={star} style={styles.starImg}/>
+            <ScrollView style={{height:'93%'}}>
+                <View style={{flexDirection:'row'}}><Text style={styles.h3}>이름</Text></View>
+                    <TextInput value={burgerDTO.name} style={styles.txtBox} onChangeText={(text) => onInput('name', text)} />
+                <View style={{flexDirection:'row'}}><Text style={styles.h3}>설명</Text></View>
+                    <TextInput value={burgerDTO.content} style={styles.txtBox} onChangeText={(text) => onInput('content', text)} />
+                {burgerDTO.type !== 2 && <View>
+                <View style={{flexDirection: 'row'}}>
+                    <Text style={[styles.h3,{marginTop: '3%'}]}>가격</Text>
+                    <Switch 
+                        trackColor={{ false: "#767577", true: "#81b0ff" }}
+                        thumbColor={'white'}
+                        onValueChange={() => setPrice(!price)}
+                        value={price}
+                    />
                 </View>
-                <View style={{flexDirection:'row'}}>
-                <View style={{width: store ? '50%' : '100%'}}>
-                    <View style={{flexDirection:'row'}}><Text style={[styles.h3]}>평가 내용</Text></View>
-                    <TextInput value={content} multiline={true} maxLength={500} 
-                        style={[styles.contentInput,{height: store ? 160 : 85}]} numberOfLines={3}
-                        onChangeText={(text) => setContent(text)} />
-                    {burgerDTO.type === 0 && <View style={{flexDirection:'row',zIndex:30}}>
-                        <Text style={[styles.h3,{marginTop: store ? '7%' : '3.5%'}]}>지점</Text>
-                        <Switch 
-                            trackColor={{ false: "#767577", true: "#81b0ff" }}
-                            thumbColor={'white'}
-                            onValueChange={() => {
-                                setStore(!store)
-                                setPlaceDTO()
-                            }}
-                            value={store}
-                        />
-                        {placeDTO && <Text 
-                            style={{fontSize:14,verticalAlign:'middle',marginLeft:5,color:'gray',fontWeight:'bold'}}>
-                            #{placeDTO.placeName.split(' ')[placeDTO.placeName.split(' ').length-1]}</Text>}
-                    </View>}
+                {price && <View>
+                        <TextInput 
+                        keyboardType="numeric"
+                        value={burgerDTO.price.toLocaleString()} 
+                        style={styles.txtBox}
+                        onChangeText={(text) => onInput('price', text.replace(/[^0-9]/g, ''))} />
+                </View>}
+                </View>}
+                <View style={{flexDirection: 'row'}}>
+                    <Text style={[styles.h3,{marginTop: '3%'}]}>평가</Text>
+                    <Switch 
+                        trackColor={{ false: "#767577", true: "#81b0ff" }}
+                        thumbColor={'white'}
+                        onValueChange={() => setRating(!rating)}
+                        value={rating}
+                    />
+                </View>
+                {rating && <View>
+                    <View style={styles.starBox} {...panResponder.panHandlers} onLayout={starLayout}>
+                        <View style={[styles.starBack,{width : rate + '%'}]}/>
+                        <Image source={star} style={styles.starImg}/>
                     </View>
-                    { store &&
-                        <View style={{width:'50%'}}>
-                            <Map type={2} onPlace={onPlace}/>
+                    <View style={{flexDirection:'row'}}>
+                    <View style={{width: store ? '50%' : '100%'}}>
+                        <View style={{flexDirection:'row'}}><Text style={[styles.h3]}>평가 내용</Text></View>
+                        <TextInput value={content} multiline={true} maxLength={500} 
+                            style={[styles.contentInput,{height: store ? 160 : 85}]} numberOfLines={3}
+                            onChangeText={(text) => setContent(text)} />
+                        {burgerDTO.type === 0 && <View style={{flexDirection:'row',zIndex:30}}>
+                            <Text style={[styles.h3,{marginTop: store ? '7%' : '3.5%'}]}>지점</Text>
+                            <Switch 
+                                trackColor={{ false: "#767577", true: "#81b0ff" }}
+                                thumbColor={'white'}
+                                onValueChange={() => {
+                                    setStore(!store)
+                                    setPlaceDTO()
+                                }}
+                                value={store}
+                            />
+                            {placeDTO && <Text 
+                                style={{fontSize:14,verticalAlign:'middle',marginLeft:5,color:'gray',fontWeight:'bold'}}>
+                                #{placeDTO.placeName.split(' ')[placeDTO.placeName.split(' ').length-1]}</Text>}
+                        </View>}
                         </View>
-                    }
-                    </View>
-            </View>}
+                        { store &&
+                            <View style={{width:'50%'}}>
+                                <Map type={2} onPlace={onPlace}/>
+                            </View>
+                        }
+                        </View>
+                </View>}
+            </ScrollView>
             <View style={{position: 'absolute',height: '9%',flexDirection: 'row-reverse',margin: 20,bottom:0,right:0}}>
                 <Pressable onPress={() => onSub()}>
                     <Image source={burgerReg} style={{height:'90%',aspectRatio: 1/1}}/>

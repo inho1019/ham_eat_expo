@@ -90,7 +90,7 @@ const HamburgerForm = (props) => {
         } else {
             setPage(1)
         }
-        setBurgerDTO({...burgerDTO, type : num})
+        setBurgerDTO({...burgerDTO, type : num, price: '', storeSeq: -1})
         scrollRef.current.scrollTo({ y: windowHeight * (num === 2 ? 2 : 1), animated: true });
     }
 

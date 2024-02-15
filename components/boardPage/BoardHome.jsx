@@ -4,6 +4,7 @@ import noticeImg from '../../assets/board/notice.png'
 import axios from 'axios';
 import { useAppContext } from '../api/ContextAPI';
 import { Skel } from 'react-native-ui-skel-expo'
+import ImageModal from '../ImageModal';
 
 const BoardHome = (props) => {
     const {navigation} = props
@@ -50,6 +51,12 @@ const BoardHome = (props) => {
     const [bestEvent,setBestEvent] = useState()
     
     const [first,setFirst] = useState(true)
+
+    const [imgModal,setImgModal] = useState(false)
+
+    const onClose = () => {
+        setImgModal(false)
+    }
     
     useEffect(()=>{
         if(state.view !== -1) {
@@ -191,10 +198,16 @@ const BoardHome = (props) => {
                     </View>
                 </View>
                 :<View style={styles.eventContainer}>
-                {imageArray.length > 0 && 
-                    <Image source={{ uri : 'http' + imageArray[0] }} style={styles.eventImg}/>}
+                {imageArray.length > 0 &&
+                <Pressable
+                    style={styles.eventImgBox}
+                    onPress={() => setImgModal(true)}>
+                    <Image source={{ uri : 'http' + imageArray[0] }} 
+                        resizeMode='cover'
+                        style={{width:'100%',height:'100%'}}/>
+                </Pressable>}
                 <View style={[styles.eventInfo,{width: imageArray.length > 0 ? '45%' : '95%',
-                        padding: imageArray.length > 0 ? '0' : '2%' }]}>
+                        padding: imageArray.length > 0 ? '0' : '1%' }]}>
                     <Pressable
                         onPress={openLink}>
                         <Text style={styles.linkBut}>바로가기</Text>
@@ -264,6 +277,7 @@ const BoardHome = (props) => {
                     </Pressable>)}
                 </View>
             }
+            <ImageModal imgModal={imgModal} src={'http' + imageArray[0]} onClose={onClose}/>
             <Modal
                 animationType="fade"
                 visible={alertTxt !== ''}
@@ -331,7 +345,7 @@ const styles = StyleSheet.create({
         margin: 10,
         elevation: 10,
     },
-    eventImg : {
+    eventImgBox : {
         margin:'2.5%',
         width: '45%',
         aspectRatio: 1/1,
@@ -352,13 +366,13 @@ const styles = StyleSheet.create({
         color:'black'
     },
     linkBut : {
-        width:'95%',
+        width:'98%',
         textAlign:'center',
         fontSize: 17,
         paddingVertical: 3,
         marginVertical: 3,
-        marginHorizontal: '2.5%',
-        borderRadius: 10,
+        marginHorizontal: '1%',
+        borderRadius: 8,
         fontWeight:'bold',
         color:'white',
         backgroundColor:'#2E8DFF'

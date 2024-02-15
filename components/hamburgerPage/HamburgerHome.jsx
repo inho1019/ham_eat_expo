@@ -113,7 +113,7 @@ const HamburgerHome = (props) => {
     
     return (
         <ScrollView style={{flex:1}}>
-            <Text style={styles.h1}>신규 버거</Text>
+            <Text style={styles.h1}>신규 추천 버거</Text>
                 {first ? 
                 <View style={{width:'95%',aspectRatio:5/2, marginLeft:'2.5%', marginTop:'5%'}}>
                     <View style={{flexDirection:'row'}}>
@@ -262,11 +262,10 @@ const HamburgerHome = (props) => {
 const styles = StyleSheet.create({
     recomContainer : {
         flexDirection: 'row',
-        borderTopWidth: 2,
-        borderBottomWidth: 2,
-        borderColor: 'back',
-        margin: 10,
-        paddingVertical: 20,
+        width: '95%',
+        alignSelf: 'center',
+        marginTop: 10,
+        paddingVertical: 15,
     },
     makeContainer : {
         width: '50%',
@@ -338,12 +337,12 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     burgerBut : {
-        width: '80%',
+        width: '85%',
         marginVertical: 30,
         paddingVertical: 15,
         borderRadius: 10,
         flexDirection: 'row',
-        backgroundColor: 'whitesmoke',
+        backgroundColor: 'white',
         justifyContent:'space-evenly',
         alignItems: 'center' ,
         alignSelf: 'center',

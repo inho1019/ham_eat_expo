@@ -152,12 +152,12 @@ const HamburgerAdd = (props) => {
             </Pressable>
             </View>}
             {route.params.type !== 3 && <View>
-                <View style={{flexDirection:'row'}}><Text style={styles.h4}>가게 이름</Text></View>
+                <View style={{flexDirection:'row'}}><Text style={styles.h4}>프렌차이즈 이름</Text></View>
                 <TextInput value={storeDTO.name} style={styles.txtBox}
                     onChangeText={(text) => setStoreDTO({...storeDTO, name: text})}/>
                 <Pressable onPress={() => onStore()}
                     style={styles.addBut}>
-                    <Text style={styles.addButTxt}>가게 등록</Text>
+                    <Text style={styles.addButTxt}>등록</Text>
                 </Pressable>
             </View>}
             <Modal 

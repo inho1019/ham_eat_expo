@@ -91,28 +91,37 @@ const BoardList = (props) => {
                     style={styles.searchBox} placeholder={'검색'}/>
             </View>}
             {(loading && searchParam !== undefined) && 
-            <View style={{width:'95%',aspectRatio:5/2, marginLeft:'2.5%'}}>
-                <View style={[styles.itemSkel,{height:'31%',marginVertical:'1%'}]}>
+            <View style={{width:'95%',aspectRatio:5/4, marginLeft:'2.5%'}}>
+                <View style={[styles.itemSkel,{height:'15%',marginVertical:'1%'}]}>
                     <Skel height={'100%'} width={windowWidth*0.95}/>
                 </View>
-                <View style={[styles.itemSkel,{height:'31%',marginVertical:'1%'}]}>
+                <View style={[styles.itemSkel,{height:'15%',marginVertical:'1%'}]}>
                     <Skel height={'100%'} width={windowWidth*0.95}/>
                 </View>
-                <View style={[styles.itemSkel,{height:'31%',marginVertical:'1%'}]}>
+                <View style={[styles.itemSkel,{height:'15%',marginVertical:'1%'}]}>
+                    <Skel height={'100%'} width={windowWidth*0.95}/>
+                </View>
+                <View style={[styles.itemSkel,{height:'15%',marginVertical:'1%'}]}>
+                    <Skel height={'100%'} width={windowWidth*0.95}/>
+                </View>
+                <View style={[styles.itemSkel,{height:'15%',marginVertical:'1%'}]}>
+                    <Skel height={'100%'} width={windowWidth*0.95}/>
+                </View>
+                <View style={[styles.itemSkel,{height:'15%',marginVertical:'1%'}]}>
                     <Skel height={'100%'} width={windowWidth*0.95}/>
                 </View>
             </View>}
-            {!loading && boardList.filter(bdl => (bdl[0].title.includes(search) || 
-                        search.includes(bdl[0].title) || 
-                        search.includes(bdl[0].content) || 
+            {!loading && boardList.filter(bdl => (
+                        bdl[0].title.includes(search) || search.includes(bdl[0].title) || 
+                        bdl[0].content.includes(search) || search.includes(bdl[0].content) || 
                         (bdl[1] && search.includes(bdl[1].name)))).length === 0 && 
                         <Text style={styles.noList}>결과가 없습니다</Text>}
             <FlatList
                 style={{height: searchParam === undefined ? '92%' : '100%'}}
-                data={boardList.filter(bdl => (bdl[0].title.includes(search) || 
-                                            search.includes(bdl[0].title) || 
-                                            search.includes(bdl[0].content) || 
-                                            (bdl[1] && search.includes(bdl[1].name))))}
+                data={boardList.filter(bdl => (
+                                    bdl[0].title.includes(search) || search.includes(bdl[0].title) || 
+                                    bdl[0].content.includes(search) || search.includes(bdl[0].content) || 
+                                    (bdl[1] && search.includes(bdl[1].name))))}
                 renderItem={(data) => <Pressable
                     onPress={() =>  searchParam === undefined ? navigation.navigate('View',{ boardSeq : data.item[0].boardSeq }) 
                     : onGo(2,data.item[0].boardSeq) }
@@ -179,8 +188,7 @@ const styles = StyleSheet.create({
     },
     item : {
         padding: 5,
-        borderColor:'lightgray',
-        borderTopWidth: 0.5,
+        borderBottomColor:'lightgray',
         borderBottomWidth: 1,
     },
     writeBut : {

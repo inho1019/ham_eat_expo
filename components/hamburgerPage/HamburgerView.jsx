@@ -16,6 +16,7 @@ import searchIcon from '../../assets/main/search.png'
 import { useAppContext } from '../api/ContextAPI';
 import MapModal from '../MapModal';
 import Map from '../Map';
+import { Skel } from 'react-native-ui-skel-expo'
 
 const HamburgerView = (props) => {
     const {navigation,route} = props
@@ -24,6 +25,7 @@ const HamburgerView = (props) => {
 
     const [rate,setRate] = useState(0)
     const [content,setContent] = useState('')
+    const [first,setFirst] = useState(true)
 
     ///////////드래그 이벤트////////////
     const [starWidth, setStarWidth] = useState(0);
@@ -162,25 +164,30 @@ const HamburgerView = (props) => {
                     .then(res => {
                         setStoreDTO(res.data)
                         onLoading(false)
+                        setFirst(false)
                     })
                     .catch(() => {
                         setAlertTxt('불러오기 중 에러발생')
                         onLoading(false)
+                        setFirst(false)
                     })
                 })
                 .catch(() => {
                     setAlertTxt('불러오기 중 에러발생')
                     onLoading(false)
+                    setFirst(false)
                 })
             })
             .catch(() => {
                 setAlertTxt('불러오기 중 에러발생')
                 onLoading(false)
+                setFirst(false)
             })
         })
         .catch(() => {
             setAlertTxt('불러오기 중 에러발생')
             onLoading(false)
+            setFirst(false)
         })
     },[route])
 
@@ -253,7 +260,11 @@ const HamburgerView = (props) => {
                 <Pressable onPress={() => setFold(!fold)} style={styles.fold}>
                     <Image source={fold ? foldT : foldF} style={{height:40,width:40}}/>
                 </Pressable>
-                {makeDTO.length > 0 && <Pressable 
+                {first && <View style={{width:200,height:200,overflow:'hidden',
+                    alignSelf:'center', borderRadius:5, marginVertical:'5%'}}>
+                        <Skel height={200} width={200}/>
+                </View>}
+                {!first && makeDTO.length > 0 && <Pressable 
                     onPress={() => setFold(!fold)}
                     style={styles.makeContainer}>
                     {makeDTO.map((item,index) => {
@@ -278,7 +289,21 @@ const HamburgerView = (props) => {
                         ingres.find(ing => ing.ingreSeq === makeDTO[0]).height : 160), 
                         zIndex: -makeDTO.length,marginTop: burgerDTO[0].size === 0 ? 7 : burgerDTO[0].size === 1 ? 3 : 0}} />
                 </Pressable>}
-                {burgerDTO[0] && <View style={{marginBottom:15}}>
+                {first && <View style={{width:150,height:50,overflow:'hidden',
+                    alignSelf:'center', borderRadius:5, marginVertical:'2%'}}>
+                        <Skel width={150} height={50}/>
+                </View>}
+                {first && <View style={{flexDirection:'row',justifyContent:'space-between',margin:'3%'}}>
+                    <View style={{width:100,height:40,overflow:'hidden',
+                        borderRadius:5}}>
+                            <Skel width={100} height={40}/>
+                    </View>
+                    <View style={{width:100,height:40,overflow:'hidden',
+                        borderRadius:5}}>
+                            <Skel width={100} height={40}/>
+                    </View>
+                </View>}
+                {!first && burgerDTO[0] && <View style={{marginBottom:15}}>
                     <Text style={styles.h1}>{burgerDTO[0].name}</Text>
                     {burgerDTO[0].type !== 2 &&<View style={{flexDirection:'row',justifyContent:'center', marginTop:5}}>
                         <Image source={won} style={{height:29,width:29}}/>
@@ -319,7 +344,17 @@ const HamburgerView = (props) => {
                         <Image source={ratings.length > 0 ? star : starNone } style={styles.starImg}/>
                     </View>
                 </Pressable>
-                <Text style={styles.content}>{burgerDTO[0] && burgerDTO[0].content}</Text>
+                {first && 
+                    <View style={{width:'90%',height:80 ,overflow:'hidden', marginVertical: '5%',
+                        marginLeft:'5%', borderRadius:10}}>
+                            <Skel width={windowWidth*0.9} height={80}/>
+                    </View>}
+                {!first && burgerDTO[0] && <Text style={styles.content}>{burgerDTO[0].content}</Text>}
+                {first && 
+                    <View style={{width:250, height:250, overflow:'hidden', marginVertical: '3%',
+                        alignSelf:'center' , borderRadius:5}}>
+                            <Skel width={250} height={250}/>
+                    </View>}
                 {burgerDTO[0] && <View style={styles.nut}>
                     <Text style={styles.nutTitle}>예상 영양 정보</Text>
                     <Text style={styles.nutTxt}>탄수화물&nbsp;

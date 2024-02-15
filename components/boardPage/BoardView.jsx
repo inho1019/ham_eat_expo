@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Image, Linking, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import favImg from '../../assets/board/fav.png'
 import { useAppContext } from '../api/ContextAPI';
+import ImageModal from '../ImageModal';
 
 const BoardView = (props) => {
     const {navigation,route} = props
@@ -23,6 +24,19 @@ const BoardView = (props) => {
          }
      },[alertTxt])
      ////////////////////////////////////////////
+
+    const [imgModal,setImgModal] = useState(false)
+    const [imgSrc,setImgSrc] = useState('')
+
+    const onOpen = (src) => {
+        setImgSrc('http' + src)
+        setImgModal(true)
+    }
+
+    const onClose = () => {
+        setImgModal(false)
+        setImgSrc('')
+    }
 
     const [boardDTO,setBoardDTO] = useState()
 
@@ -179,15 +193,20 @@ const BoardView = (props) => {
                     <Text style={styles.h4}>{boardDTO[0].content}</Text>
                     <View style={styles.imageSection}>
                         {imageArray.map((item,index) => 
-                        <Image key={index} 
-                            source={{ uri:'http' + item}}
-                            resizeMode="cover"
+                        <Pressable
+                            key={index} 
                             style={{width: imageArray.length > 1 ? 
                                     (imageArray.length % 2 === 1 && index+1 === imageArray.length) ?
                                     '100%' : '50%' : '100%',aspectRatio: imageArray.length > 1 ? 
                                     (imageArray.length % 2 === 1 && index+1 === imageArray.length) ?
                                     2 : 1 : 1/1}}
-                        />)}
+                            onPress={() => onOpen(item)}>
+                            <Image 
+                                source={{ uri:'http' + item}}
+                                resizeMode="cover"
+                                style={{width:'100%',height:'100%'}}
+                            />
+                        </Pressable>)}
                     </View>
                 </View>
                 <View style={{flexDirection:'row',justifyContent:'center',marginTop:30}}>
@@ -199,6 +218,7 @@ const BoardView = (props) => {
                     <Text style={styles.favTxt}>{JSON.parse(boardDTO[0].fav).length}</Text>
                 </View>
             </View>}
+            <ImageModal imgModal={imgModal} src={imgSrc} onClose={onClose}/>
             <Modal
                 animationType="fade"
                 visible={alertTxt !== ''}

@@ -130,11 +130,17 @@ const HamburgerList = (props) => {
                 </Pressable>)}
             </ScrollView>}
             {(loading && searchParam !== undefined) && 
-            <View style={{width:'95%',aspectRatio:5/3, marginLeft:'2.5%'}}>
-                <View style={[styles.itemSkel,{height:'48%',marginVertical:'1%'}]}>
+            <View style={{width:'95%',aspectRatio:5/6, marginLeft:'2.5%'}}>
+                <View style={[styles.itemSkel,{height:'24%',marginVertical:'0.5%'}]}>
                     <Skel height={'100%'} width={windowWidth*0.95}/>
                 </View>
-                <View style={[styles.itemSkel,{height:'48%',marginVertical:'1%'}]}>
+                <View style={[styles.itemSkel,{height:'24%',marginVertical:'0.5%'}]}>
+                    <Skel height={'100%'} width={windowWidth*0.95}/>
+                </View>
+                <View style={[styles.itemSkel,{height:'24%',marginVertical:'0.5%'}]}>
+                    <Skel height={'100%'} width={windowWidth*0.95}/>
+                </View>
+                <View style={[styles.itemSkel,{height:'24%',marginVertical:'0.5%'}]}>
                     <Skel height={'100%'} width={windowWidth*0.95}/>
                 </View>
             </View>}
@@ -157,10 +163,10 @@ const HamburgerList = (props) => {
                 renderItem={(data) => {
                 const makeDTO = JSON.parse(data.item[0].make)
 
-                return <Pressable style={({pressed})  => [styles.burgerItem,{elevation : pressed ? 1 : 3,
-                        borderTopColor: pressed ? 'whitesmoke' : 'white', height: data.index !== 0 ? 123 : (
+                return <Pressable style={({pressed})  => [styles.burgerItem,{elevation : pressed ? 1 : 4,
+                        borderTopColor: pressed ? 'whitesmoke' : 'white', height: data.index !== 0 ? 120 : (
                             stores.filter(str => strPick !== -1 ? str.storeSeq === strPick : (search.includes(str.name) || str.name.includes(search))).length > 0 &&
-                            searchParam === undefined && type !== 2) ? 162 : 123,
+                            searchParam === undefined && type !== 2) ? 160 : 120,
                         paddingTop: (stores.filter(str => strPick !== -1 ? str.storeSeq === strPick : (search.includes(str.name) || str.name.includes(search))).length > 0 &&
                             searchParam === undefined && type !== 2 && data.index === 0) && 40}]} 
                         key={data.index} onPress={() => searchParam === undefined ? navigation.navigate('View', { burgerSeq : data.item[0].burgerSeq }) 
@@ -190,14 +196,14 @@ const HamburgerList = (props) => {
                     </View>
                     <View style={styles.infoContainer}>
                         <Text style={styles.itemName}>{data.item[0].name}</Text>
-                        {type !== 2 && <Text style={styles.itemStore}>{stores.find(str => str.storeSeq === data.item[0].storeSeq) ? 
+                        {data.item[0].type !== 2 && <Text style={styles.itemStore}>{stores.find(str => str.storeSeq === data.item[0].storeSeq) ? 
                         stores.find(str => str.storeSeq === data.item[0].storeSeq).name : '없는 매장'}</Text>}
-                        {type === 2 && <Text style={styles.itemStore}>{data.item[1] ? data.item[1].name : '탈퇴 회원'}</Text>}{/* userSeq를 통한 유저명 가져오기 */}
-                        {type !== 2 &&<View style={{flexDirection:'row',justifyContent:'center'}}>
+                        {data.item[0].type === 2 && <Text style={styles.itemStore}>{data.item[1] ? data.item[1].name : '탈퇴 회원'}</Text>}{/* userSeq를 통한 유저명 가져오기 */}
+                        {data.item[0].type !== 2 &&<View style={{flexDirection:'row',justifyContent:'center'}}>
                             <Image source={won} style={{width:23,height:23}}/>
                             <Text style={{textAlign:'center',verticalAlign:'middle',fontSize:15}}>&nbsp;{data.item[0].price}원</Text>
                         </View>}
-                        <View style={[styles.starBox,{ width: type === 2 ? '80%' : '70%',margin: type === 2 ? 10 : 5 }]}>
+                        <View style={[styles.starBox,{ width: data.item[0].type === 2 ? '80%' : '70%', margin: data.item[0].type === 2 ? 10 : 5 }]}>
                             <View style={[styles.starBack,{width : 
                                 ratings.find(rat =>  ( searchParam === undefined ? rat[0].burgerSeq : rat.burgerSeq ) 
                                     === data.item[0].burgerSeq) !== undefined &&
@@ -248,14 +254,16 @@ const styles = StyleSheet.create({
     makeContainer : {
         width: '35%',
         justifyContent: 'center',
-        marginTop: 2,
-        borderRadius: 10,
-        backgroundColor:'whitesmoke',
         overflow:'hidden',
-        marginRight: 10
+        marginRight: 15
     },
     infoContainer: {
-        width: '65%'
+        width: '65%',
+        borderLeftWidth: 1,
+        borderColor: 'gray',
+        marginVertical: 3,
+        paddingLeft: 5,
+        borderStyle: 'dashed'
     },
     burgerItem : {
         flexDirection: 'row',
@@ -263,6 +271,7 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
         paddingVertical: 1,
         marginBottom: 3,
+        marginTop: 1,
         backgroundColor:'white',
     },
     itemName : {
@@ -272,6 +281,7 @@ const styles = StyleSheet.create({
     itemStore : {
         borderBottomWidth : 1,
         borderBottomColor: 'gray',
+        borderStyle: 'dashed',
         paddingBottom: 2,
         marginBottom: 2,
         fontWeight: 'bold',

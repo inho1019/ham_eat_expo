@@ -6,7 +6,7 @@ import Main from './mainPage/Main';
 import HamburgerMain from './hamburgerPage/HamburgerMain';
 import { useAppContext } from './api/ContextAPI';
 import UserMain from './userPage/UserMain';
-import loadingImg from '../assets/burger/loading.gif'
+import loadingImg from '../assets/loading.gif'
 import UserMypageMain from './userPage/UserMypageMain';
 import BoardMain from './boardPage/BoardMain';
 

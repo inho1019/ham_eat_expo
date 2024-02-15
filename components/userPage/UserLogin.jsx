@@ -184,6 +184,8 @@ const UserLogin = (props) => {
           </Pressable>
         </View>
       </View>
+      <Text style={{textAlign:'center',fontSize:17,color:'darkgray',fontWeight:'bold',marginVertical:20}}>
+                Designed By FreePik</Text>
       <Modal
         animationType="fade"
         visible={alertTxt !== ''}
