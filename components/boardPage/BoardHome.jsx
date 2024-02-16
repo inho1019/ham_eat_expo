@@ -172,6 +172,7 @@ const BoardHome = (props) => {
                 onPress={() => navigation.navigate('View',{ boardSeq : notice[0].boardSeq })}
                 style={styles.noticeBox}>
                 <Image source={noticeImg} style={{width:30,height:30}}/>
+                <Text style={[styles.noticeTxt,{color:'gray'}]}>공지</Text>
                 <Text style={styles.noticeTxt} numberOfLines={1} ellipsizeMode="tail">
                     {notice[0].title}</Text>
             </Pressable>}
@@ -350,7 +351,8 @@ const styles = StyleSheet.create({
         width: '45%',
         aspectRatio: 1/1,
         backgroundColor:'whitesmoke',
-        borderRadius: 10
+        borderRadius: 10,
+        overflow:'hidden'
     },
     eventInfo : {
         margin:'2.5%',
@@ -410,7 +412,7 @@ const styles = StyleSheet.create({
     item : {
         borderBottomColor : 'lightgray',
         borderBottomWidth : 1,
-        fontSize: 16,
+        fontSize: 17,
         color: 'gray',
         fontWeight: 'bold',
         marginVertical: 3

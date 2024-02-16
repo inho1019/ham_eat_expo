@@ -11,16 +11,19 @@ const Search = (props) => {
 
     const [ani,setAni] = useState(1)
 
+    const [aning,setAning] = useState(false)
+
     ///////////// 애니메이션//////////////
     const searchAni = useRef(new Animated.Value(1)).current;
 
     const aniSearch = (num) => {
+        setAning(true)
         Animated.timing(searchAni, {
             toValue: num,
             duration: 500,
             useNativeDriver: false,
             easing: Easing.out(Easing.ease)
-            }).start();
+            }).start(() => setAning(false));
     }
 
     const boardHeight = {
@@ -68,7 +71,7 @@ const Search = (props) => {
             <View style={styles.titleBox}>
                 <Text style={styles.h1}>게시판</Text>
                 <Pressable
-                    onPressIn={onBoard}>
+                    onPressIn={() => !aning && onBoard()}>
                     <Image source={ ani !== 2 ? max : min } style={{width: 27, height: 27, marginTop: 2}}/>
                 </Pressable>
             </View>
@@ -78,7 +81,7 @@ const Search = (props) => {
             <View style={styles.titleBox}>
                 <Text style={styles.h1}>햄버거</Text>
                 <Pressable
-                    onPressIn={onBurger}>
+                    onPressIn={() => !aning && onBurger()}>
                     <Image source={ ani !== 0 ? max : min  } style={{width: 27, height: 27, marginTop: 2}}/>
                 </Pressable>
             </View>

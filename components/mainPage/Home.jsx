@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Image, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import searchIcon from '../../assets/main/search.png'
-import logo from '../../assets/main/logo.png'
+import logo from '../../assets/icon.png'
 import Map from '../Map';
 
 const Home = (props) => {
@@ -30,8 +30,9 @@ const Home = (props) => {
 
     return (
         <View style={{flex:1}}>
-            <View style={{borderBottomColor: 'whitesmoke', borderBottomWidth: 20,paddingBottom: 10}}>
+            <View style={{flexDirection:'row',borderBottomColor: 'whitesmoke', borderBottomWidth: 20,paddingBottom: 10}}>
                 <Image source={logo} style={styles.logo}/>
+                <Text style={styles.logoTxt}>HamEat</Text>
             </View>
             <Text style={styles.h2}>통합 검색</Text>
             <View style={styles.searchContainer}>
@@ -53,10 +54,17 @@ const Home = (props) => {
 
 const styles = StyleSheet.create({
     logo : {
-        height: 30,
-        aspectRatio: 1300/288,
+        height: 35,
+        width: 35,
         marginLeft: 10,
         marginTop: 5,
+    },
+    logoTxt : {
+        fontSize: 20,
+        fontWeight:'bold',
+        color:'#472523',
+        textAlignVertical:'bottom',
+        marginLeft: 10
     },
     h2 : {
         fontSize: 25,

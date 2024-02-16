@@ -267,8 +267,10 @@ const styles = StyleSheet.create({
     },
     itemBut : {
         marginHorizontal: 4,
-        paddingVertical: 4,
-        paddingHorizontal: 10,
+        width: 40,
+        height: 25,
+        justifyContent:'center',
+        alignItems:'center',
         borderRadius: 3,
     },
     itemButTxt : {

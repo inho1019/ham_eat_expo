@@ -220,7 +220,7 @@ const UserRegister = (props) => {
             <TextInput style={styles.txtBox}
               value={userDTO.name} onChangeText={(text) => onInput('name',text)} 
               placeholder='닉네임 입력'/>
-            { userDTO.name.length > 0 &&<Text style={[styles.smTxt,{color: nameCheck ? 'skyblue' : 'tomato'}]}>
+            { userDTO.name.length > 0 &&<Text style={[styles.smTxt,{color: nameCheck ? '#2E8DFF' : 'tomato'}]}>
               {nameCheck ? '사용 가능한 닉네임입니다' : '중복이거나 사용 불가한 닉네임입니다' }</Text>}
             <View style={{ flexDirection : 'row' }}><Text style={styles.h3}>성별</Text></View>
             <View style={{ flexDirection : 'row' , justifyContent : 'space-around'}}>
@@ -228,7 +228,7 @@ const UserRegister = (props) => {
                 <Text style={[styles.genTxt,{color: userDTO.gender === 0 ? 'black' : 'darkgray'}]}>비공개</Text>
               </Pressable>
               <Pressable onPress={() => onInput('gender',1)}>
-                <Text style={[styles.genTxt,{color: userDTO.gender === 1 ? 'skyblue' : 'darkgray'}]}>남자</Text>
+                <Text style={[styles.genTxt,{color: userDTO.gender === 1 ? '#2E8DFF' : 'darkgray'}]}>남자</Text>
               </Pressable>
               <Pressable onPress={() => onInput('gender',2)}>
                 <Text style={[styles.genTxt,{color: userDTO.gender === 2 ? 'tomato' : 'darkgray'}]}>여자</Text>

@@ -5,6 +5,7 @@ import foldT from '../../assets/burger/fold_true.png'
 import foldF from '../../assets/burger/fold_false.png'
 import reset from '../../assets/burger/reset.png'
 import holding from '../../assets/burger/holding.png'
+import holdingGif from '../../assets/burger/holding_gif.gif'
 import info from '../../assets/burger/info.png'
 import sizemImg from '../../assets/burger/size_m.png'
 import sizelImg from '../../assets/burger/size_l.png'
@@ -13,11 +14,12 @@ import pattynImg from '../../assets/burger/pattyn.png'
 import pattysImg from '../../assets/burger/pattys.png'
 import backImg from '../../assets/burger/up_arrow.png'
 import nextImg from '../../assets/burger/down_arrow.png'
+import max from '../../assets/main/max.png'
+import min from '../../assets/main/min.png'
 
 const HamburgerMake = (props) => {
     const{onBack,onAlert,route,onLoading,onMakes} = props
 
-    const scrollRef = useRef(null)
 ///////////드래그 이벤트////////////
     const [resc,setResc] = useState(true)
     const [action,setAction] = useState(false)
@@ -32,15 +34,15 @@ const HamburgerMake = (props) => {
             },
             onPanResponderRelease: (event, gestureState) => {
                 if (gestureState.dy > 50 || gestureState.dy < -50) {
-                    if (gestureState.dy <= (250 - (burCon-49)*9) && gestureState.dy >= (-250 + (ingCon-49)*9)) {
+                    if (gestureState.dy <= (250 - (burCon-49.5)*9) && gestureState.dy >= (-250 + (ingCon-49.5)*9)) {
                         setBurCon(burCon + parseInt(gestureState.dy/9))
                         setIngCon(ingCon - parseInt(gestureState.dy/9))
-                    } else if (gestureState.dy > (250 - (burCon-49)*9)) {
-                        setBurCon(73)
+                    } else if (gestureState.dy > (250 - (burCon-49.5)*9)) {
+                        setBurCon(74)
                         setIngCon(25)
-                    } else if (gestureState.dy < (-250 + (ingCon-49)*9)) {
+                    } else if (gestureState.dy < (-250 + (ingCon-49.5)*9)) {
                         setBurCon(25)
-                        setIngCon(73)
+                        setIngCon(74)
                     }
                 }
                 setResc(!resc)
@@ -49,19 +51,24 @@ const HamburgerMake = (props) => {
         })
     },[burCon,ingCon,resc])
 ///////////////////
-    const[ingres,setIngres] = useState([])
-    const[size,setSize] = useState(-1)
-    const[sizeModal,setSizeModal] = useState(false)
-    const[makeDTO,setMakeDTO] = useState([])
-    const[fold,setFold] = useState(true)
-    const[burCon,setBurCon] = useState(49)
-    const[ingCon,setIngCon] = useState(49)
-    const[sizeMode,setSizeMode] = useState(0)
+    const [ingres,setIngres] = useState([])
+    const [size,setSize] = useState(-1)
+    const [sizeModal,setSizeModal] = useState(false)
+    const [makeDTO,setMakeDTO] = useState([])
+    const [fold,setFold] = useState(true)
+    const [burCon,setBurCon] = useState(49.5)
+    const [ingCon,setIngCon] = useState(49.5)
+    const [sizeMode,setSizeMode] = useState(0)
+
+    const [bunBox,setBunBox] = useState(true)
+    const [pattyBox,setPattyBox] = useState(true)
+    const [vegeBox,setVegeBox] = useState(true)
+    const [fillBox,setFillBox] = useState(true)
+    const [sauBox,setSauBox] = useState(true)
 
     const windowWidth = Dimensions.get('window').width;
 
     const onMake = (num) => {
-        scrollRef.current.scrollToEnd({ animated: true });
         setMakeDTO([...makeDTO,num])
     }
 
@@ -93,7 +100,9 @@ const HamburgerMake = (props) => {
                     <Image source={backImg} style={{height:'95%',aspectRatio: 1/1, alignSelf:'center'}}/>
                 </Pressable>
             </View>
-             <ScrollView style={[styles.burgerContainer,{height:burCon + '%'}]} ref={scrollRef}>
+             <ScrollView 
+                onScroll={() => setAction(false)}
+                style={[styles.burgerContainer,{height:burCon + '%'}]}>
                 <View style={styles.totalContainer}>
                     <View style={styles.makeContainer}>
                         {!fold && <Text style={styles.topTxt}>* 재료 클릭시 삭제</Text>}
@@ -177,14 +186,16 @@ const HamburgerMake = (props) => {
                 </View>
             </ScrollView>
 
-                <View style={{height: '2%', backgroundColor: action ? 'lightgray' : 'darkgray'}} 
+                <View style={{height: '1%',backgroundColor: action ? 'gray' : 'darkgray'}} 
                     {...panResponder.current.panHandlers}>
-                    <Image source={holding} style={styles.hold}/>
+                    <Image source={action ? holdingGif : holding} style={styles.hold}/>
                 </View>
 
-            <ScrollView style={[styles.ingreContainer,{height:ingCon + '%'}]}>
-                <View style={{flexDirection:'row'}}>
-                    <Text style={styles.ingreTitle}>Size </Text> 
+            <ScrollView 
+                onScroll={() => setAction(false)}
+                style={[styles.ingreContainer,{height:ingCon + '%'}]}>
+                <View style={styles.ingreTop}> 
+                        <Text style={styles.ingreTitle}>Size </Text> 
                 </View>
                 <View style={styles.sizeBox}>
                     <Pressable onPress={() => setSize(0)}>
@@ -198,8 +209,14 @@ const HamburgerMake = (props) => {
                     </Pressable>
                 </View>
                 {size !== -1 && <View>
-                <Text style={styles.ingreTitle}>Bun</Text>
-                <ScrollView horizontal={true}>
+                <View style={styles.ingreTop}>  
+                    <Text style={styles.ingreTitle}>Bun</Text>
+                    <Pressable onPress={() => setBunBox(!bunBox)}>
+                        <Image source={bunBox ? max : min} style={{width:25,height:25,marginTop:6}}/>
+                    </Pressable>
+                </View>
+                <ScrollView horizontal={bunBox}>
+                    <View style={{display:'flex',flexDirection:'row',flexWrap:'wrap',justifyContent:'center'}}>
                     {makeDTO.length === 0 && ingres.filter(ing => ing.type === 0 && ing.name !== '추가 번')
                         .map((item,index) => 
                         <Pressable key={index}
@@ -217,9 +234,16 @@ const HamburgerMake = (props) => {
                             <Text style={{fontSize:15}}>추가 번</Text>
                         </Pressable>
                     }
+                    </View>
                 </ScrollView>
-                <Text style={styles.ingreTitle}>Patty</Text>
-                <ScrollView horizontal={true}>
+                <View style={styles.ingreTop}> 
+                    <Text style={styles.ingreTitle}>Patty</Text>
+                    <Pressable onPress={() => setPattyBox(!pattyBox)}>
+                        <Image source={pattyBox ? max : min} style={{width:25,height:25,marginTop:6}}/>
+                    </Pressable>
+                </View>
+                <ScrollView horizontal={pattyBox}>
+                    <View style={{display:'flex',flexDirection:'row',flexWrap:'wrap',justifyContent:'center'}}>
                     {ingres.filter(ing => ing.type === 1).map((item,index) => 
                         <Pressable key={index}
                             style={styles.ingreItem}
@@ -228,10 +252,16 @@ const HamburgerMake = (props) => {
                             <Text style={{fontSize:15}}>{item.name}</Text>
                         </Pressable>
                     )}
+                    </View>
                 </ScrollView>
-                {makeDTO.length > 0 && <View>
-                <Text style={styles.ingreTitle}>Vegetable</Text>
-                <ScrollView horizontal={true}>
+                <View style={styles.ingreTop}> 
+                    <Text style={styles.ingreTitle}>Vegetable</Text>
+                    <Pressable onPress={() => setVegeBox(!vegeBox)}>
+                        <Image source={vegeBox ? max : min} style={{width:25,height:25,marginTop:6}}/>
+                    </Pressable>
+                </View>
+                <ScrollView horizontal={vegeBox}>
+                    <View style={{display:'flex',flexDirection:'row',flexWrap:'wrap',justifyContent:'center'}}>
                     {ingres.filter(ing => ing.type === 2).map((item,index) => 
                         <Pressable key={index}
                             style={styles.ingreItem}
@@ -240,28 +270,44 @@ const HamburgerMake = (props) => {
                             <Text style={{fontSize:15}}>{item.name}</Text>
                         </Pressable>
                     )}
+                    </View>
                 </ScrollView>
-                <Text style={styles.ingreTitle}>Filling</Text>
-                <ScrollView horizontal={true}>
-                    {ingres.filter(ing => ing.type === 3).map((item,index) => 
-                        <Pressable key={index}
-                            style={styles.ingreItem}
-                            onPress={() => onMake(item.ingreSeq)}>
-                            <Image source={{ uri: item.image }} style={styles.ingreImage} resizeMode='contain'/>
-                            <Text style={{fontSize:15}}>{item.name}</Text>
-                        </Pressable>
-                    )}
+                {makeDTO.length > 0 && <View>
+                <View style={styles.ingreTop}> 
+                    <Text style={styles.ingreTitle}>Filling</Text>
+                    <Pressable onPress={() => setFillBox(!fillBox)}>
+                        <Image source={fillBox ? max : min} style={{width:25,height:25,marginTop:6}}/>
+                    </Pressable>
+                </View>
+                <ScrollView horizontal={fillBox}>
+                    <View style={{display:'flex',flexDirection:'row',flexWrap:'wrap',justifyContent:'center'}}>
+                        {ingres.filter(ing => ing.type === 3).map((item,index) => 
+                            <Pressable key={index}
+                                style={styles.ingreItem}
+                                onPress={() => onMake(item.ingreSeq)}>
+                                <Image source={{ uri: item.image }} style={styles.ingreImage} resizeMode='contain'/>
+                                <Text style={{fontSize:15}}>{item.name}</Text>
+                            </Pressable>
+                        )}
+                    </View>
                 </ScrollView>
-                <Text style={styles.ingreTitle}>Sauce</Text>
-                <ScrollView horizontal={true}>
-                    {ingres.filter(ing => ing.type === 4).map((item,index) => 
-                        <Pressable key={index}
-                            style={styles.ingreItem}
-                            onPress={() => onMake(item.ingreSeq)}>
-                            <Image source={{ uri: item.image }} style={styles.ingreImage} resizeMode='contain'/>
-                            <Text style={{fontSize:15}}>{item.name}</Text>
-                        </Pressable>
-                    )}
+                <View style={styles.ingreTop}> 
+                    <Text style={styles.ingreTitle}>Sauce</Text>
+                    <Pressable onPress={() => setSauBox(!sauBox)}>
+                        <Image source={sauBox ? max : min} style={{width:25,height:25,marginTop:6}}/>
+                    </Pressable>
+                </View>
+                <ScrollView horizontal={sauBox}>
+                    <View style={{display:'flex',flexDirection:'row',flexWrap:'wrap',justifyContent:'center'}}>
+                        {ingres.filter(ing => ing.type === 4).map((item,index) => 
+                            <Pressable key={index}
+                                style={styles.ingreItem}
+                                onPress={() => onMake(item.ingreSeq)}>
+                                <Image source={{ uri: item.image }} style={styles.ingreImage} resizeMode='contain'/>
+                                <Text style={{fontSize:15}}>{item.name}</Text>
+                            </Pressable>
+                        )}
+                    </View>
                 </ScrollView>
                 </View>}
             </View>}
@@ -326,10 +372,10 @@ const HamburgerMake = (props) => {
 
 const styles = StyleSheet.create({
     hold : {
-        marginTop: '-3%',
-        height: '270%',
+        marginTop: '-2.55%',
+        height: '405%',
         aspectRatio: 1/1,
-        alignSelf: 'center'
+        alignSelf: 'center',
     },
     burgerContainer : {
         padding: 10,
@@ -358,6 +404,11 @@ const styles = StyleSheet.create({
     },
     ingreContainer : {
         zIndex: -1,
+    },
+    ingreTop : {
+        flexDirection:'row',
+        justifyContent:'space-between',
+        paddingHorizontal:20
     },
     sizeTxt : {
         fontSize: 35,
@@ -398,7 +449,6 @@ const styles = StyleSheet.create({
     },
     ingreTitle : {
         fontSize: 16,
-        paddingLeft: 30,
         paddingTop: 10,
         fontWeight: 'bold',
     },

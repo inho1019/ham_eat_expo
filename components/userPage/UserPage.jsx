@@ -272,7 +272,7 @@ const UserPage = (props) => {
                 <Text style={styles.myBut}>로그아웃</Text>
             </Pressable>
             <Text style={{textAlign:'center',fontSize:17,color:'darkgray',fontWeight:'bold',marginVertical:20}}>
-                Designed By FreePik</Text>
+                Image Designed By FreePik</Text>
             <Modal
                 animationType="fade"
                 visible={nameModal}
@@ -294,7 +294,7 @@ const UserPage = (props) => {
                                 <Text style={{color: nameCheck ? 'gray' : 'lightgray',fontWeight:'bold'}}>변경</Text>
                             </Pressable>
                         </View>
-                        { name.length > 0 &&<Text style={[styles.smTxt,{color: nameCheck ? 'skyblue' : 'tomato'}]}>
+                        { name.length > 0 &&<Text style={[styles.smTxt,{color: nameCheck ? '#2E8DFF' : 'tomato'}]}>
                         {nameCheck ? '사용 가능한 닉네임입니다' : '중복이거나 사용 불가한 닉네임입니다' }</Text>}
                     </View>
                 </View>

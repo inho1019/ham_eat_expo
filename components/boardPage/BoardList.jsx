@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Dimensions, FlatList, Image, Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Dimensions, FlatList, Image, KeyboardAvoidingView, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useAppContext } from '../api/ContextAPI';
 import writeImg from '../../assets/board/write.png'
 import axios from 'axios';
@@ -85,11 +85,13 @@ const BoardList = (props) => {
     }
 
     return (
-        <View>
-            {searchParam === undefined && <View style={{height: '8%',paddingTop:2,justifyContent: 'center',borderBottomWidth : 2,borderColor: 'lightgray',}}>
-                <TextInput value={search} onChangeText={(text) => setSearch(text)} 
-                    style={styles.searchBox} placeholder={'검색'}/>
-            </View>}
+        <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+        >
+        {searchParam === undefined && <View style={{height: '8%',paddingTop:2,justifyContent: 'center',borderBottomWidth : 2,borderColor: 'lightgray',}}>
+            <TextInput value={search} onChangeText={(text) => setSearch(text)} 
+                style={styles.searchBox} placeholder={'검색'}/>
+        </View>}
             {(loading && searchParam !== undefined) && 
             <View style={{width:'95%',aspectRatio:5/4, marginLeft:'2.5%'}}>
                 <View style={[styles.itemSkel,{height:'15%',marginVertical:'1%'}]}>
@@ -156,7 +158,7 @@ const BoardList = (props) => {
                     </View>
                 </View>
             </Modal>
-        </View>
+        </KeyboardAvoidingView>
     );
 };
 

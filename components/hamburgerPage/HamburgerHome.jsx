@@ -113,9 +113,12 @@ const HamburgerHome = (props) => {
     
     return (
         <ScrollView style={{flex:1}}>
-            <Text style={styles.h1}>신규 추천 버거</Text>
+            <View
+                style={styles.h1Out}>
+                <Text style={styles.h1}>신규 추천 버거</Text>
+            </View>
                 {first ? 
-                <View style={{width:'95%',aspectRatio:5/2, marginLeft:'2.5%', marginTop:'5%'}}>
+                <View style={{width:'95%',aspectRatio:5/2, marginLeft:'2.5%', marginVertical:'5%'}}>
                     <View style={{flexDirection:'row'}}>
                         <View style={[styles.itemSkel,{height:'100%'}]}>
                         <Skel height={'100%'} width={windowWidth*0.45}/></View>
@@ -181,7 +184,10 @@ const HamburgerHome = (props) => {
             </View> 
             <Pressable
                 onPress={() => navigation.navigate('List',{ type : 0 })}>
-                <Text style={styles.h1}>프렌차이즈 버거</Text>
+                <View
+                style={styles.h1Out}>
+                    <Text style={styles.h1}>프렌차이즈 버거</Text>
+                </View>       
                 {first  ? 
                 <View style={{width:'95%',aspectRatio:5/2,overflow:'hidden',
                     marginLeft:'2.5%', borderRadius:5, marginTop:'5%'}}>
@@ -203,7 +209,10 @@ const HamburgerHome = (props) => {
             </Pressable>
             <Pressable
                 onPress={() => navigation.navigate('List',{ type : 1 })}>
-                <Text style={styles.h1}>수제 버거</Text>
+                <View
+                style={styles.h1Out}>
+                    <Text style={styles.h1}>수제 버거</Text>
+                </View>
                 {first  ? 
                 <View style={{width:'95%',aspectRatio:5/2,overflow:'hidden',
                     marginLeft:'2.5%', borderRadius:5, marginTop:'5%'}}>
@@ -225,7 +234,10 @@ const HamburgerHome = (props) => {
             </Pressable>
             <Pressable
                 onPress={() => navigation.navigate('List',{ type : 2 })}>
-                <Text style={styles.h1}>DIY 버거</Text>
+                <View
+                style={styles.h1Out}>
+                    <Text style={styles.h1}>DIY 버거</Text>
+                </View>
                 {first  ? 
                 <View style={{width:'95%',aspectRatio:5/2,overflow:'hidden',
                     marginLeft:'2.5%', borderRadius:5, marginTop:'5%'}}>
@@ -295,14 +307,22 @@ const styles = StyleSheet.create({
         margin: 5
     },
 ///////아이템 관련///////////////////
+    h1Out : {
+        flexDirection:'row',
+        justifyContent:'space-between',
+        borderBottomColor:'black',
+        borderBottomWidth:2,
+        paddingBottom:3,
+        marginHorizontal: 10,
+        marginTop: 20,
+    },
     h1 : {
-        marginHorizontal: 5,
         fontSize: 25,
-        fontWeight: 'bold'
+        fontWeight: 'bold',
     },
     itemBox : {
         padding: 10,
-        paddingBottom: 20
+        paddingBottom: 10
     },
     itemContent : {
         paddingHorizontal: 10,
@@ -317,14 +337,14 @@ const styles = StyleSheet.create({
         fontWeight: 'bold'
     },
     itemNew : {
-        verticalAlign: 'middle',
         borderRadius: 5,
         borderWidth: 1,
         borderColor: 'black',
-        paddingLeft: 5,
-        paddingRight: 3,
         marginRight: 5,
-        marginVertical: 10
+        width: 35,
+        height:25,
+        alignSelf:'center',
+        textAlign:'center'
     },
     itemSkel : {
         height: '25%',
@@ -338,7 +358,7 @@ const styles = StyleSheet.create({
     },
     burgerBut : {
         width: '85%',
-        marginVertical: 30,
+        marginVertical: 20,
         paddingVertical: 15,
         borderRadius: 10,
         flexDirection: 'row',
