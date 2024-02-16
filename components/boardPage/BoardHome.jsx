@@ -391,7 +391,7 @@ const styles = StyleSheet.create({
     },
     h1 : {
         fontSize: 25,
-        fontWeight: 'bold',
+        fontFamily: 'esamanruMedium',
     },
     more : {
         textAlignVertical:'bottom',

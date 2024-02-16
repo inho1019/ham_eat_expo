@@ -52,18 +52,24 @@ const BoardList = (props) => {
 
     useEffect(()=>{
         if( searchParam === undefined ) {
-            navigation.setOptions({
-                title: route.params?.type === 0 ? '자유 게시판' : 
-                       route.params?.type === 1 ? '행사/이벤트 게시판' :  
-                       route.params?.type === 2 ? '공지사항' : ''
-            });
+            if( route.params?.name ) {
+                navigation.setOptions({
+                    title: '내 글 목록'
+                });
+            } else {
+                navigation.setOptions({
+                    title: route.params?.type === 0 ? '자유 게시판' : 
+                        route.params?.type === 1 ? '행사/이벤트 게시판' :  
+                        route.params?.type === 2 ? '공지사항' : ''
+                });
+            }
         } else {
             setSearch(searchParam)
         }
         const unsubscribe = navigation.addListener('focus', () => {
             onLoading(true)
             setLoading(true)
-            axios.get( searchParam === undefined ? 
+            axios.get( (!route.params?.name && (!route.params?.name && searchParam === undefined)) ? 
                 `https://hameat.onrender.com/board/list/${route.params?.type}`
                 : `https://hameat.onrender.com/board/listAll`)
             .then(res => {
@@ -88,7 +94,8 @@ const BoardList = (props) => {
         <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
-        {searchParam === undefined && <View style={{height: '8%',paddingTop:2,justifyContent: 'center',borderBottomWidth : 2,borderColor: 'lightgray',}}>
+        {(!route.params?.name && searchParam === undefined) && 
+        <View style={{height: '8%',paddingTop:2,justifyContent: 'center',borderBottomWidth : 2,borderColor: 'lightgray',}}>
             <TextInput value={search} onChangeText={(text) => setSearch(text)} 
                 style={styles.searchBox} placeholder={'검색'}/>
         </View>}
@@ -113,19 +120,21 @@ const BoardList = (props) => {
                     <Skel height={'100%'} width={windowWidth*0.95}/>
                 </View>
             </View>}
-            {!loading && boardList.filter(bdl => (
-                        bdl[0].title.includes(search) || search.includes(bdl[0].title) || 
-                        bdl[0].content.includes(search) || search.includes(bdl[0].content) || 
-                        (bdl[1] && search.includes(bdl[1].name)))).length === 0 && 
-                        <Text style={styles.noList}>결과가 없습니다</Text>}
+            {!loading && boardList.filter(bdl => route.params?.name ? 
+                                            (bdl[1] && bdl[1].name === route.params?.name)
+                                                : (bdl[0].title.includes(search) || search.includes(bdl[0].title) || 
+                                                bdl[0].content.includes(search) || search.includes(bdl[0].content) || 
+                                                (bdl[1] && search.includes(bdl[1].name)))).length === 0 && 
+                                                <Text style={styles.noList}>결과가 없습니다</Text>}
             <FlatList
-                style={{height: searchParam === undefined ? '92%' : '100%'}}
-                data={boardList.filter(bdl => (
-                                    bdl[0].title.includes(search) || search.includes(bdl[0].title) || 
-                                    bdl[0].content.includes(search) || search.includes(bdl[0].content) || 
-                                    (bdl[1] && search.includes(bdl[1].name))))}
+                style={{height: (!route.params?.name && searchParam === undefined) ? '92%' : '100%'}}
+                data={boardList.filter(bdl => route.params?.name ? 
+                                        (bdl[1] && bdl[1].name === route.params?.name)
+                                            :(bdl[0].title.includes(search) || search.includes(bdl[0].title) || 
+                                            bdl[0].content.includes(search) || search.includes(bdl[0].content) || 
+                                            (bdl[1] && search.includes(bdl[1].name))))}
                 renderItem={(data) => <Pressable
-                    onPress={() =>  searchParam === undefined ? navigation.navigate('View',{ boardSeq : data.item[0].boardSeq }) 
+                    onPress={() =>  (!route.params?.name && searchParam === undefined) ? navigation.navigate('View',{ boardSeq : data.item[0].boardSeq }) 
                     : onGo(2,data.item[0].boardSeq) }
                     style={({pressed}) => [styles.item,{backgroundColor: pressed ? 'whitesmoke' : 'white'}]}>
                     <Text style={styles.h2} numberOfLines={1} ellipsizeMode="tail">{data.item[0].title}</Text>
@@ -142,7 +151,7 @@ const BoardList = (props) => {
                 </Pressable>}
                 alwaysBounceVertical={false}
             />
-            { searchParam === undefined && 
+            { (!route.params?.name && searchParam === undefined) && 
                 (route.params?.type !== 2 || state.user.own === 2) && <Pressable style={styles.writeBut}
                 onPress={() => state.user.userSeq === -1 ? onPage(3)
                 : navigation.navigate('Form',{ type : route.params?.type })}>

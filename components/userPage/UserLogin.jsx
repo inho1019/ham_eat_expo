@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Easing, Modal, Pressable, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
+import { Animated, Easing, Linking, Modal, Pressable, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
 import { useAppContext } from '../api/ContextAPI';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -140,6 +140,11 @@ const UserLogin = (props) => {
     })
   }
 
+  const openLink = (url) => {
+      Linking.openURL(url)
+      .catch((err) => console.error('Error opening external link:', err));
+  };
+
   return (
     <View style={{ flex: 1, justifyContent: 'center'}}>
       <View style={styles.loginBox}>
@@ -184,8 +189,10 @@ const UserLogin = (props) => {
           </Pressable>
         </View>
       </View>
-      <Text style={{textAlign:'center',fontSize:17,color:'darkgray',fontWeight:'bold',marginVertical:20}}>
-      Image Designed By FreePik</Text>
+      <Pressable onPress={() => openLink('https://kr.freepik.com/')}>
+        <Text style={{textAlign:'center',fontSize:17,color:'darkgray',fontWeight:'bold',marginTop:10}}>
+        Images Designed By FreePik</Text>
+      </Pressable>
       <Modal
         animationType="fade"
         visible={alertTxt !== ''}

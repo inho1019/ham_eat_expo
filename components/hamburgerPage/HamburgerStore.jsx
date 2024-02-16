@@ -1,8 +1,10 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { Button, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Image, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import backImg from '../../assets/burger/up_arrow.png'
 import addImg from '../../assets/burger/add.png'
+import mapIcon from '../../assets/burger/map.png'
+import MapModal from '../MapModal';
 
 
 const HamburgerStore = (props) => {
@@ -11,6 +13,33 @@ const HamburgerStore = (props) => {
 
     const [stores,setStores] = useState([])
     const [search,setSearch] = useState('')
+
+    ///////////////////지도모달/////////////////
+    const [storeTouch,setStoreTouch] = useState(true)
+    const [mapModal,setMapModal] = useState(false)
+    const [mapDTO,setMapDTO] = useState({
+        longitude : 0,
+        latitude : 0,
+        name : '',
+        address : '',
+        placeUrl : '',
+    })
+
+    const onMapPlace = (data) => {
+        setMapDTO({
+            longitude:data.longitude,
+            latitude:data.latitude,
+            name:data.name,
+            address:data.address,
+            placeUrl:data.placeUrl
+        })
+        setMapModal(true)
+    }
+
+    const onClose = () => {
+        setMapModal(false) 
+    }
+    /////////////////////////////////////////////
 
     useEffect(() => {
         onLoading(true)
@@ -55,19 +84,32 @@ const HamburgerStore = (props) => {
             </View>
             <ScrollView style={styles.storeList}>
                 {stores.filter(str => str.name.includes(search)).map((item, index) => <Pressable key={index} 
-                    onPress={() => onStore(item.storeSeq)} style={({pressed})  => [styles.storeBut,
+                    onPress={() => storeTouch && onStore(item.storeSeq)} style={({pressed})  => [styles.storeBut,
                         {backgroundColor: pressed ? 'whitesmoke' : 'white'}
                     ]}>
                     <Text style={styles.storeTxt}>{item.name}</Text>
+                    {type === 1 && <Pressable
+                        style={{paddingHorizontal:10}}
+                        onPress={() => onMapPlace(item)}
+                        onPressIn={() => setStoreTouch(false)}
+                        onPressOut={() => setStoreTouch(true)}>
+                        <Image source={mapIcon} style={{width: 27,height: 27}}/>
+                    </Pressable>}
                 </Pressable>)}
             {type === 1 &&
-            <Pressable
-                style={({pressed}) => [styles.addBut, {elevation: pressed ? 2 : 5}]}
-                onPress={() => navigation.navigate('Add',{ type : type })}>
-                <Text style={{fontSize: 16,fontWeight: 'bold',color: 'darkgray',verticalAlign:'middle'}}>매장 추가</Text>
-                <Image source={addImg} style={{width: 30, height: 30}}/>
-            </Pressable>}
+                <Pressable
+                    style={({pressed}) => [styles.addBut, {elevation: pressed ? 2 : 5}]}
+                    onPress={() => navigation.navigate('Add',{ type : type })}>
+                    <Text style={{fontSize: 16,fontWeight: 'bold',color: 'darkgray',verticalAlign:'middle'}}>매장 추가</Text>
+                    <Image source={addImg} style={{width: 30, height: 30}}/>
+                </Pressable>}
             </ScrollView>
+            <Modal
+                animationType="fade"
+                visible={mapModal}
+                transparent={true}>
+                    <MapModal mapDTO={mapDTO} onClose={onClose}/>
+            </Modal>
         </View>
     );
 };
@@ -79,6 +121,7 @@ const styles = StyleSheet.create({
     storeBut : {
         borderBottomWidth: 2,
         borderBottomColor: 'lightgray',
+        flexDirection: 'row',
         padding: 20
     },
     storeTxt : {
@@ -99,7 +142,7 @@ const styles = StyleSheet.create({
         justifyContent:'center',
         backgroundColor: 'whitesmoke',
         marginHorizontal: 10,
-        marginVertical: 5,
+        marginVertical: 10,
         paddingHorizontal: '20%',
         borderRadius: 10,
         shadowColor: '#000',

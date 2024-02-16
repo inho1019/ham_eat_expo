@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Image, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Image, Linking, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAppContext } from '../api/ContextAPI';
 import deleteImg from '../../assets/burger/delete.png';
@@ -206,21 +206,28 @@ const UserPage = (props) => {
         })
     }
     
+    const openLink = (url) => {
+        Linking.openURL(url)
+        .catch((err) => console.error('Error opening external link:', err));
+    };
+
     return (
         <ScrollView style={{flex: 1, padding:'5%'}}>
             <Text style={styles.h1}>{state.user.name}</Text>
             <Text style={styles.h2}>내 게시물</Text>
             <View style={{flexDirection:'row',justifyContent:'space-around',marginVertical: 20}}>
                 <Pressable
-                    style={styles.myBigBut}>
+                    onPress={() => navigation.navigate('BoardList', { name : state.user.name })}
+                    style={({pressed}) => [ styles.myBigBut,{ elevation : pressed ? 2 : 5 }]}>
                     <Text style={styles.h3}>글</Text>
                 </Pressable>
                 <Pressable
-                    style={styles.myBigBut}>
+                    onPress={() => navigation.navigate('BurgerList', { name : state.user.name })}
+                    style={({pressed}) => [ styles.myBigBut,{ elevation : pressed ? 2 : 5 }]}>
                     <Text style={styles.h3}>버거</Text>
                 </Pressable>
                 <Pressable
-                    style={styles.myBigBut}>
+                    style={({pressed}) => [ styles.myBigBut,{ elevation : pressed ? 2 : 5 }]}>
                     <Text style={styles.h3}>평가</Text>
                 </Pressable>
             </View>
@@ -271,8 +278,10 @@ const UserPage = (props) => {
                   })}>
                 <Text style={styles.myBut}>로그아웃</Text>
             </Pressable>
-            <Text style={{textAlign:'center',fontSize:17,color:'darkgray',fontWeight:'bold',marginVertical:20}}>
-                Image Designed By FreePik</Text>
+            <Pressable onPress={() => openLink('https://kr.freepik.com/')}>
+                <Text style={{textAlign:'center',fontSize:17,color:'darkgray',fontWeight:'bold',marginVertical:20}}>
+                Images Designed By FreePik</Text>
+            </Pressable>
             <Modal
                 animationType="fade"
                 visible={nameModal}
@@ -378,7 +387,7 @@ const UserPage = (props) => {
 const styles = StyleSheet.create({
     h1 : {
         fontSize: 40,
-        fontWeight: 'bold',
+        fontFamily: 'esamanruMedium',
         marginBottom: 15,
         borderBottomWidth: 5,
         paddingVertical: 10,
@@ -386,7 +395,7 @@ const styles = StyleSheet.create({
     },
     h2 : {
         fontSize: 25,
-        fontWeight: 'bold'
+        fontFamily: 'esamanruMedium',
     },
     h3 : {
         fontSize: 18,
@@ -418,7 +427,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignSelf: 'center',
         shadowColor: '#000',
-        elevation: 5
     },
     myBut : {
         color: 'gray',

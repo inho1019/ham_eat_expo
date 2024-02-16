@@ -372,7 +372,7 @@ const HamburgerMake = (props) => {
 
 const styles = StyleSheet.create({
     hold : {
-        marginTop: '-2.55%',
+        marginTop: '-2.6%',
         height: '405%',
         aspectRatio: 1/1,
         alignSelf: 'center',
@@ -412,7 +412,7 @@ const styles = StyleSheet.create({
     },
     sizeTxt : {
         fontSize: 35,
-        fontWeight: 'bold'
+        fontFamily: 'esamanruMedium',
     },
     sizeBox : {
         padding: 20,
@@ -450,7 +450,7 @@ const styles = StyleSheet.create({
     ingreTitle : {
         fontSize: 16,
         paddingTop: 10,
-        fontWeight: 'bold',
+        fontFamily: 'esamanruMedium',
     },
     topTxt :{
         fontSize: 11,

@@ -163,7 +163,9 @@ const HamburgerHome = (props) => {
                         </View>
                         <View style={styles.infoContainer}>
                             <Text style={{fontWeight:'bold',fontSize:22,textAlign:'center'}}>{burger.name}</Text>
-                            <Text style={{padding: 10,fontSize:16,textAlign:'center'}} >{burger.content}</Text>
+                            <View style={styles.recomContent}>
+                                <Text style={{padding: 8,fontSize:16,textAlign:'center',color:'gray'}} >{burger.content}</Text>
+                            </View>
                             <View style={styles.starBox}>
                                 <View style={[styles.starBack,{width : 
                                     ratings.reduce((acc, cur) => acc + cur[0].rate , 0) * 20 / ratings.length + '%'}]}/>
@@ -318,7 +320,7 @@ const styles = StyleSheet.create({
     },
     h1 : {
         fontSize: 25,
-        fontWeight: 'bold',
+        fontFamily: 'esamanruMedium',
     },
     itemBox : {
         padding: 10,
@@ -342,7 +344,7 @@ const styles = StyleSheet.create({
         borderColor: 'black',
         marginRight: 5,
         width: 35,
-        height:25,
+        height:22,
         alignSelf:'center',
         textAlign:'center'
     },
@@ -373,9 +375,9 @@ const styles = StyleSheet.create({
         height: 70,
     },
     burgerText : {
-        fontSize: 22,
-        fontWeight: 'bold',
-        color: 'black'
+        fontSize: 24,
+        fontFamily: 'chab',
+        color:'#472523',
     },
     //alert
     alert : {

@@ -209,6 +209,7 @@ const styles = StyleSheet.create({
     },
     handText : {
         fontSize: 30,
+        fontFamily: 'esamanruMedium',
         textAlign: 'center',
     },
     ///////////alert///////////

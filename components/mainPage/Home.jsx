@@ -30,9 +30,9 @@ const Home = (props) => {
 
     return (
         <View style={{flex:1}}>
-            <View style={{flexDirection:'row',borderBottomColor: 'whitesmoke', borderBottomWidth: 20,paddingBottom: 10}}>
+            <View style={{flexDirection:'row',borderBottomColor: 'whitesmoke', borderBottomWidth: 20,paddingBottom: 5}}>
                 <Image source={logo} style={styles.logo}/>
-                <Text style={styles.logoTxt}>HamEat</Text>
+                <Text style={styles.logoTxt}>HAMEAT</Text>
             </View>
             <Text style={styles.h2}>통합 검색</Text>
             <View style={styles.searchContainer}>
@@ -54,21 +54,21 @@ const Home = (props) => {
 
 const styles = StyleSheet.create({
     logo : {
-        height: 35,
-        width: 35,
+        height: 30,
+        width: 30,
         marginLeft: 10,
         marginTop: 5,
     },
     logoTxt : {
-        fontSize: 20,
-        fontWeight:'bold',
+        fontSize: 21,
+        fontFamily: 'chab',
         color:'#472523',
         textAlignVertical:'bottom',
         marginLeft: 10
     },
     h2 : {
         fontSize: 25,
-        fontWeight: 'bold',
+        fontFamily: 'esamanruMedium',
         marginHorizontal: '2%',
         marginTop: 10,
         marginBottom: 5
