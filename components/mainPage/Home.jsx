@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Image, KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import searchIcon from '../../assets/main/search.png'
 import logo from '../../assets/icon.png'
@@ -13,13 +13,13 @@ const Home = (props) => {
 ///////////캐러셀/////////////
     const data = [{//캐러셀용 DB제작후 삽입 예정
         type : 0,
-        src : 'https://img.freepik.com/free-vector/hand-drawn-tasty-food-restaurant-facebook-cover_23-2150966640.jpg?w=1800&t=st=1708146307~exp=1708146907~hmac=37f3f7b8ff4f61277f56fa24102c5b0b71651f8f5cf6ff716161b469f1bdfe12'
+        src : 'https://www.techm.kr/news/photo/202310/115685_144854_348.jpg'
     },{
         type : 0,
-        src : 'https://img.freepik.com/free-psd/flat-design-burger-template_23-2150091675.jpg?w=1800&t=st=1708146272~exp=1708146872~hmac=07e7b2c390f1fed6ffcd9d4581d0239849d64a3212d981af482deacdd0a6042e'
+        src : 'https://naeiledu.co.kr/tabtap_photo/skin/images/evt-visual.png'
     },{
         type : 0,
-        src : 'https://img.freepik.com/free-psd/american-retro-restaurant-instagram-posts-template_23-2150133048.jpg?w=1800&t=st=1708146287~exp=1708146887~hmac=e4ff7f1b3a524043b419caad081844f973e56b93c277f0c72a48be3a84a1d186'
+        src : 'https://www.kfckorea.com/nas/event/2024/01/04/7UHLn9Fwwfm0.png'
     }];
     const [itemWidth, setItemWidth] = useState(0);
 
@@ -27,12 +27,30 @@ const Home = (props) => {
     const [currentPage, setCurrentPage] = useState(0);
 
     const pageChange = (event) => {
-      const offsetX = event.nativeEvent.contentOffset.x;
-      const pageIndex = Math.round(offsetX / event.nativeEvent.layoutMeasurement.width);
-      setCurrentPage(pageIndex);
+        const offsetX = event.nativeEvent.contentOffset.x;
+        const pageIndex = Math.round(offsetX / event.nativeEvent.layoutMeasurement.width);
+        setCurrentPage(pageIndex);
     };
     //////////////////////////////////////////
-////////////////////////////
+
+    const scrollRef = useRef(null)
+
+    useEffect(() => {
+        setTimeout(() => {
+            if(scrollRef.current !== null) {
+                if(currentPage === data.length-1) {
+                    scrollRef.current.scrollTo({ x: 0,animated: true });
+                    setCurrentPage(0)
+                } else {
+                    scrollRef.current.scrollTo({ x: itemWidth * (currentPage + 1),animated: true });
+                    setCurrentPage(currentPage + 1)
+                }
+            }
+        }, 5000)
+    },[currentPage])
+
+    ///////////////////////////////////////////
+
     useEffect(()=>{
         const unsubscribe = navigation.addListener('focus', () => {
             setMapStop(false)
@@ -61,6 +79,7 @@ const Home = (props) => {
                 <TextInput 
                     value={search}
                     style={styles.searchBox}
+                    placeholder='통합 검색'
                     onChangeText={(text) => setSearch(text)}
                     onSubmitEditing={onSearch}
                 />
@@ -69,8 +88,9 @@ const Home = (props) => {
                 </Pressable>
             </View>
             <View 
-                style={{flex: 1,maxHeight: '16%',aspectRatio: 3.125/1,marginTop:12,marginBottom:7}}>
+                style={styles.carBox}>
                 <ScrollView
+                    ref={ scrollRef }
                     horizontal
                     pagingEnabled
                     contentContainerStyle={{width: `${100 * data.length}%`}}
@@ -111,6 +131,15 @@ const styles = StyleSheet.create({
         color:'#472523',
         textAlignVertical:'bottom',
         marginLeft: 10
+    },
+    carBox : {
+        width:'95%',
+        alignSelf:'center',
+        aspectRatio: 3/1,
+        marginTop:17,
+        marginBottom:12,
+        borderRadius:10,
+        overflow:'hidden'
     },
     carBall : {
         width: 15,

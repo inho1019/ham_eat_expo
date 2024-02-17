@@ -84,7 +84,8 @@ const styles = StyleSheet.create({
     },
     tabImg: {
         width:30, 
-        height:30
+        height:30,
+        opacity: 0.8
     },
     moves:{
         zIndex: 1,

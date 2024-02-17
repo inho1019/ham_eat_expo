@@ -217,16 +217,17 @@ const UserPage = (props) => {
             <Text style={styles.h2}>내 게시물</Text>
             <View style={{flexDirection:'row',justifyContent:'space-around',marginVertical: 20}}>
                 <Pressable
-                    onPress={() => navigation.navigate('BoardList', { name : state.user.name })}
+                    onPress={() => navigation.navigate('BoardList', { userSeq : state.user.userSeq })}
                     style={({pressed}) => [ styles.myBigBut,{ elevation : pressed ? 2 : 5 }]}>
                     <Text style={styles.h3}>글</Text>
                 </Pressable>
                 <Pressable
-                    onPress={() => navigation.navigate('BurgerList', { name : state.user.name })}
+                    onPress={() => navigation.navigate('BurgerList', { userSeq : state.user.userSeq })}
                     style={({pressed}) => [ styles.myBigBut,{ elevation : pressed ? 2 : 5 }]}>
                     <Text style={styles.h3}>버거</Text>
                 </Pressable>
                 <Pressable
+                    onPress={() => navigation.navigate('RatingList', { userSeq : state.user.userSeq })}
                     style={({pressed}) => [ styles.myBigBut,{ elevation : pressed ? 2 : 5 }]}>
                     <Text style={styles.h3}>평가</Text>
                 </Pressable>

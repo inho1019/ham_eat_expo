@@ -53,7 +53,7 @@ const HamburgerList = (props) => {
             setSearch(route.params?.search)
         }
         if( searchParam === undefined ) {
-            if( route.params?.name ) {
+            if( route.params?.userSeq ) {
                 navigation.setOptions({
                     title: '내 버거 목록'
                 });
@@ -71,18 +71,18 @@ const HamburgerList = (props) => {
         const unsubscribe = navigation.addListener('focus', () => {
             onLoading(true)
             setLoading(true)
-            axios.get((!route.params?.name && searchParam === undefined) ? `https://hameat.onrender.com/rating/listType/${route.params?.type}`
+            axios.get((!route.params?.userSeq && searchParam === undefined) ? `https://hameat.onrender.com/rating/listType/${route.params?.type}`
                     : `https://hameat.onrender.com/rating/listAll`)
             .then(res => {
                 setRatings(res.data)
                 axios.get(`https://hameat.onrender.com/ingre/list`)
                 .then(res => {
                     setIngres(res.data)
-                    axios.get( (!route.params?.name && searchParam === undefined) ? `https://hameat.onrender.com/store/list/${route.params?.type}`
+                    axios.get( (!route.params?.userSeq && searchParam === undefined) ? `https://hameat.onrender.com/store/list/${route.params?.type}`
                     : `https://hameat.onrender.com/store/listAll`)
                     .then(res => {
                         setStores(res.data)
-                        axios.get( (!route.params?.name && searchParam === undefined) ? `https://hameat.onrender.com/burger/list/${route.params?.type}`
+                        axios.get( (!route.params?.userSeq && searchParam === undefined) ? `https://hameat.onrender.com/burger/list/${route.params?.type}`
                             : `https://hameat.onrender.com/burger/listAll`)
                         .then(res => {
                             setBurgers(res.data)
@@ -119,12 +119,12 @@ const HamburgerList = (props) => {
 
     return (
         <View style={{flex : 1}}>
-            {(!route.params?.name && searchParam === undefined) &&
+            {(!route.params?.userSeq && searchParam === undefined) &&
             <View style={{paddingTop:2,justifyContent: 'center'}}>
                 <TextInput value={search} onChangeText={(text) => setSearch(text)} 
                     style={styles.searchBox} placeholder={type === 2 ? '버거 및 유저 검색' : '버거 및 가게 검색'}/>
             </View>}
-            {(!route.params?.name && searchParam === undefined) && type !== 2 &&<ScrollView style={styles.storeBox} horizontal={strPick === -1 ? true : false}>
+            {(!route.params?.userSeq && searchParam === undefined) && type !== 2 &&<ScrollView style={styles.storeBox} horizontal={strPick === -1 ? true : false}>
                 {stores.filter(str => strPick !== -1 ? str.storeSeq === strPick : (search.includes(str.name) || str.name.includes(search)))
                     .map((item,index) => <Pressable key={index}
                     style={[styles.storesItem,{backgroundColor : item.storeSeq === strPick ? 'darkgray' : 'lightgray'}]}
@@ -148,8 +148,8 @@ const HamburgerList = (props) => {
                     <Skel height={'100%'} width={windowWidth*0.95}/>
                 </View>
             </View>}
-            {!loading && burgers.filter(bgs => route.params?.name ? 
-                                        (bgs[1] && bgs[1].name === route.params?.name)
+            {!loading && burgers.filter(bgs => route.params?.userSeq ? 
+                                        (bgs[1] && bgs[1].userSeq === route.params?.userSeq)
                                             : ( bgs[0].name.includes(search) || search.includes(bgs[0].name) || 
                                             search.includes(bgs[0].content) || bgs[0].content.includes(search) ||
                                             (bgs[1] && search.includes(bgs[1].name)) || 
@@ -159,8 +159,8 @@ const HamburgerList = (props) => {
                                             <Text style={styles.noList}>결과가 없습니다</Text>}
             <FlatList
                 style={{flex : 1}}
-                data={burgers.filter(bgs => route.params?.name ? 
-                                        (bgs[1] && bgs[1].name === route.params?.name)
+                data={burgers.filter(bgs => route.params?.userSeq ? 
+                                        (bgs[1] && bgs[1].userSeq === route.params?.userSeq)
                                             : ( bgs[0].name.includes(search) || search.includes(bgs[0].name) || 
                                             search.includes(bgs[0].content) || bgs[0].content.includes(search) ||
                                             (bgs[1] && search.includes(bgs[1].name)) || 
@@ -171,13 +171,13 @@ const HamburgerList = (props) => {
                 renderItem={(data) => {
                 const makeDTO = JSON.parse(data.item[0].make)
 
-                return <Pressable style={({pressed})  => [styles.burgerItem,{elevation : pressed ? 1 : 4,
+                return <Pressable style={({pressed})  => [styles.burgerItem,{elevation : pressed ? 0.5 : 4,
                         borderTopColor: pressed ? 'whitesmoke' : 'white', height: data.index !== 0 ? 120 : (
                             stores.filter(str => strPick !== -1 ? str.storeSeq === strPick : (search.includes(str.name) || str.name.includes(search))).length > 0 &&
-                            (!route.params?.name && searchParam === undefined) && type !== 2) ? 160 : 120,
+                            (!route.params?.userSeq && searchParam === undefined) && type !== 2) ? 160 : 120,
                         paddingTop: (stores.filter(str => strPick !== -1 ? str.storeSeq === strPick : (search.includes(str.name) || str.name.includes(search))).length > 0 &&
-                            (!route.params?.name && searchParam === undefined) && type !== 2 && data.index === 0) && 40}]} 
-                        key={data.index} onPress={() => (!route.params?.name && searchParam === undefined) ? navigation.navigate('View', { burgerSeq : data.item[0].burgerSeq }) 
+                            (!route.params?.userSeq && searchParam === undefined) && type !== 2 && data.index === 0) && 40}]} 
+                        key={data.index} onPress={() => (!route.params?.userSeq && searchParam === undefined) ? navigation.navigate('View', { burgerSeq : data.item[0].burgerSeq }) 
                         : onGo(1,data.item[0].burgerSeq)}>
                         <View style={styles.makeContainer}>
                         {makeDTO.map((item,index) => {
@@ -213,14 +213,14 @@ const HamburgerList = (props) => {
                         </View>}
                         <View style={[styles.starBox,{ width: data.item[0].type === 2 ? '80%' : '70%', margin: data.item[0].type === 2 ? 12 : 2 }]}>
                             <View style={[styles.starBack,{width : 
-                                ratings.find(rat =>  ( (!route.params?.name && searchParam === undefined) ? rat[0].burgerSeq : rat.burgerSeq ) 
+                                ratings.find(rat =>  ( (!route.params?.userSeq && searchParam === undefined) ? rat[0].burgerSeq : rat.burgerSeq ) 
                                     === data.item[0].burgerSeq) !== undefined &&
-                                parseFloat(ratings.filter(rat => ( (!route.params?.name && searchParam === undefined) ? rat[0].burgerSeq : rat.burgerSeq ) 
+                                parseFloat(ratings.filter(rat => ( (!route.params?.userSeq && searchParam === undefined) ? rat[0].burgerSeq : rat.burgerSeq ) 
                                     === data.item[0].burgerSeq)
-                                .reduce((acc, cur) => acc + ( (!route.params?.name && searchParam === undefined) ? cur[0].rate : cur.rate ) , 0)) * 20 / 
-                                ratings.filter(rat => ( (!route.params?.name && searchParam === undefined) ? rat[0].burgerSeq : rat.burgerSeq )
+                                .reduce((acc, cur) => acc + ( (!route.params?.userSeq && searchParam === undefined) ? cur[0].rate : cur.rate ) , 0)) * 20 / 
+                                ratings.filter(rat => ( (!route.params?.userSeq && searchParam === undefined) ? rat[0].burgerSeq : rat.burgerSeq )
                                     === data.item[0].burgerSeq).length + '%'}]}/>
-                            <Image source={ratings.find(rat => ( (!route.params?.name && searchParam === undefined) ? rat[0].burgerSeq : rat.burgerSeq )
+                            <Image source={ratings.find(rat => ( (!route.params?.userSeq && searchParam === undefined) ? rat[0].burgerSeq : rat.burgerSeq )
                                     === data.item[0].burgerSeq) !== undefined ? star : starNone} style={styles.starImg}/>
                         </View>
                     </View>
@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
         textAlign:'center',
         fontSize: 17,
         color:'gray',
-        paddingVertical: 10,
+        paddingVertical: 5,
         fontWeight:'bold'
     },
     searchBox : {
@@ -263,13 +263,13 @@ const styles = StyleSheet.create({
         overflow:'hidden'
     },
     makeContainer : {
-        width: '33.5%',
+        width: '35.5%',
         justifyContent: 'center',
         overflow:'hidden',
-        marginRight: '2%',
+        paddingRight: '2%',
     },
     infoContainer: {
-        width: '66.5%',
+        width: '64.5%',
         borderLeftWidth: 1,
         borderColor: 'gray',
         marginVertical: 3,

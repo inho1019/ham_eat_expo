@@ -11,10 +11,6 @@ const BoardHome = (props) => {
 
     const { state, dispatch } = useAppContext();
 
-    const onLoading = (bool) => {
-        dispatch({ type: 'SET_LOADING' , payload : bool });
-    };
-
     const onView = (num) => {
         dispatch({ type: 'SET_VIEW' , payload : num });
     };
@@ -64,7 +60,6 @@ const BoardHome = (props) => {
             onView(-1)
         }
         const unsubscribe = navigation.addListener('focus', () => {
-            onLoading(true)
             axios.get(`https://hameat.onrender.com/board/listHome/0`)
             .then(res0 => {
                 setFree(res0.data)
@@ -80,36 +75,30 @@ const BoardHome = (props) => {
                             axios.get(`https://hameat.onrender.com/board/best/1`)
                             .then(res4 => {
                                 setBestEvent(res4.data)
-                                onLoading(false)
                                 setFirst(false)
                             })
                             .catch(() => {
                                 setAlertTxt('불러오기 중 에러발생')
-                                onLoading(false)
                                 setFirst(false)
                             })
                         })
                         .catch(() => {
                             setAlertTxt('불러오기 중 에러발생')
-                            onLoading(false)
                             setFirst(false)
                         })
                     })
                     .catch(() => {
                         setAlertTxt('불러오기 중 에러발생')
-                        onLoading(false)
                         setFirst(false)
                     })
                 })
                 .catch(() => {
                     setAlertTxt('불러오기 중 에러발생')
-                    onLoading(false)
                     setFirst(false)
                 })
             })
             .catch(() => {
                 setAlertTxt('불러오기 중 에러발생')
-                onLoading(false)
                 setFirst(false)
             })
         });

@@ -5,6 +5,7 @@ import BoardList from '../boardPage/BoardList';
 import max from '../../assets/main/max.png'
 import min from '../../assets/main/min.png'
 import Map from '../Map';
+import HamburgerRating from '../hamburgerPage/HamburgerRating';
 
 const Search = (props) => {
     const { route,navigation } = props
@@ -105,7 +106,7 @@ const Search = (props) => {
                 </View>
                 <View style={{height: '20%'}}>
                     <View style={{width:'100%',aspectRatio:1/1}}>
-
+                        <HamburgerRating navigation={navigation} searchData={route.params?.search} route={route}/>
                     </View>
                 </View>
             </View>
