@@ -19,6 +19,10 @@ const Index = () => {
         },
     };
     
+    const navHeader = {
+        headerTitleStyle: { fontFamily: 'esamanruMedium'},
+    };
+    
     const { state, dispatch } = useAppContext();
 
     const onPage = (num) => {
@@ -51,19 +55,19 @@ const Index = () => {
         <View style={styles.container}>
             <View style={[styles.screenContainer,{height: '92%'}]}>
                 {
-                    state.page === 0 && <Main navTheme={navTheme}/>
+                    state.page === 0 && <Main navTheme={navTheme} navHeader={navHeader}/>
                 }
                 {
-                    state.page === 1 && <HamburgerMain navTheme={navTheme}/>
+                    state.page === 1 && <HamburgerMain navTheme={navTheme} navHeader={navHeader}/>
                 }
                 {
-                    state.page === 2 && <BoardMain navTheme={navTheme}/>
+                    state.page === 2 && <BoardMain navTheme={navTheme} navHeader={navHeader}/>
                 }
                 {
-                    state.page === 3 && <UserMain navTheme={navTheme}/>
+                    state.page === 3 && <UserMain navTheme={navTheme} navHeader={navHeader}/>
                 }
                 {
-                    state.page === 4 && <UserMypageMain navTheme={navTheme}/>
+                    state.page === 4 && <UserMypageMain navTheme={navTheme} navHeader={navHeader}/>
                 }
             </View>
             <View style={{height: key ? 0 : '8%',overflow:'hidden',opacity: key ? 0 : 1}}>

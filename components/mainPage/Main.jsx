@@ -7,11 +7,11 @@ import Search from './Search';
 const Stack = createNativeStackNavigator();
 
 const Main = (props) => {
-    const{ navTheme } = props
+    const{ navTheme,navHeader } = props
 
     return (
         <NavigationContainer theme={navTheme}>
-            <Stack.Navigator initialRouteName="Home">
+            <Stack.Navigator initialRouteName="Home" screenOptions={navHeader}>
                 <Stack.Screen name="Home" component={Home} options={{ headerShown: false }}/>
                 <Stack.Screen name="Search" component={Search}/>
             </Stack.Navigator>

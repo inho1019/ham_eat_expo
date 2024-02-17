@@ -146,6 +146,7 @@ const HamburgerForm = (props) => {
             } else setAlertTxt('설명을 입력해 주세요');
         } else setAlertTxt('이름을 입력해 주세요')
     }
+    
     return (
         <ScrollView style={{flex: 1}} ref={scrollRef} scrollEnabled={false}
             contentContainerStyle={{height: windowHeight * 4}}

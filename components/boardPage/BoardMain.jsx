@@ -8,10 +8,12 @@ import BoardView from './BoardView';
 
 const Stack = createNativeStackNavigator();
 
-const BoardMain = ({navTheme}) => {
+const BoardMain = (props) => {
+    const {navTheme,navHeader} = props
+
     return (
         <NavigationContainer theme={navTheme}>
-            <Stack.Navigator initialRouteName="Home">
+            <Stack.Navigator initialRouteName="Home" screenOptions={navHeader}>
                 <Stack.Screen name="Home" component={BoardHome} options={{ headerShown: false }}/>
                 <Stack.Screen name="List" component={BoardList}/>
                 <Stack.Screen name="Form" component={BoardForm}/>

@@ -10,11 +10,11 @@ import HamburgerMap from './HamburgerMap';
 const Stack = createNativeStackNavigator();
 
 const HamburgerMain = (props) => {
-    const {navTheme} = props
+    const {navTheme,navHeader} = props
 
     return (
         <NavigationContainer theme={navTheme}>
-            <Stack.Navigator initialRouteName="Home">
+            <Stack.Navigator initialRouteName="Home" screenOptions={navHeader}>
                 <Stack.Screen name="Home" component={HamburgerHome} options={{ headerShown: false }}/>
                 <Stack.Screen name="Form" component={HamburgerForm} options={{ headerTitle: '버거 등록'}}/>
                 <Stack.Screen name="Add" component={HamburgerMap} options={{ headerTitle: '등록'}}/>

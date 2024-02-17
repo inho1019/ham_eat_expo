@@ -7,11 +7,11 @@ import UserRegister from './UserRegister';
 const Stack = createNativeStackNavigator();
 
 const UserMain = (props) => {
-    const {navTheme} = props
+    const {navTheme,navHeader} = props
 
     return (
         <NavigationContainer theme={navTheme}>
-            <Stack.Navigator initialRouteName="Login">
+            <Stack.Navigator initialRouteName="Login" screenOptions={navHeader}>
                 <Stack.Screen name="Login" component={UserLogin} options={{ headerShown: false }}/>
                 <Stack.Screen name="Register" component={UserRegister} options={{ headerTitle: '회원가입' }}/>
             </Stack.Navigator>
