@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { Dimensions, FlatList, Image, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Dimensions, FlatList, Image, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import star from '../../assets/burger/star.png'
 import starNone from '../../assets/burger/star_none.png'
 import won from '../../assets/burger/won.png'
@@ -118,11 +118,9 @@ const HamburgerList = (props) => {
     }
 
     return (
-        <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-        >
+        <View style={{flex : 1}}>
             {(!route.params?.name && searchParam === undefined) &&
-            <View style={{height: '8%',paddingTop:2,justifyContent: 'center',borderBottomWidth : 2,borderColor: 'lightgray',}}>
+            <View style={{paddingTop:2,justifyContent: 'center'}}>
                 <TextInput value={search} onChangeText={(text) => setSearch(text)} 
                     style={styles.searchBox} placeholder={type === 2 ? '버거 및 유저 검색' : '버거 및 가게 검색'}/>
             </View>}
@@ -160,7 +158,7 @@ const HamburgerList = (props) => {
                                             && (strPick >= 0 ? bgs[0].storeSeq === strPick : bgs)).length === 0 && 
                                             <Text style={styles.noList}>결과가 없습니다</Text>}
             <FlatList
-                style={{height: (!route.params?.name && searchParam === undefined) ? '92%' : '100%'}}
+                style={{flex : 1}}
                 data={burgers.filter(bgs => route.params?.name ? 
                                         (bgs[1] && bgs[1].name === route.params?.name)
                                             : ( bgs[0].name.includes(search) || search.includes(bgs[0].name) || 
@@ -202,18 +200,18 @@ const HamburgerList = (props) => {
                             style={{width: data.item[0].size === 0 ? '50%' : data.item[0].size === 2 ? '90%' : '70%',alignSelf:'center',
                             aspectRatio: 500/(ingres.find(ing => ing.ingreSeq === makeDTO[0]).type !== 0 ? 
                             ingres.find(ing => ing.ingreSeq === makeDTO[0]).height : 160), 
-                            zIndex: -makeDTO.length,marginTop: data.item[0].size === 0 ? 7 : data.item[0].size === 1 ? 3 : 0}} />
+                            zIndex: -makeDTO.length,marginTop: data.item[0].size === 0 ? 4 : data.item[0].size === 1 ? 3 : 0}} />
                     </View>
                     <View style={styles.infoContainer}>
                         <Text style={styles.itemName}>{data.item[0].name}</Text>
                         {data.item[0].type !== 2 && <Text style={styles.itemStore}>{stores.find(str => str.storeSeq === data.item[0].storeSeq) ? 
                         stores.find(str => str.storeSeq === data.item[0].storeSeq).name : '없는 매장'}</Text>}
                         {data.item[0].type === 2 && <Text style={styles.itemStore}>{data.item[1] ? data.item[1].name : '탈퇴 회원'}</Text>}{/* userSeq를 통한 유저명 가져오기 */}
-                        {data.item[0].type !== 2 &&<View style={{flexDirection:'row',justifyContent:'center'}}>
-                            <Image source={won} style={{width:23,height:23}}/>
-                            <Text style={{textAlign:'center',verticalAlign:'middle',fontSize:15}}>&nbsp;{data.item[0].price}원</Text>
+                        {data.item[0].type !== 2 &&<View style={{flexDirection:'row',justifyContent:'center',marginTop:3}}>
+                            <Image source={won} style={{width:22,height:22}}/>
+                            <Text style={{fontSize:15}}> {data.item[0].price}</Text>
                         </View>}
-                        <View style={[styles.starBox,{ width: data.item[0].type === 2 ? '80%' : '70%', margin: data.item[0].type === 2 ? 10 : 5 }]}>
+                        <View style={[styles.starBox,{ width: data.item[0].type === 2 ? '80%' : '70%', margin: data.item[0].type === 2 ? 12 : 2 }]}>
                             <View style={[styles.starBack,{width : 
                                 ratings.find(rat =>  ( (!route.params?.name && searchParam === undefined) ? rat[0].burgerSeq : rat.burgerSeq ) 
                                     === data.item[0].burgerSeq) !== undefined &&
@@ -239,7 +237,7 @@ const HamburgerList = (props) => {
                     </View>
                 </View>
             </Modal>
-        </KeyboardAvoidingView>
+        </View>
     );
 };
 
@@ -252,23 +250,26 @@ const styles = StyleSheet.create({
         fontWeight:'bold'
     },
     searchBox : {
-        borderWidth: 2,
         borderRadius: 5,
-        fontSize: 20,
+        backgroundColor: '#e5e5e5',
+        color:'#505050',
+        height: 40,
+        fontSize: 18,
         paddingHorizontal: 10,
         paddingVertical: 3,
+        marginVertical: 5,
         alignSelf: 'center',
         width: '95%',
         overflow:'hidden'
     },
     makeContainer : {
-        width: '35%',
+        width: '33.5%',
         justifyContent: 'center',
         overflow:'hidden',
-        marginRight: 15
+        marginRight: '2%',
     },
     infoContainer: {
-        width: '65%',
+        width: '66.5%',
         borderLeftWidth: 1,
         borderColor: 'gray',
         marginVertical: 3,
@@ -277,7 +278,7 @@ const styles = StyleSheet.create({
     },
     burgerItem : {
         flexDirection: 'row',
-        paddingHorizontal: 20,
+        paddingHorizontal : '2.5%',
         overflow: 'hidden',
         paddingVertical: 1,
         marginBottom: 3,
@@ -300,17 +301,16 @@ const styles = StyleSheet.create({
     storeBox : {
         zIndex: 10,
         position:'absolute',
-        top: '8%',
-        height : '6%',
+        top: 53,
         flexDirection: 'row',
     },
     storesItem : {
         opacity: 0.7,
         margin: 5,
-        paddingHorizontal: 5,
-        height: '80%',
+        paddingHorizontal: 6,
+        paddingVertical: 6,
         justifyContent: 'center',
-        borderRadius: 10
+        borderRadius: 5
     },
     starImg : {
         width: '100%',

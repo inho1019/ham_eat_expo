@@ -91,11 +91,9 @@ const BoardList = (props) => {
     }
 
     return (
-        <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-        >
+        <View style={{flex : 1}}>
         {(!route.params?.name && searchParam === undefined) && 
-        <View style={{height: '8%',paddingTop:2,justifyContent: 'center',borderBottomWidth : 2,borderColor: 'lightgray',}}>
+        <View style={{justifyContent: 'center',paddingTop: 2}}>
             <TextInput value={search} onChangeText={(text) => setSearch(text)} 
                 style={styles.searchBox} placeholder={'검색'}/>
         </View>}
@@ -127,7 +125,7 @@ const BoardList = (props) => {
                                                 (bdl[1] && search.includes(bdl[1].name)))).length === 0 && 
                                                 <Text style={styles.noList}>결과가 없습니다</Text>}
             <FlatList
-                style={{height: (!route.params?.name && searchParam === undefined) ? '92%' : '100%'}}
+                style={{flex: 1}}
                 data={boardList.filter(bdl => route.params?.name ? 
                                         (bdl[1] && bdl[1].name === route.params?.name)
                                             :(bdl[0].title.includes(search) || search.includes(bdl[0].title) || 
@@ -167,7 +165,7 @@ const BoardList = (props) => {
                     </View>
                 </View>
             </Modal>
-        </KeyboardAvoidingView>
+        </View>
     );
 };
 
@@ -180,8 +178,11 @@ const styles = StyleSheet.create({
         fontWeight:'bold'
     },
     searchBox : {
-        borderWidth: 2,
         borderRadius: 5,
+        marginVertical: 5,
+        backgroundColor: '#e5e5e5',
+        color:'#505050',
+        height: 40,
         fontSize: 18,
         paddingHorizontal: 10,
         paddingVertical: 3,

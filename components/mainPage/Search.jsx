@@ -76,7 +76,7 @@ const Search = (props) => {
                 </Pressable>
             </View>
             <Animated.View style={[boardHeight,{marginVertical: '1%'}]}>
-                <BoardList navigation={navigation} searchParam={route.params?.search}/>
+                <BoardList navigation={navigation} searchParam={route.params?.search} route={route}/>
             </Animated.View>
             <View style={styles.titleBox}>
                 <Text style={styles.h1}>햄버거</Text>

@@ -306,8 +306,8 @@ const HamburgerView = (props) => {
                 {!first && burgerDTO[0] && <View style={{marginBottom:15}}>
                     <Text style={styles.h1}>{burgerDTO[0].name}</Text>
                     {burgerDTO[0].type !== 2 &&<View style={{flexDirection:'row',justifyContent:'center', marginTop:5}}>
-                        <Image source={won} style={{height:29,width:29}}/>
-                        <Text style={{fontSize: 16,paddingTop:3}}> {burgerDTO[0].price}원</Text>
+                        <Image source={won} style={{height:25,width:25}}/>
+                        <Text style={{fontSize: 17,textAlignVertical:'center'}}> {burgerDTO[0].price}</Text>
                     </View>}
                     <View style={{flexDirection:'row',marginHorizontal: '5%',justifyContent:'space-between',marginBottom: 5}}>
                         {burgerDTO[0].type !== 2 &&<Text style={styles.h3}>{storeDTO ? storeDTO.name : '없는 매장'}</Text>}
@@ -468,18 +468,18 @@ const HamburgerView = (props) => {
                             data={ratings}
                             renderItem={(data) => <View style={styles.reviewItem} key={data.index}>
                                 <View style={{flexDirection:'row',justifyContent:'space-between',paddingHorizontal:5}}>
-                                    <View style={{flexDirection:'row',marginBottom:5}}>
+                                    <View style={{flexDirection:'row',marginBottom:5,width:'90%',flexWrap:'wrap'}}>
                                         <View style={styles.reviewStar}>
                                         <Image source={starOne} style={{width:18,height:18}}/>
                                         <Text style={{fontSize: 15,fontWeight: 'bold'}}> {data.item[0].rate} </Text></View>
                                         <Text style={styles.reviewName}>{data.item[1] ? data.item[1].name : '탈퇴한 회원'}</Text>
+                                        <Text style={styles.reviewTime}> | {getToday(data.item[0].logTime)}</Text>
                                         {data.item[0].placeName && <Pressable style={{flexDirection:'row'}}
                                             onPress={() => onMapPlace(data.item[0])}>
                                             <Text style={styles.reviewPlace}> #{data.item[0].placeName.split(' ')
                                                 [data.item[0].placeName.split(' ').length - 1]} </Text>
                                             <Image source={mapIcon} style={{height:22,width:22}}/>
                                         </Pressable>}
-                                        <Text style={styles.reviewTime}> | {getToday(data.item[0].logTime)}</Text>
                                     </View>
                                     {data.item[0] && state.user.userSeq === data.item[0].userSeq && 
                                         <Pressable onPress={() => onDelete(data.item[0].ratingSeq)}>

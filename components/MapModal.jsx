@@ -78,10 +78,10 @@ const MapModal = (props) => {
             />
             <View style={styles.selItem}>
                 <Text style={styles.h2}>{mapDTO.name}</Text>
-                <View style={{flexDirection:'row'}}>
+                <View style={{flexDirection:'row',marginVertical:3}}>
                     <Text style={styles.h3}>{mapDTO.address}</Text>
                     <Pressable onPress={() => setHtml('')}>
-                        <Image source={pin} style={{width:26,height:26,marginLeft:10}}/>
+                        <Image source={pin} style={{width:25,height:25,marginLeft:10}}/>
                     </Pressable>
                 </View>
                 <View style={{flexDirection:'row'}}>

@@ -147,8 +147,9 @@ const HamburgerForm = (props) => {
         } else setAlertTxt('이름을 입력해 주세요')
     }
     return (
-        <ScrollView style={{flex: 1, maxHeight: windowHeight * 4}} ref={scrollRef} scrollEnabled={false}
-            showsVerticalScrollIndicator={false}    >
+        <ScrollView style={{flex: 1}} ref={scrollRef} scrollEnabled={false}
+            contentContainerStyle={{height: windowHeight * 4}}
+            showsVerticalScrollIndicator={false}>
             <View style={{height:windowHeight,justifyContent: 'center',paddingVertical: '1%'}}>
                 <Pressable style={{marginVertical:'7%'}}
                     onPress={() => onType(0)}

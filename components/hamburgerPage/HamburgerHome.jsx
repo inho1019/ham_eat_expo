@@ -164,7 +164,7 @@ const HamburgerHome = (props) => {
                         <View style={styles.infoContainer}>
                             <Text style={{fontWeight:'bold',fontSize:22,textAlign:'center'}}>{burger.name}</Text>
                             <View style={styles.recomContent}>
-                                <Text style={{padding: 8,fontSize:16,textAlign:'center',color:'gray'}} >{burger.content}</Text>
+                                <Text style={{padding: 8,fontSize:16,textAlign:'center',color:'gray'}} >"{burger.content}"</Text>
                             </View>
                             <View style={styles.starBox}>
                                 <View style={[styles.starBack,{width : 

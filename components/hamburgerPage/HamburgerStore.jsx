@@ -78,7 +78,7 @@ const HamburgerStore = (props) => {
                 <Image source={backImg} style={{height:'95%',aspectRatio: 1/1, alignSelf:'center'}}/>
             </Pressable>
             </View>
-            <View style={{height: '8%',justifyContent: 'center',borderBottomWidth : 2,borderColor: 'lightgray',}}>
+            <View style={{height: '8%',justifyContent: 'center'}}>
             <TextInput value={search} onChangeText={(text) => setSearch(text)} 
                 style={styles.searchBox} placeholder='가게 검색'/>
             </View>
@@ -128,9 +128,11 @@ const styles = StyleSheet.create({
         fontSize: 20
     },
     searchBox : {
-        borderWidth: 2,
         borderRadius: 5,
-        fontSize: 20,
+        backgroundColor: '#e5e5e5',
+        color:'#505050',
+        height: 40,
+        fontSize: 18,
         paddingHorizontal: 10,
         paddingVertical: 3,
         alignSelf: 'center',
