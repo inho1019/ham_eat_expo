@@ -395,7 +395,7 @@ const styles = StyleSheet.create({
         borderBottomColor:'gray'
     },
     h2 : {
-        fontSize: 25,
+        fontSize: 23,
         fontFamily: 'esamanruMedium',
     },
     h3 : {

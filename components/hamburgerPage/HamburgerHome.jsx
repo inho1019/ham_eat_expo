@@ -341,13 +341,13 @@ const styles = StyleSheet.create({
         flexDirection:'row',
         justifyContent:'space-between',
         borderBottomColor:'black',
-        borderBottomWidth:2,
-        paddingBottom:3,
+        borderBottomWidth: 2,
+        paddingBottom: 3,
         marginHorizontal: 10,
         marginTop: 20,
     },
     h1 : {
-        fontSize: 25,
+        fontSize: 23,
         fontFamily: 'esamanruMedium',
     },
     itemBox : {

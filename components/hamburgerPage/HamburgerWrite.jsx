@@ -103,7 +103,7 @@ const HamburgerWrite = (props) => {
                 {price && <View>
                         <TextInput 
                         keyboardType="numeric"
-                        value={burgerDTO.price.toLocaleString()} 
+                        value={burgerDTO.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} 
                         style={styles.txtBox}
                         onChangeText={(text) => onInput('price', text.replace(/[^0-9]/g, ''))} />
                 </View>}

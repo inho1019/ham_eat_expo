@@ -307,7 +307,8 @@ const HamburgerView = (props) => {
                     <Text style={styles.h1}>{burgerDTO[0].name}</Text>
                     {burgerDTO[0].type !== 2 &&<View style={{flexDirection:'row',justifyContent:'center', marginTop:5}}>
                         <Image source={won} style={{height:25,width:25}}/>
-                        <Text style={{fontSize: 17,textAlignVertical:'center'}}> {burgerDTO[0].price}</Text>
+                        <Text style={{fontSize: 17,textAlignVertical:'center'}}> 
+                        &nbsp;{burgerDTO[0].price <= 0 ? '가격 정보가 없습니다' : burgerDTO[0].price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") }</Text>
                     </View>}
                     <View style={{flexDirection:'row',marginHorizontal: '5%',justifyContent:'space-between',marginBottom: 5}}>
                         {burgerDTO[0].type !== 2 &&<Text style={styles.h3}>{storeDTO ? storeDTO.name : '없는 매장'}</Text>}

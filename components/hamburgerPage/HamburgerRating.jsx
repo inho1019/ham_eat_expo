@@ -101,6 +101,12 @@ const HamburgerRating = (props) => {
 
     return (
         <View style={{flex : 1}}>
+            {ratings.filter(rat => route.params?.userSeq ? 
+                    (rat.userSeq === route.params?.userSeq)
+                    : searchData !== undefined ? ( (rat.userSeq === route.params?.userSeq) ||
+                    (rat.placeName && (rat.placeName.includes(searchData) || searchData.includes(rat.placeName))) || 
+                    rat.content.includes(searchData) || searchData.includes(rat.content) ) : true).length === 0 &&
+                    <Text style={styles.noList}>결과가 없습니다</Text>}
             <FlatList
                 style={{flex : 1}}
 
@@ -162,6 +168,13 @@ const HamburgerRating = (props) => {
 };
 
 const styles = StyleSheet.create({
+    noList : {
+        textAlign:'center',
+        fontSize: 17,
+        color:'gray',
+        paddingVertical: 5,
+        fontWeight:'bold'
+    },
     reviewItem : {
         borderBottomColor:'lightgray',
         borderBottomWidth: 2,

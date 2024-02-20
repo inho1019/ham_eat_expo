@@ -1,9 +1,9 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { Dimensions, FlatList, Image, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
-import star from '../../assets/burger/star.png'
-import starNone from '../../assets/burger/star_none.png'
-import won from '../../assets/burger/won.png'
+import star from '../../assets/burger/star.png';
+import starNone from '../../assets/burger/star_none.png';
+import won from '../../assets/burger/won.png';
 import { useAppContext } from '../api/ContextAPI';
 import { Skel } from 'react-native-ui-skel-expo'
 
@@ -180,36 +180,37 @@ const HamburgerList = (props) => {
                         key={data.index} onPress={() => (!route.params?.userSeq && searchParam === undefined) ? navigation.navigate('View', { burgerSeq : data.item[0].burgerSeq }) 
                         : onGo(1,data.item[0].burgerSeq)}>
                         <View style={styles.makeContainer}>
-                        {makeDTO.map((item,index) => {
-                            const getIngre = ingres.find(ing => ing.ingreSeq === item)
-                            return <Image key={index} style={
-                                {width: data.item[0].size === 0 ? '50%' : data.item[0].size === 2 ? '90%' : '70%',
-                                aspectRatio: getIngre.width / getIngre.height + 
-                                    (data.item[0].size === 0 ? - 0.3 : data.item[0].size === 2 && + 0.4),
-                                marginBottom: ((getIngre.type === 2 || getIngre.type === 3) && 
-                                    getIngre.height > 170 ? -(windowWidth*0.07) : -(windowWidth*0.06)) + 
-                                    (data.item[0].size === 0 ? + (windowWidth*0.0125) : data.item[0].size === 2 && + -(windowWidth*0.006)),
-                                zIndex:-index,alignSelf: 'center'}}
-                                source={{ uri : getIngre.image}}
-                                resizeMode='stretch'/>
-                            })}
-                        <Image 
-                        source={{ uri : ingres.find(ing => ing.ingreSeq === makeDTO[0]).type !== 0 ? 
-                            ingres.find(ing => ing.ingreSeq === makeDTO[0]).image :
-                            'https://codingdiary.s3.eu-west-2.amazonaws.com/burger/normal_bun.png'}} 
-                            style={{width: data.item[0].size === 0 ? '50%' : data.item[0].size === 2 ? '90%' : '70%',alignSelf:'center',
-                            aspectRatio: 500/(ingres.find(ing => ing.ingreSeq === makeDTO[0]).type !== 0 ? 
-                            ingres.find(ing => ing.ingreSeq === makeDTO[0]).height : 160), 
-                            zIndex: -makeDTO.length,marginTop: data.item[0].size === 0 ? 4 : data.item[0].size === 1 ? 3 : 0}} />
-                    </View>
+                            {makeDTO.map((item,index) => {
+                                const getIngre = ingres.find(ing => ing.ingreSeq === item)
+                                return <Image key={index} style={
+                                    {width: data.item[0].size === 0 ? '50%' : data.item[0].size === 2 ? '90%' : '70%',
+                                    aspectRatio: getIngre.width / getIngre.height + 
+                                        (data.item[0].size === 0 ? - 0.3 : data.item[0].size === 2 && + 0.4),
+                                    marginBottom: ((getIngre.type === 2 || getIngre.type === 3) && 
+                                        getIngre.height > 170 ? -(windowWidth*0.07) : -(windowWidth*0.06)) + 
+                                        (data.item[0].size === 0 ? + (windowWidth*0.0125) : data.item[0].size === 2 && + -(windowWidth*0.006)),
+                                    zIndex:-index+999,alignSelf: 'center'}}
+                                    source={{ uri : getIngre.image}}
+                                    resizeMode='stretch'/>
+                                })}
+                            <Image 
+                            source={{ uri : ingres.find(ing => ing.ingreSeq === makeDTO[0]).type !== 0 ? 
+                                ingres.find(ing => ing.ingreSeq === makeDTO[0]).image :
+                                'https://codingdiary.s3.eu-west-2.amazonaws.com/burger/normal_bun.png'}} 
+                                style={{width: data.item[0].size === 0 ? '50%' : data.item[0].size === 2 ? '90%' : '70%',alignSelf:'center',
+                                aspectRatio: 500/(ingres.find(ing => ing.ingreSeq === makeDTO[0]).type !== 0 ? 
+                                ingres.find(ing => ing.ingreSeq === makeDTO[0]).height : 160), 
+                                zIndex: -makeDTO.length+999,marginTop: data.item[0].size === 0 ? 4 : data.item[0].size === 1 ? 3 : 0}} />
+                        </View>
                     <View style={styles.infoContainer}>
                         <Text style={styles.itemName}>{data.item[0].name}</Text>
                         {data.item[0].type !== 2 && <Text style={styles.itemStore}>{stores.find(str => str.storeSeq === data.item[0].storeSeq) ? 
                         stores.find(str => str.storeSeq === data.item[0].storeSeq).name : '없는 매장'}</Text>}
                         {data.item[0].type === 2 && <Text style={styles.itemStore}>{data.item[1] ? data.item[1].name : '탈퇴 회원'}</Text>}{/* userSeq를 통한 유저명 가져오기 */}
                         {data.item[0].type !== 2 &&<View style={{flexDirection:'row',justifyContent:'center',marginTop:3}}>
-                            <Image source={won} style={{width:22,height:22}}/>
-                            <Text style={{fontSize:15}}> {data.item[0].price}</Text>
+                            <Image source={won} style={{width:23,height:23}}/>
+                            <Text style={{fontSize:15,textAlignVertical:'center'}}>
+                            &nbsp;{data.item[0].price <= 0 ? '가격 정보가 없습니다' : data.item[0].price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") }</Text>
                         </View>}
                         <View style={[styles.starBox,{ width: data.item[0].type === 2 ? '80%' : '70%', margin: data.item[0].type === 2 ? 12 : 2 }]}>
                             <View style={[styles.starBack,{width : 
@@ -263,13 +264,13 @@ const styles = StyleSheet.create({
         overflow:'hidden'
     },
     makeContainer : {
-        width: '35.5%',
-        justifyContent: 'center',
+        width: '33%',
+        justifyContent:'center',
+        paddingHorizontal:'0.2%',
         overflow:'hidden',
-        paddingRight: '2%',
     },
     infoContainer: {
-        width: '64.5%',
+        width: '67%',
         borderLeftWidth: 1,
         borderColor: 'gray',
         marginVertical: 3,
@@ -278,9 +279,10 @@ const styles = StyleSheet.create({
     },
     burgerItem : {
         flexDirection: 'row',
-        paddingHorizontal : '2.5%',
         overflow: 'hidden',
         paddingVertical: 1,
+        marginHorizontal: '1%',
+        borderRadius: 10,
         marginBottom: 3,
         marginTop: 1,
         backgroundColor:'white',

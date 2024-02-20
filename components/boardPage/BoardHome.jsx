@@ -211,7 +211,7 @@ const BoardHome = (props) => {
                 </View>
             </View>}
             <Pressable onPress={() => navigation.navigate('List', { type : 0 } )}
-                style={styles.h1Out}>
+                style={({pressed}) => [styles.h1Out,{backgroundColor: pressed ? 'whitesmoke' : 'white'}]}>
                 <Text style={styles.h1}>자유 게시판</Text>
                 <Text style={styles.more}>more </Text>
             </Pressable>
@@ -224,13 +224,14 @@ const BoardHome = (props) => {
                 </View> 
                 :   <View style={styles.itemBox}>
                     {free.map((item,index) => <Pressable key={index}
+                        style={({pressed}) => ({backgroundColor: pressed ? 'whitesmoke' : 'white'})}
                         onPress={() => navigation.navigate('View',{ boardSeq : item.boardSeq })}>
                         <Text numberOfLines={1} ellipsizeMode="tail" style={styles.item}>{item.title}</Text>
                     </Pressable>)}
                 </View>
             }
             <Pressable onPress={() => navigation.navigate('List', { type : 1 } )}
-                style={styles.h1Out}>
+                style={({pressed}) => [styles.h1Out,{backgroundColor: pressed ? 'whitesmoke' : 'white'}]}>
                 <Text style={styles.h1}>행사/이벤트 게시판</Text>
                 <Text style={styles.more}>more </Text>
             </Pressable>
@@ -243,13 +244,14 @@ const BoardHome = (props) => {
                 </View> 
                 :    <View style={styles.itemBox}>
                     {event.map((item,index) => <Pressable key={index}
+                        style={({pressed}) => ({backgroundColor: pressed ? 'whitesmoke' : 'white'})}
                         onPress={() => navigation.navigate('View',{ boardSeq : item.boardSeq })}>
                         <Text numberOfLines={1} ellipsizeMode="tail" style={styles.item}>{item.title}</Text>
                     </Pressable>)}
                 </View>
             }
             <Pressable onPress={() => navigation.navigate('List', { type : 2 } )}
-                style={styles.h1Out}>
+                style={({pressed}) => [styles.h1Out,{backgroundColor: pressed ? 'whitesmoke' : 'white'}]}>
                 <Text style={styles.h1}>공지사항</Text>
                 <Text style={styles.more}>more </Text>
             </Pressable>
@@ -262,6 +264,7 @@ const BoardHome = (props) => {
                 </View> 
                 :    <View style={styles.itemBox}>
                     {notice.map((item,index) => <Pressable key={index}
+                        style={({pressed}) => ({backgroundColor: pressed ? 'whitesmoke' : 'white'})}
                         onPress={() => navigation.navigate('View',{ boardSeq : item.boardSeq })}>
                         <Text numberOfLines={1} ellipsizeMode="tail" style={styles.item}>{item.title}</Text>
                     </Pressable>)}
@@ -376,11 +379,12 @@ const styles = StyleSheet.create({
         borderBottomWidth:2,
         paddingBottom:3,
         marginHorizontal: 10,
-        marginTop: 20,
+        paddingTop: 10,
+        marginTop: 10,
     },
     h1 : {
-        fontSize: 25,
-        fontFamily: 'esamanruMedium',
+        fontSize: 23,
+        fontFamily:'esamanruMedium',
     },
     more : {
         textAlignVertical:'bottom',
@@ -404,7 +408,8 @@ const styles = StyleSheet.create({
         fontSize: 17,
         color: 'gray',
         fontWeight: 'bold',
-        marginVertical: 3
+        marginVertical: 3,
+        paddingHorizontal: 5
     },
     itemSkel : {
         height: '25%',
