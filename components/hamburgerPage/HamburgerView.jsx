@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { Dimensions, FlatList, Image, Keyboard, Modal, PanResponder, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
+import { Dimensions, FlatList, Image, Keyboard, Modal, PanResponder, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, TouchableWithoutFeedback, View } from 'react-native';
 import addImg from '../../assets/burger/add_review.png'
 import deleteImg from '../../assets/burger/delete.png'
 import drag from '../../assets/burger/drag.png'
@@ -51,7 +51,7 @@ const HamburgerView = (props) => {
 /////////////드래그 이벤트 2////////////////
     const panResponder2 = PanResponder.create({
         onStartShouldSetPanResponder: () => true,
-        onPanResponderRelease: (event, gestureState) => {
+        onPanResponderRelease: (_ , gestureState) => {
             if(gestureState.dy > 100) {
                 setReview(false)
             }
@@ -60,7 +60,7 @@ const HamburgerView = (props) => {
 /////////////드래그 이벤트 3////////////////
     const panResponder3 = PanResponder.create({
         onStartShouldSetPanResponder: () => true,
-        onPanResponderRelease: (event, gestureState) => {
+        onPanResponderRelease: (_ , gestureState) => {
             if(gestureState.dy < -100) {
                 setReview(true)
             }
@@ -408,7 +408,7 @@ const HamburgerView = (props) => {
                     animationType="slide"
                     transparent={true}
                     visible={review}>
-                    <View style={{flex : 1, flexDirection:'column-reverse'}}>
+                    <View style={{flex : 1, flexDirection:'column-reverse'}}>                          
                         <View style={styles.review}>
                             <View {...panResponder2.panHandlers}>
                                 <Image style={styles.dragImg} source={drag}/>
@@ -424,7 +424,7 @@ const HamburgerView = (props) => {
                                 <View style={{flexDirection:'row'}}><Text style={[styles.h2]}>평가 내용</Text></View>
                                 <TextInput value={content} multiline={true} maxLength={500} 
                                     style={[styles.contentInput,{height: store ? 160 : 85}]} numberOfLines={3}
-                                    onChangeText={(text) => setContent(text)} />
+                                    onChangeText={(text) => setContent(text)} onSubmitEditing={() => onSub()}/>
                                 {burgerDTO[0] && 
                                     burgerDTO[0].type === 0 && <View style={{flexDirection:'row',zIndex:30}}>
                                     <Text style={[styles.h2,{marginTop: store ? '7%' : '3.5%'}]}>지점</Text>
@@ -493,6 +493,9 @@ const HamburgerView = (props) => {
                             alwaysBounceVertical={false}
                             />
                         </View>
+                        <TouchableWithoutFeedback onPress={() => setReview(false)}>
+                                <View style={{flex: 1}}/>
+                        </TouchableWithoutFeedback>  
                     </View>
                 </Modal>
         </View>
@@ -597,9 +600,8 @@ const styles = StyleSheet.create({
     },
     ////////리뷰 모달/////////
     review : {
-        flex: 1,
+        flex: 4,
         backgroundColor: 'white',
-        maxHeight: '80%',
         marginHorizontal : '1%',
         elevation: 20,
         borderTopLeftRadius: 40,

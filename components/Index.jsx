@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Image, Keyboard, Modal, StyleSheet, View } from 'react-native';
+import { Image, Keyboard, Modal, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
 import { DefaultTheme } from '@react-navigation/native';
 import NavBar from './NavBar';
 import Main from './mainPage/Main';
@@ -52,36 +52,38 @@ const Index = () => {
      ///////////////////////////////////////////
 
     return (
-        <View style={styles.container}>
-            <View style={[styles.screenContainer,{height: '92%'}]}>
-                {
-                    state.page === 0 && <Main navTheme={navTheme} navHeader={navHeader}/>
-                }
-                {
-                    state.page === 1 && <HamburgerMain navTheme={navTheme} navHeader={navHeader}/>
-                }
-                {
-                    state.page === 2 && <BoardMain navTheme={navTheme} navHeader={navHeader}/>
-                }
-                {
-                    state.page === 3 && <UserMain navTheme={navTheme} navHeader={navHeader}/>
-                }
-                {
-                    state.page === 4 && <UserMypageMain navTheme={navTheme} navHeader={navHeader}/>
-                }
-            </View>
-            <View style={{height: key ? 0 : '8%',overflow:'hidden',opacity: key ? 0 : 1}}>
-                <NavBar onPage={onPage} page={state.page}/>
-            </View>
-            <Modal
-                animationType="fade"
-                transparent={true}
-                visible={state.loading}>
-                <View style={styles.modalView}>
-                    <Image source={loadingImg} style={{width:100,height:100}}/>
+        <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+            <View style={styles.container}>
+                <View style={[styles.screenContainer,{height: '92%'}]}>
+                    {
+                        state.page === 0 && <Main navTheme={navTheme} navHeader={navHeader}/>
+                    }
+                    {
+                        state.page === 1 && <HamburgerMain navTheme={navTheme} navHeader={navHeader}/>
+                    }
+                    {
+                        state.page === 2 && <BoardMain navTheme={navTheme} navHeader={navHeader}/>
+                    }
+                    {
+                        state.page === 3 && <UserMain navTheme={navTheme} navHeader={navHeader}/>
+                    }
+                    {
+                        state.page === 4 && <UserMypageMain navTheme={navTheme} navHeader={navHeader}/>
+                    }
                 </View>
-            </Modal>
-        </View>
+                <View style={{height: key ? 0 : '8%',overflow:'hidden',opacity: key ? 0 : 1}}>
+                    <NavBar onPage={onPage} page={state.page}/>
+                </View>
+                <Modal
+                    animationType="fade"
+                    transparent={true}
+                    visible={state.loading}>
+                    <View style={styles.modalView}>
+                        <Image source={loadingImg} style={{width:100,height:100}}/>
+                    </View>
+                </Modal>
+            </View>
+        </TouchableWithoutFeedback>
     );
 };
 
