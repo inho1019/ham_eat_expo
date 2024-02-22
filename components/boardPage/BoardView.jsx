@@ -1,7 +1,9 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { Image, Linking, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Image, Keyboard, Linking, Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import commentAdd from '../../assets/board/comment_reg.png'
 import favImg from '../../assets/board/fav.png'
+import deleteImg from '../../assets/burger/delete.png';
 import { useAppContext } from '../api/ContextAPI';
 import ImageModal from '../ImageModal';
 
@@ -62,7 +64,15 @@ const BoardView = (props) => {
                 navigation.setOptions({
                     title: res.data[0].title
                 });
-                onLoading(false)
+                axios.get(`https://hameat.onrender.com/comment/list/${route.params?.boardSeq}`)
+                .then(res => {
+                    setCommentList(res.data)
+                    onLoading(false)
+                })
+                .catch(() => {
+                    setAlertTxt('불러오기 중 에러발생')
+                    onLoading(false)
+                })
             }).catch(() => {
                 setAlertTxt('불러오기 중 에러발생')
                 onLoading(false)
@@ -148,75 +158,142 @@ const BoardView = (props) => {
         }
     },[boardDTO])
 
+    const [commentList,setCommentList] = useState([])
+    const [commentDTO,setCommentDTO] = useState({
+        userSeq : state.user.userSeq,
+        boardSeq : route.params?.boardSeq,
+        content : ''
+    })
+
+    const onSub = () => {
+        Keyboard.dismiss();
+        if(commentDTO.content.length > 0) {
+            onLoading(true)
+            axios.post(`https://hameat.onrender.com/comment/write`,commentDTO)
+            .then(res => {
+                setCommentList((item) => {
+                    return [[res.data,state.user],...item]
+                })
+                setCommentDTO((item) => {
+                    return {...item, content : ''}
+                })
+                onLoading(false)
+            })
+            .catch(() => {
+                setAlertTxt('등록 중 에러발생')
+                onLoading(false)
+            })
+        } else {
+            setAlertTxt('내용을 입력해주세요') 
+        }
+    }
+
+    const onDeleteCom = (seq) => {
+        onLoading(true)
+        axios.delete(`https://hameat.onrender.com/comment/delete/${seq}`)
+        .then(() => {
+            setCommentList((com) => com.filter(item => item[0].commentSeq !== seq))
+            onLoading(false)
+        })
+        .catch(() => {
+            setAlertTxt('삭제 중 에러발생')
+            onLoading(false)
+        })
+    }
+
     const openLink = () => {
         Linking.openURL(boardDTO[0].url)
         .catch((err) => console.error('Error opening external link:', err));
     };
 
     return (
-        <ScrollView>
-            {boardDTO && <View style={{flexDirection:'column', borderBottomWidth:10,borderBottomColor:'whitesmoke'}}>
-                <View style={{borderBottomWidth:2,borderBottomColor:'lightgray',padding: 5}}>
-                    <Text style={styles.h1}>{boardDTO[0].title}</Text>
-                    <View style={{flexDirection:'row'}}>
-                        <View style={{width:'100%'}}>
-                            <View style={{flexDirection:'row',justifyContent:'space-between'}}>
-                                <Text style={styles.h2}>{boardDTO[1] ? boardDTO[1].name : '탈퇴 회원'}</Text>
-                                {boardDTO[1].userSeq === state.user.userSeq && <View style={{flexDirection:'row'}}>
-                                    <View style={{flexDirection:'column'}}>
-                                        <Pressable onPress={onUpdate}
-                                            style={[styles.itemBut,{backgroundColor:'#2E8DFF'}]}>
-                                            <Text style={styles.itemButTxt}>수정</Text>
+        <View style={{flex: 1}}>   
+            <FlatList
+                ListHeaderComponent={() => boardDTO && <View style={{flexDirection:'column', borderBottomWidth:10,borderBottomColor:'whitesmoke'}}>
+                    <View style={{borderBottomWidth:2,borderBottomColor:'lightgray',padding: 5}}>
+                        <Text style={styles.h1}>{boardDTO[0].title}</Text>
+                        <View style={{flexDirection:'row'}}>
+                            <View style={{width:'100%'}}>
+                                <View style={{flexDirection:'row',justifyContent:'space-between'}}>
+                                    <Text style={styles.h2}>{boardDTO[1] ? boardDTO[1].name : '탈퇴 회원'}</Text>
+                                    {boardDTO[1].userSeq === state.user.userSeq && <View style={{flexDirection:'row'}}>
+                                        <View style={{flexDirection:'column'}}>
+                                            <Pressable onPress={onUpdate}
+                                                style={[styles.itemBut,{backgroundColor:'#2E8DFF'}]}>
+                                                <Text style={styles.itemButTxt}>수정</Text>
+                                            </Pressable>
+                                        </View>
+                                        <View style={{flexDirection:'column'}}>
+                                        <Pressable onPress={onDelete}
+                                            style={[styles.itemBut,{backgroundColor:'tomato'}]}>
+                                            <Text style={styles.itemButTxt}>삭제</Text>
                                         </Pressable>
-                                    </View>
-                                    <View style={{flexDirection:'column'}}>
-                                    <Pressable onPress={onDelete}
-                                        style={[styles.itemBut,{backgroundColor:'tomato'}]}>
-                                        <Text style={styles.itemButTxt}>삭제</Text>
-                                    </Pressable>
-                                    </View>
-                                </View>}
-                            </View>
-                            <View style={{flexDirection:'row'}}>
-                                <Text style={styles.h3}>조회 {boardDTO[0].hit}</Text>
-                                <Text style={styles.h3}> | 추천 {JSON.parse(boardDTO[0].fav).length}</Text>
-                                <Text style={styles.h3}> | {getToday(boardDTO[0].logTime)}</Text>
+                                        </View>
+                                    </View>}
+                                </View>
+                                <View style={{flexDirection:'row'}}>
+                                    <Text style={styles.h3}>조회 {boardDTO[0].hit}</Text>
+                                    <Text style={styles.h3}> | 추천 {JSON.parse(boardDTO[0].fav).length}</Text>
+                                    <Text style={styles.h3}> | {getToday(boardDTO[0].logTime)}</Text>
+                                </View>
                             </View>
                         </View>
                     </View>
-                </View>
-                {boardDTO[0].url !== '' && <Pressable style={styles.link}
-                    onPress={openLink}>
-                    <Text style={{color:'gray'}}>{boardDTO[0].url}</Text>
-                </Pressable>}
-                <View style={{padding:5}}>
-                    <Text style={styles.h4}>{boardDTO[0].content}</Text>
-                    <View style={styles.imageSection}>
-                        {imageArray.map((item,index) => 
-                        <Pressable
-                            key={index} 
-                            style={{width: imageArray.length > 1 ? 
-                                    (imageArray.length % 2 === 1 && index+1 === imageArray.length) ?
-                                    '100%' : '50%' : '100%',aspectRatio: imageArray.length > 1 ? 
-                                    (imageArray.length % 2 === 1 && index+1 === imageArray.length) ?
-                                    2 : 1 : 1/1}}
-                            onPress={() => onOpen(item)}>
-                            <Image 
-                                source={{ uri:'http' + item}}
-                                resizeMode="cover"
-                                style={{width:'100%',height:'100%'}}
-                            />
-                        </Pressable>)}
+                    {boardDTO[0].url !== '' && <Pressable style={styles.link}
+                        onPress={openLink}>
+                        <Text style={{color:'gray'}}>{boardDTO[0].url}</Text>
+                    </Pressable>}
+                    <View style={{padding:5}}>
+                        <Text style={styles.h4}>{boardDTO[0].content}</Text>
+                        <View style={styles.imageSection}>
+                            {imageArray.map((item,index) => 
+                            <Pressable
+                                key={index} 
+                                style={{width: imageArray.length > 1 ? 
+                                        (imageArray.length % 2 === 1 && index+1 === imageArray.length) ?
+                                        '100%' : '50%' : '100%',aspectRatio: imageArray.length > 1 ? 
+                                        (imageArray.length % 2 === 1 && index+1 === imageArray.length) ?
+                                        2 : 1 : 1/1}}
+                                onPress={() => onOpen(item)}>
+                                <Image 
+                                    source={{ uri:'http' + item}}
+                                    resizeMode="cover"
+                                    style={{width:'100%',height:'100%'}}
+                                />
+                            </Pressable>)}
+                        </View>
                     </View>
-                </View>
-                <View style={{flexDirection:'row',justifyContent:'center',marginTop:30}}>
-                    <Pressable onPress={() => onFav()}>
-                        <Image source={favImg} style={{width:50,height:50}}/>
-                    </Pressable>
-                </View>
-                <View style={{flexDirection:'row',justifyContent:'center'}}>
-                    <Text style={styles.favTxt}>{JSON.parse(boardDTO[0].fav).length}</Text>
-                </View>
+                    <View style={{flexDirection:'row',justifyContent:'center',marginTop:30}}>
+                        <Pressable onPress={() => onFav()}>
+                            <Image source={favImg} style={{width:50,height:50}}/>
+                        </Pressable>
+                    </View>
+                    <View style={{flexDirection:'row',justifyContent:'center'}}>
+                        <Text style={styles.favTxt}>{JSON.parse(boardDTO[0].fav).length}</Text>
+                    </View>
+                </View>}
+                data={commentList}
+                renderItem={(data) => <View style={{padding:5,borderBottomColor:'lightgray',borderBottomWidth:2}}>
+                    <View style={{flexDirection:'row',justifyContent:'space-between'}}>
+                    <View style={{flexDirection:'row'}}>
+                        <Text style={{fontSize:16,fontWeight:'bold',color:'gray'}}>{data.item[1].name}</Text>
+                        <Text style={{fontSize:14,textAlignVertical:'bottom',color:'gray'}}> | {getToday(data.item[0].logTime)}</Text>
+                    </View>
+                        {data.item[1].userSeq === state.user.userSeq && 
+                        <Pressable onPress={ () => onDeleteCom(data.item[0].commentSeq) }>
+                            <Image source={deleteImg} style={{width:25,height:25}}/>
+                        </Pressable>}
+                    </View>
+                    <Text style={{marginTop:3}}>{data.item[0].content}</Text>
+                </View>}
+                ListFooterComponent={() => <View style={{paddingBottom:50}}/>}
+            />
+            {state.user.userSeq !== -1 && <View><TextInput style={styles.commentInput} value={commentDTO.content}
+                onChangeText={(text) => setCommentDTO({...commentDTO, content : text})} 
+                onSubmitEditing={ onSub } placeholder='댓글 입력'/>
+            <Pressable onPress={ onSub }>
+                <Image source={commentAdd} style={styles.commentAdd}/>
+            </Pressable>
             </View>}
             <ImageModal imgModal={imgModal} src={imgSrc} onClose={onClose}/>
             <Modal
@@ -229,7 +306,7 @@ const BoardView = (props) => {
                     </View>
                 </View>
             </Modal>
-        </ScrollView>
+        </View>
     );
 };
 
@@ -293,6 +370,24 @@ const styles = StyleSheet.create({
         marginTop: 5,
         padding: 3,
         borderRadius:5
+    },
+    commentInput : {
+        position: 'absolute',
+        width: '100%',
+        bottom: 0,
+        borderTopColor:'darkgray',
+        backgroundColor:'white',
+        borderTopWidth: 2,
+        fontSize: 15,
+        padding: 5
+    },
+    commentAdd : {
+        position: 'absolute',
+        width: 30,
+        height : 30,
+        bottom: 2,
+        right: 10,
+        zIndex: 999
     },
     //alert
     alert : {

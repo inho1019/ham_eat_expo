@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { Dimensions, Image, Keyboard, Linking, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Dimensions, Image, Keyboard, Linking, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableWithoutFeedback, View } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { requestForegroundPermissionsAsync, getCurrentPositionAsync, watchPositionAsync } from 'expo-location';
 import deleteImg from '../assets/burger/delete.png'
@@ -289,13 +289,15 @@ const Map = (props) => {
                 marginLeft:'5%', borderRadius:20, marginTop: type !== 0 ? '7%' : 5}}>
                 <Skel height={'100%'} width={windowWidth*0.9}/>
             </View>
-                : <WebView
+            : <TouchableWithoutFeedback>
+                <WebView
                     style={{marginTop: type !== 0 ? '7%' : 5}}
                     source={{ html: link }}
                     javaScriptEnabled={true}
                     domStorageEnabled={true}
                     onMessage={webMessage}
                 />
+            </TouchableWithoutFeedback>
             }
             {selData && <View style={styles.selItem}>
                 <View style={{flexDirection:'row',justifyContent:'space-between'}}>

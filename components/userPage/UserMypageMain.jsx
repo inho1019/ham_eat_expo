@@ -7,6 +7,7 @@ import HamburgerMap from '../hamburgerPage/HamburgerMap';
 import HamburgerList from '../hamburgerPage/HamburgerList';
 import BoardList from '../boardPage/BoardList';
 import HamburgerRating from '../hamburgerPage/HamburgerRating';
+import Carousel from './Carousel';
 
 const Stack = createNativeStackNavigator();
 
@@ -19,6 +20,7 @@ const UserMypageMain = (props) => {
             <Stack.Screen name="Page" component={UserPage} options={{ headerShown: false }}/>
             <Stack.Screen name="Add" component={HamburgerAdd} options={{ headerTitle: '등록'}}/>
             <Stack.Screen name="Map" component={HamburgerMap} options={{ headerTitle: '등록'}}/>
+            <Stack.Screen name="Carousel" component={Carousel} options={{ headerTitle: '캐러셀'}}/>
             <Stack.Screen name="BurgerList" component={HamburgerList}/>
             <Stack.Screen name="BoardList" component={BoardList}/>
             <Stack.Screen name="RatingList" component={HamburgerRating}/>

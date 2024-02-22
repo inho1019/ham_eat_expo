@@ -1,8 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Image, KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Dimensions, Image, KeyboardAvoidingView, Linking, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import searchIcon from '../../assets/main/search.png'
 import logo from '../../assets/icon.png'
 import Map from '../Map';
+import { useAppContext } from '../api/ContextAPI';
+import { Skel } from 'react-native-ui-skel-expo'
+import axios from 'axios';
 
 const Home = (props) => {
     const{navigation} = props 
@@ -10,21 +13,36 @@ const Home = (props) => {
     const [search,setSearch] = useState('')
 
     const [mapStop,setMapStop] = useState(false)
+
+    const windowWidth = Dimensions.get('window').width;
+
+    const { dispatch } = useAppContext();
+
+    const onLoading = (bool) => {
+        dispatch({ type: 'SET_LOADING' , payload : bool });
+    };
     //////////캐러셀/////////////
-    const data = [{//캐러셀용 DB제작후 삽입 예정
-        type : 0,
-        src : 'https://www.techm.kr/news/photo/202310/115685_144854_348.jpg'
-    },{
-        type : 0,
-        src : 'https://naeiledu.co.kr/tabtap_photo/skin/images/evt-visual.png'
-    },{
-        type : 0,
-        src : 'https://www.kfckorea.com/nas/event/2024/01/04/7UHLn9Fwwfm0.png'
-    }];
+    const [carousel,setCarousel] = useState([]);
+    
+    useEffect(() => {
+        onLoading(true)
+        axios.get('https://hameat.onrender.com/carousel/list')
+        .then(res => {
+            setCarousel(res.data)
+            onLoading(false)
+        })
+        .catch(() => {
+            alert('불러오기 중 에러발생')
+            onLoading(false)
+        })
+    },[])
+
     const [itemWidth, setItemWidth] = useState(0);
 
     useEffect(() => {
-        scrollRef.current.scrollTo({ x: itemWidth * 1 , animated: false });
+        if(scrollRef.current) {
+            scrollRef.current.scrollTo({ x: itemWidth * 1 , animated: false });
+        }
     },[itemWidth])
 
     ///////////////캐러셀 추적////////////////
@@ -42,9 +60,9 @@ const Home = (props) => {
     useEffect(() => {
         if(itemWidth > 0) {
             if(currentPage === 0) {
-                setCurrentPage(data.length)
-                scrollRef.current.scrollTo({ x: itemWidth * (data.length), animated: false });
-            } else if(currentPage === data.length + 1) {
+                setCurrentPage(carousel.length)
+                scrollRef.current.scrollTo({ x: itemWidth * (carousel.length), animated: false });
+            } else if(currentPage === carousel.length + 1) {
                 setCurrentPage(1)
                 scrollRef.current.scrollTo({ x: itemWidth, animated: false });
             } else {
@@ -58,7 +76,7 @@ const Home = (props) => {
                 return () => clearTimeout(timeoutId);
             }
         }
-    },[itemWidth,currentPage])
+    },[itemWidth,currentPage,carousel])
 
     ///////////////////////////////////////////
 
@@ -79,6 +97,11 @@ const Home = (props) => {
         requestAnimationFrame(() => navigation.navigate('Search', { search : txt }))
     } 
 
+    const openLink = (url) => {
+        Linking.openURL(url)
+        .catch((err) => console.error('Error opening external link:', err));
+    };
+
     return (
         <KeyboardAvoidingView style={{flex:1}}>
             <View style={{flexDirection:'row',borderBottomColor: 'whitesmoke', borderBottomWidth: 20,paddingBottom: 5,marginBottom: 5}}>
@@ -98,38 +121,44 @@ const Home = (props) => {
                     <Image source={searchIcon} style={styles.searchIcon}/>
                 </Pressable>
             </View>
-            <View 
-                style={styles.carBox}>
-                <ScrollView
-                    ref={ scrollRef }
-                    horizontal
-                    pagingEnabled
-                    contentContainerStyle={{width: `${100 * (data.length + 2)}%`}}
-                    scrollEventThrottle={100}
-                    decelerationRate="fast"
-                    onMomentumScrollEnd={pageChange}
-                    onContentSizeChange={w => setItemWidth(w / (data.length + 2))}
-                    showsHorizontalScrollIndicator={false}
-                    initialPage={1}>
-                    <View style={{flexDirection: 'row'}}>
-                        <View style={{width: itemWidth,height: '100%'}}>
-                            <Image source={{uri : data[data.length-1].src}} style={{width:'100%',height: '100%'}} resizeMode='cover'/>  
+            { carousel.length > 0 ?
+                <View 
+                    style={styles.carBox}>
+                    <ScrollView
+                        ref={ scrollRef }
+                        horizontal
+                        pagingEnabled
+                        contentContainerStyle={{width: `${100 * (carousel.length + 2)}%`}}
+                        scrollEventThrottle={100}
+                        decelerationRate="fast"
+                        onMomentumScrollEnd={pageChange}
+                        onContentSizeChange={w => setItemWidth(w / (carousel.length + 2))}
+                        showsHorizontalScrollIndicator={false}
+                        initialPage={1}>
+                        <View style={{flexDirection: 'row'}}>
+                            <View style={{width: itemWidth,height: '100%'}}>
+                                <Image source={{uri : carousel[carousel.length-1].image}} style={{width:'100%',height: '100%'}} resizeMode='cover'/>  
+                            </View>
+                            {carousel.map((item,index) => <Pressable
+                            key={index}
+                            onPress={() => item.type === 0 && openLink(item.url)}
+                            style={{width: itemWidth,height: '100%'}}>
+                                <Image source={{uri : item.image}} style={{width:'100%',height: '100%'}} resizeMode='cover'/>
+                            </Pressable>)}
+                            <View style={{width: itemWidth,height: '100%'}}>
+                                <Image source={{uri : carousel[0].image}} style={{width:'100%',height: '100%'}} resizeMode='cover'/>  
+                            </View>
                         </View>
-                        {data.map((item,index) => <Pressable
-                        key={index}
-                        style={{width: itemWidth,height: '100%'}}>
-                            <Image source={{uri : item.src}} style={{width:'100%',height: '100%'}} resizeMode='cover'/>
-                        </Pressable>)}
-                        <View style={{width: itemWidth,height: '100%'}}>
-                            <Image source={{uri : data[0].src}} style={{width:'100%',height: '100%'}} resizeMode='cover'/>  
-                        </View>
+                    </ScrollView>
+                    <View style={{flexDirection: 'row',position:'absolute',bottom: 5, right: 5}}>
+                        {carousel.map((_,index) => <View key={index} 
+                        style={[styles.carBall,{ opacity : index === currentPage-1 ? 0.7 : 0.3}]}/>)}
                     </View>
-                </ScrollView>
-                <View style={{flexDirection: 'row',position:'absolute',bottom: 5, right: 5}}>
-                    {data.map((_,index) => <View key={index} 
-                    style={[styles.carBall,{ opacity : index === currentPage-1 ? 0.7 : 0.3}]}/>)}
+                </View> :
+                <View style={styles.carBox}>
+                    <Skel height={'100%'} width={windowWidth}/>
                 </View>
-            </View>
+            }
             <Text style={styles.h2}>주변 매장</Text>
             {!mapStop && <Map type={0} onMapSearch={onMapSearch}/>}
         </KeyboardAvoidingView>

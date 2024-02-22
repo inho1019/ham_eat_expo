@@ -252,6 +252,12 @@ const UserPage = (props) => {
                     })}>
                     <Text style={styles.myBut}>재료 등록</Text>
                 </Pressable>
+                <Pressable onPress={() => navigation.navigate('Carousel')}
+                    style={({ pressed }) => ({
+                        backgroundColor: pressed ? 'whitesmoke' : 'white',
+                    })}>
+                    <Text style={styles.myBut}>캐러셀 관리</Text>
+                </Pressable>
                 <Text/>
             </View>}
             <Text style={styles.h2}>계정</Text>
