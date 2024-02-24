@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Dimensions, FlatList, Image, Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Dimensions, FlatList, Image, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useAppContext } from '../api/ContextAPI';
 import writeImg from '../../assets/board/write.png'
 import axios from 'axios';
@@ -22,18 +22,11 @@ const BoardList = (props) => {
         dispatch({ type: 'SET_VIEW' , payload : num });
     };
 
-    const windowWidth = Dimensions.get('window').width;
-     /////////////alert애니메이션//////////////
-     const [alertTxt,setAlertTxt] = useState('')
+    const onAlertTxt = (txt) => {
+        dispatch({ type: 'SET_ALERTTXT' , payload : txt });
+    };
 
-     useEffect(()=> {
-         if(alertTxt !== '') {
-             setTimeout(() => {
-                 setAlertTxt('')
-             }, 2000)
-         }
-     },[alertTxt])
-     ////////////////////////////////////////////
+    const windowWidth = Dimensions.get('window').width;
     ////////////////////////////////////////////
     const getToday = (logTime) => {
         const date = new Date(logTime)
@@ -77,7 +70,7 @@ const BoardList = (props) => {
                 onLoading(false)
                 setLoading(false)
             }).catch(() => {
-                setAlertTxt('불러오기 중 에러발생')
+                onAlertTxt('불러오기 중 에러발생')
                 onLoading(false)
                 setLoading(false)
             })
@@ -155,16 +148,6 @@ const BoardList = (props) => {
                 : navigation.navigate('Form',{ type : route.params?.type })}>
                 <Image source={writeImg} style={{width: 50, height: 50}}/>
             </Pressable>}
-            <Modal
-                animationType="fade"
-                visible={alertTxt !== ''}
-                transparent={true}>
-                <View style={{flex:1,flexDirection:'column-reverse'}}>
-                    <View style={styles.alert}>
-                        <Text style={styles.alertTxt}>{alertTxt}</Text>
-                    </View>
-                </View>
-            </Modal>
         </View>
     );
 };
@@ -214,27 +197,6 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
         marginVertical: 3,
         borderRadius: 5
-    },
-    //alert
-    alert : {
-        padding: 10,
-        marginBottom: 70,
-        borderRadius: 10,
-        width: '95%',
-        alignSelf: 'center',
-        backgroundColor: '#666666',
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5,
-    },
-    alertTxt : {
-        color: 'whitesmoke',
-        textAlign: 'center',
     }
 })
 

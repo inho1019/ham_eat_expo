@@ -1,4 +1,4 @@
-import { StatusBar, SafeAreaView } from 'react-native';
+import { StatusBar } from 'react-native';
 import Index from './components/Index';
 import { AppProvider } from './components/api/ContextAPI';
 import * as Font from 'expo-font';
@@ -25,6 +25,10 @@ export default function App() {
 
   return (
     <AppProvider style={{flex : 1}}>
+      <StatusBar
+        backgroundColor="white"
+        barStyle="dark-content" 
+      />
       <Index/>
     </AppProvider>
   );

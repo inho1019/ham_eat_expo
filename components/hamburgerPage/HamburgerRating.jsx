@@ -9,17 +9,6 @@ import MapModal from '../MapModal';
 
 const HamburgerRating = (props) => {
     const {route,navigation,searchData} = props
-
-    /////////////alert애니메이션//////////////
-    const [alertTxt,setAlertTxt] = useState('')
-
-    useEffect(()=> {
-        if(alertTxt !== '') {
-            setTimeout(() => {
-                setAlertTxt('')
-            }, 2000)
-        }
-    },[alertTxt])
     ////////////////////////////////////////////
     const getToday = (logTime) => {
         const date = new Date(logTime)
@@ -41,6 +30,10 @@ const HamburgerRating = (props) => {
     const onPageView = (pg,seq) => {
         dispatch({ type: 'SET_PAGE' , payload : pg });
         dispatch({ type: 'SET_VIEW' , payload : seq });
+    };
+
+    const onAlertTxt = (txt) => {
+        dispatch({ type: 'SET_ALERTTXT' , payload : txt });
     };
     ///////////////////지도모달/////////////////
     const [mapModal,setMapModal] = useState(false)
@@ -91,10 +84,10 @@ const HamburgerRating = (props) => {
         .then(() => {
             onLoading(false)
             setRatings(ratings.filter(rat => rat.ratingSeq !== ratingSeq))
-            setAlertTxt('삭제 완료')
+            onAlertTxt('삭제 완료')
         })
         .catch(() => {
-            setAlertTxt('삭제 중 에러발생')
+            onAlertTxt('삭제 중 에러발생')
             onLoading(false)
         })
     }
@@ -148,20 +141,10 @@ const HamburgerRating = (props) => {
                 alwaysBounceVertical={false}
             />
             <Modal 
-                    animationType="fade"
-                    visible={mapModal}
-                    transparent={true}>
-                        <MapModal mapDTO={mapDTO} onClose={onClose}/>
-                </Modal>
-            <Modal
                 animationType="fade"
-                visible={alertTxt !== ''}
+                visible={mapModal}
                 transparent={true}>
-                <View style={{flex:1,flexDirection:'column-reverse'}}>
-                    <View style={styles.alert}>
-                        <Text style={styles.alertTxt}>{alertTxt}</Text>
-                    </View>
-                </View>
+                    <MapModal mapDTO={mapDTO} onClose={onClose}/>
             </Modal>
         </View>
     );
@@ -199,27 +182,6 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: 'gray',
         paddingTop: 5
-    },
-    //alert
-    alert : {
-        padding: 10,
-        marginBottom: 70,
-        borderRadius: 10,
-        width: '95%',
-        alignSelf: 'center',
-        backgroundColor: '#666666',
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5,
-    },
-    alertTxt : {
-        color: 'whitesmoke',
-        textAlign: 'center',
     }
 });
 

@@ -66,16 +66,6 @@ const HamburgerView = (props) => {
             }
         },
     })
-    /////////////alert애니메이션//////////////
-    const [alertTxt,setAlertTxt] = useState('')
-
-    useEffect(()=> {
-        if(alertTxt !== '') {
-            setTimeout(() => {
-                setAlertTxt('')
-            }, 2000)
-        }
-    },[alertTxt])
     ////////////////////////////////////////////
     const getToday = (logTime) => {
         const date = new Date(logTime)
@@ -95,6 +85,10 @@ const HamburgerView = (props) => {
     };
     const onLoading = (bool) => {
         dispatch({ type: 'SET_LOADING' , payload : bool });
+    };
+
+    const onAlertTxt = (txt) => {
+        dispatch({ type: 'SET_ALERTTXT' , payload : txt });
     };
     ///////////////////지도모달/////////////////
     const [mapModal,setMapModal] = useState(false)
@@ -167,25 +161,25 @@ const HamburgerView = (props) => {
                         setFirst(false)
                     })
                     .catch(() => {
-                        setAlertTxt('불러오기 중 에러발생')
+                        onAlertTxt('불러오기 중 에러발생')
                         onLoading(false)
                         setFirst(false)
                     })
                 })
                 .catch(() => {
-                    setAlertTxt('불러오기 중 에러발생')
+                    onAlertTxt('불러오기 중 에러발생')
                     onLoading(false)
                     setFirst(false)
                 })
             })
             .catch(() => {
-                setAlertTxt('불러오기 중 에러발생')
+                onAlertTxt('불러오기 중 에러발생')
                 onLoading(false)
                 setFirst(false)
             })
         })
         .catch(() => {
-            setAlertTxt('불러오기 중 에러발생')
+            onAlertTxt('불러오기 중 에러발생')
             onLoading(false)
             setFirst(false)
         })
@@ -214,21 +208,21 @@ const HamburgerView = (props) => {
                 .then(res => {
                     setRatings(res.data)
                     onLoading(false)
-                    setAlertTxt('평가 등록 완료')
+                    onAlertTxt('평가 등록 완료')
                     setStore(false)
                 })
                 .catch(() => {
-                    setAlertTxt('등록 중 에러발생')
+                    onAlertTxt('등록 중 에러발생')
                     onLoading(false)
                 })
             })
             } else {
                 Keyboard.dismiss()
-                setAlertTxt('지점을 선택해주세요')
+                onAlertTxt('지점을 선택해주세요')
             }
         } else {
             Keyboard.dismiss()
-            setAlertTxt('평가 내용을 입력해주세요')
+            onAlertTxt('평가 내용을 입력해주세요')
         }
     }
     const onDelete = (ratingSeq) => {
@@ -237,10 +231,10 @@ const HamburgerView = (props) => {
         .then(() => {
             onLoading(false)
             setRatings(ratings.filter(rat => rat[0].ratingSeq !== ratingSeq))
-            setAlertTxt('삭제 완료')
+            onAlertTxt('삭제 완료')
         })
         .catch(() => {
-            setAlertTxt('삭제 중 에러발생')
+            onAlertTxt('삭제 중 에러발생')
             onLoading(false)
         })
     }
@@ -388,16 +382,6 @@ const HamburgerView = (props) => {
             <View {...panResponder3.panHandlers} style={styles.reviewOpen}>
                 <Image style={styles.dragImg} source={drag}/>
             </View>
-                <Modal 
-                    animationType="fade"
-                    visible={alertTxt !== ''}
-                    transparent={true}>
-                    <View style={{flex:1,flexDirection:'column-reverse'}}>
-                        <View style={styles.alert}>
-                            <Text style={styles.alertTxt}>{alertTxt}</Text>
-                        </View>
-                    </View>
-                </Modal>
                 <Modal 
                     animationType="fade"
                     visible={mapModal}
@@ -701,27 +685,6 @@ const styles = StyleSheet.create({
         paddingTop: 3,
         marginTop: 3
     },
-    //alert
-    alert : {
-        padding: 10,
-        marginBottom: 20,
-        borderRadius: 10,
-        width: '95%',
-        alignSelf: 'center',
-        backgroundColor: '#666666',
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5,
-    },
-    alertTxt : {
-        color: 'whitesmoke',
-        textAlign: 'center',
-    }
 })
 
 export default HamburgerView;

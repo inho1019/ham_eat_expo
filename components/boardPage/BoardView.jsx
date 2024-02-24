@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { FlatList, Image, Keyboard, Linking, Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { FlatList, Image, Keyboard, Linking, Pressable, StyleSheet, Text, TextInput, TouchableWithoutFeedback, View } from 'react-native';
 import commentAdd from '../../assets/board/comment_reg.png'
 import favImg from '../../assets/board/fav.png'
 import deleteImg from '../../assets/burger/delete.png';
@@ -15,17 +15,12 @@ const BoardView = (props) => {
     const onLoading = (bool) => {
         dispatch({ type: 'SET_LOADING' , payload : bool });
     };
-     /////////////alert애니메이션//////////////
-     const [alertTxt,setAlertTxt] = useState('')
 
-     useEffect(()=> {
-         if(alertTxt !== '') {
-             setTimeout(() => {
-                 setAlertTxt('')
-             }, 2000)
-         }
-     },[alertTxt])
-     ////////////////////////////////////////////
+    const onAlertTxt = (txt) => {
+        dispatch({ type: 'SET_ALERTTXT' , payload : txt });
+    };
+
+    ////////////////////////////////////////////
 
     const [imgModal,setImgModal] = useState(false)
     const [imgSrc,setImgSrc] = useState('')
@@ -70,11 +65,11 @@ const BoardView = (props) => {
                     onLoading(false)
                 })
                 .catch(() => {
-                    setAlertTxt('불러오기 중 에러발생')
+                    onAlertTxt('불러오기 중 에러발생')
                     onLoading(false)
                 })
             }).catch(() => {
-                setAlertTxt('불러오기 중 에러발생')
+                onAlertTxt('불러오기 중 에러발생')
                 onLoading(false)
             })
         })
@@ -92,14 +87,14 @@ const BoardView = (props) => {
                     onLoading(false)
                     setBoardDTO([{...boardDTO[0],fav:jsonFav},boardDTO[1]])
                 }).catch(() => {
-                    setAlertTxt('추천 중 에러발생')
+                    onAlertTxt('추천 중 에러발생')
                     onLoading(false)
                 })
             } else {
-                setAlertTxt('이미 추천한 글입니다')
+                onAlertTxt('이미 추천한 글입니다')
             }
         } else {
-            setAlertTxt('로그인 후 추천 가능')
+            onAlertTxt('로그인 후 추천 가능')
         }
     }
 
@@ -116,7 +111,7 @@ const BoardView = (props) => {
                 navigation.navigate('List',{ type : boardDTO[0].type })
             })
         } else {
-            setAlertTxt('잘못된 접근입니다') 
+            onAlertTxt('잘못된 접근입니다') 
         }
     }
 
@@ -180,11 +175,11 @@ const BoardView = (props) => {
                 onLoading(false)
             })
             .catch(() => {
-                setAlertTxt('등록 중 에러발생')
+                onAlertTxt('등록 중 에러발생')
                 onLoading(false)
             })
         } else {
-            setAlertTxt('내용을 입력해주세요') 
+            onAlertTxt('내용을 입력해주세요') 
         }
     }
 
@@ -196,7 +191,7 @@ const BoardView = (props) => {
             onLoading(false)
         })
         .catch(() => {
-            setAlertTxt('삭제 중 에러발생')
+            onAlertTxt('삭제 중 에러발생')
             onLoading(false)
         })
     }
@@ -209,7 +204,8 @@ const BoardView = (props) => {
     return (
         <View style={{flex: 1}}>   
             <FlatList
-                ListHeaderComponent={() => boardDTO && <View style={{flexDirection:'column', borderBottomWidth:10,borderBottomColor:'whitesmoke'}}>
+                ListHeaderComponent={() => boardDTO && <TouchableWithoutFeedback>
+                    <View style={{flexDirection:'column', borderBottomWidth:10,borderBottomColor:'whitesmoke'}}>
                     <View style={{borderBottomWidth:2,borderBottomColor:'lightgray',padding: 5}}>
                         <Text style={styles.h1}>{boardDTO[0].title}</Text>
                         <View style={{flexDirection:'row'}}>
@@ -271,22 +267,24 @@ const BoardView = (props) => {
                     <View style={{flexDirection:'row',justifyContent:'center'}}>
                         <Text style={styles.favTxt}>{JSON.parse(boardDTO[0].fav).length}</Text>
                     </View>
-                </View>}
+                </View>
+                </TouchableWithoutFeedback>}
                 data={commentList}
-                renderItem={(data) => <View style={{padding:5,borderBottomColor:'lightgray',borderBottomWidth:2}}>
+                renderItem={(data) => <TouchableWithoutFeedback>
+                    <View style={{padding:5,borderBottomColor:'lightgray',borderBottomWidth:1}}>
                     <View style={{flexDirection:'row',justifyContent:'space-between'}}>
                     <View style={{flexDirection:'row'}}>
                         <Text style={{fontSize:16,fontWeight:'bold',color:'gray'}}>{data.item[1].name}</Text>
-                        <Text style={{fontSize:14,textAlignVertical:'bottom',color:'gray'}}> | {getToday(data.item[0].logTime)}</Text>
+                        <Text style={{fontSize:14,textAlignVertical:'center',color:'gray'}}> | {getToday(data.item[0].logTime)}</Text>
                     </View>
                         {data.item[1].userSeq === state.user.userSeq && 
                         <Pressable onPress={ () => onDeleteCom(data.item[0].commentSeq) }>
                             <Image source={deleteImg} style={{width:25,height:25}}/>
                         </Pressable>}
                     </View>
-                    <Text style={{marginTop:3}}>{data.item[0].content}</Text>
-                </View>}
-                ListFooterComponent={() => <View style={{paddingBottom:50}}/>}
+                    <Text style={{marginVertical:1}}>{data.item[0].content}</Text>
+                </View></TouchableWithoutFeedback>}
+                ListFooterComponent={() => <View style={{paddingBottom:100}}/>}
             />
             {state.user.userSeq !== -1 && <View><TextInput style={styles.commentInput} value={commentDTO.content}
                 onChangeText={(text) => setCommentDTO({...commentDTO, content : text})} 
@@ -296,16 +294,6 @@ const BoardView = (props) => {
             </Pressable>
             </View>}
             <ImageModal imgModal={imgModal} src={imgSrc} onClose={onClose}/>
-            <Modal
-                animationType="fade"
-                visible={alertTxt !== ''}
-                transparent={true}>
-                <View style={{flex:1,flexDirection:'column-reverse'}}>
-                    <View style={styles.alert}>
-                        <Text style={styles.alertTxt}>{alertTxt}</Text>
-                    </View>
-                </View>
-            </Modal>
         </View>
     );
 };
@@ -376,40 +364,19 @@ const styles = StyleSheet.create({
         width: '100%',
         bottom: 0,
         borderTopColor:'darkgray',
-        backgroundColor:'white',
+        backgroundColor:'whitesmoke',
         borderTopWidth: 2,
         fontSize: 15,
-        padding: 5
+        padding: 8
     },
     commentAdd : {
         position: 'absolute',
         width: 30,
         height : 30,
-        bottom: 2,
+        bottom: 5,
         right: 10,
         zIndex: 999
     },
-    //alert
-    alert : {
-        padding: 10,
-        marginBottom: 70,
-        borderRadius: 10,
-        width: '95%',
-        alignSelf: 'center',
-        backgroundColor: '#666666',
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5,
-    },
-    alertTxt : {
-        color: 'whitesmoke',
-        textAlign: 'center',
-    }
 })
 
 export default BoardView;

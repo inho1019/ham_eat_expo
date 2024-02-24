@@ -1,8 +1,8 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { Dimensions, Image, Keyboard, Linking, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableWithoutFeedback, View } from 'react-native';
+import { Dimensions, Image, Keyboard, Linking, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableWithoutFeedback, View } from 'react-native';
 import { WebView } from 'react-native-webview';
-import { requestForegroundPermissionsAsync, getCurrentPositionAsync, watchPositionAsync } from 'expo-location';
+import { requestForegroundPermissionsAsync, getCurrentPositionAsync } from 'expo-location';
 import deleteImg from '../assets/burger/delete.png'
 import { useAppContext } from './api/ContextAPI';
 import { Skel } from 'react-native-ui-skel-expo'
@@ -11,17 +11,6 @@ const Map = (props) => {
     const {type,navigation,route,onPlace,searchParam,onMapSearch} = props
 
     const windowWidth = Dimensions.get('window').width;
-
-    /////////////alert애니메이션//////////////
-    const [alertTxt,setAlertTxt] = useState('')
-
-    useEffect(()=> {
-        if(alertTxt !== '') {
-            setTimeout(() => {
-                setAlertTxt('')
-            }, 2000)
-        }
-    },[alertTxt])
     ////////////////////////////////////////////
 
     const { state, dispatch } = useAppContext();
@@ -29,6 +18,11 @@ const Map = (props) => {
     const onLoading = (bool) => {
         dispatch({ type: 'SET_LOADING' , payload : bool });
     };
+
+    const onAlertTxt = (txt) => {
+        dispatch({ type: 'SET_ALERTTXT' , payload : txt });
+    };
+//////////////////////////////////////////////////////
 
     const kakaoMapFront = `
         <html>
@@ -79,7 +73,7 @@ const Map = (props) => {
             try {
                 const { status } = await requestForegroundPermissionsAsync();
                 if (status !== 'granted') {
-                setAlertTxt('위치 권한이 허용되지 않았습니다');
+                onAlertTxt('위치 권한이 허용되지 않았습니다');
                 setLoading(false)
                 return;
                 }
@@ -88,7 +82,7 @@ const Map = (props) => {
                     new Promise(() => setTimeout(() => { 
                         if(location === undefined) {
                             setLoading(false)
-                            setAlertTxt('위치를 찾을 수 없습니다');
+                            onAlertTxt('위치를 찾을 수 없습니다');
                         }
                     }, 10000))]);
 
@@ -124,11 +118,11 @@ const Map = (props) => {
                 })
                 .catch(() => {
                     setLoading(false)
-                    setAlertTxt(`불러오기 중 에러발생`);
+                    onAlertTxt(`불러오기 중 에러발생`);
                 })
             } catch (error) {
                 setLoading(false)
-                setAlertTxt(`불러오기 중 에러발생`);
+                onAlertTxt(`불러오기 중 에러발생`);
             }
             };
             getLocationAsync();
@@ -218,7 +212,7 @@ const Map = (props) => {
             setFocus(false)
             setSelData(data)
         } catch (error) {
-            setAlertTxt('데이터 불러오기에 실패하였습니다')
+            onAlertTxt('데이터 불러오기에 실패하였습니다')
         }
     };
 
@@ -244,7 +238,7 @@ const Map = (props) => {
             navigation.goBack();
         })
         .catch(() => {
-            setAlertTxt('등록 중 에러발생')
+            onAlertTxt('등록 중 에러발생')
             onLoading(false)
         })
       }
@@ -330,16 +324,6 @@ const Map = (props) => {
                     </Pressable>}
                 </View>
             </View>}
-            <Modal
-                animationType="fade"
-                visible={alertTxt !== ''}
-                transparent={true}>
-                <View style={{flex:1,flexDirection:'column-reverse'}}>
-                    <View style={styles.alert}>
-                        <Text style={styles.alertTxt}>{alertTxt}</Text>
-                    </View>
-                </View>
-            </Modal>
         </View>
     );
 }
@@ -422,27 +406,6 @@ const styles = StyleSheet.create({
         fontSize: 18,
         marginVertical: 5
     },
-    //alert
-    alert : {
-        padding: 10,
-        marginBottom: 70,
-        borderRadius: 10,
-        width: '95%',
-        alignSelf: 'center',
-        backgroundColor: '#666666',
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5,
-    },
-    alertTxt : {
-        color: 'whitesmoke',
-        textAlign: 'center',
-    }
 })
 
 export default Map;

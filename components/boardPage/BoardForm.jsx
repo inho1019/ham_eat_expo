@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Image, Keyboard, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useAppContext } from '../api/ContextAPI';
 import add from '../../assets/board/board_reg.png'
 import axios from 'axios';
@@ -18,16 +18,9 @@ const BoardForm = (props) => {
         dispatch({ type: 'SET_LOADING' , payload : bool });
     };
 
-    /////////////alert애니메이션//////////////
-    const [alertTxt,setAlertTxt] = useState('')
-
-    useEffect(()=> {
-        if(alertTxt !== '') {
-            setTimeout(() => {
-                setAlertTxt('')
-            }, 2000)
-        }
-    },[alertTxt])
+    const onAlertTxt = (txt) => {
+        dispatch({ type: 'SET_ALERTTXT' , payload : txt });
+    };
     /////////// 키보드 활성화 여부 확인////////
 
     const [boardDTO,setBoardDTO] = useState({
@@ -63,10 +56,10 @@ const BoardForm = (props) => {
                     navigation.goBack();
                 })
             } else {
-                setAlertTxt('내용을 입력해주세요')
+                onAlertTxt('내용을 입력해주세요')
             }
         } else {
-            setAlertTxt('제목을 입력해주세요')
+            onAlertTxt('제목을 입력해주세요')
         }
     }
 
@@ -93,16 +86,6 @@ const BoardForm = (props) => {
                     <Image source={add} style={{width:40,height:40}}/>
                 </Pressable>
             </View>
-            <Modal
-                animationType="fade"
-                visible={alertTxt !== ''}
-                transparent={true}>
-                <View style={{flex:1,flexDirection:'column-reverse'}}>
-                    <View style={styles.alert}>
-                        <Text style={styles.alertTxt}>{alertTxt}</Text>
-                    </View>
-                </View>
-            </Modal>
         </ScrollView>
     );
 };
@@ -139,27 +122,6 @@ const styles = StyleSheet.create({
         width: '95%',
         overflow:'scroll'
     },
-    //alert
-    alert : {
-        padding: 10,
-        marginBottom: 70,
-        borderRadius: 10,
-        width: '95%',
-        alignSelf: 'center',
-        backgroundColor: '#666666',
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5,
-    },
-    alertTxt : {
-        color: 'whitesmoke',
-        textAlign: 'center',
-    }
 });
 
 export default BoardForm;

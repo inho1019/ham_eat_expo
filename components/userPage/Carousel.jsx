@@ -11,7 +11,11 @@ const Carousel = () => {
     const onLoading = (bool) => {
         dispatch({ type: 'SET_LOADING' , payload : bool });
     };
-     /////////////alert애니메이션//////////////
+
+    const onAlertTxt = (txt) => {
+        dispatch({ type: 'SET_ALERTTXT' , payload : txt });
+      };
+///////////////////////////////////////////////////////
 
     const [carouselList,setCarouselList] = useState([])
 
@@ -23,7 +27,7 @@ const Carousel = () => {
             onLoading(false)
         })
         .catch(() => {
-            alert('불러오기 중 에러발생')
+            onAlertTxt('불러오기 중 에러발생')
             onLoading(false)
         })
     },[])
@@ -54,7 +58,7 @@ const Carousel = () => {
             onLoading(false)
         })
         .catch(() => {
-            alert('등록 중 에러발생')
+            onAlertTxt('등록 중 에러발생')
             onLoading(false)
         })
     }
@@ -67,7 +71,7 @@ const Carousel = () => {
             onLoading(false)
         })
         .catch(() => {
-            alert('삭제 중 에러발생')
+            onAlertTxt('삭제 중 에러발생')
             onLoading(false)
         })
     }

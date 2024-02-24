@@ -22,21 +22,10 @@ const UserPage = (props) => {
     const onLoading = (bool) => {
         dispatch({ type: 'SET_LOADING' , payload : bool });
     };
-    /////////////alert애니메이션//////////////
-    const [alertTxt,setAlertTxt] = useState('')
-    const [logout,setLogout] = useState(false)
 
-    useEffect(()=> {
-        if(alertTxt !== '') {
-            setTimeout(() => {
-                setAlertTxt('')
-                if(logout) {
-                    setLogout(false);
-                    onPage(3)
-                }
-            }, 2000)
-        }
-    },[alertTxt])
+    const onAlertTxt = (txt) => {
+        dispatch({ type: 'SET_ALERTTXT' , payload : txt });
+      };
     ///////////비밀번호 변경/////////////////
     const pwdPattern = (pwd) => {
         const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,20}$/;
@@ -75,13 +64,13 @@ const UserPage = (props) => {
             setSecret(false)
             setSecretModal(0)
             if(res.data) {
-                setAlertTxt('비밀번호 변경이 완료되었습니다')
+                onAlertTxt('비밀번호 변경이 완료되었습니다')
             } else {
-                setAlertTxt('비밀번호 변경을 실패하였습니다')
+                onAlertTxt('비밀번호 변경을 실패하였습니다')
             }
         })
         .catch(() => {
-            setAlertTxt('비밀번호 변경 중 에러발생')
+            onAlertTxt('비밀번호 변경 중 에러발생')
             onLoading(false)
         })
     }
@@ -102,15 +91,15 @@ const UserPage = (props) => {
                     own : -1
                 })
                 AsyncStorage.removeItem('user');
-                setAlertTxt('탈퇴가 완료되었습니다')
+                onAlertTxt('탈퇴가 완료되었습니다')
                 setLogout(true)
             } else {
-                setAlertTxt('탈퇴를 실패하였습니다')
+                onAlertTxt('탈퇴를 실패하였습니다')
             }
             onLoading(false)
         })
         .catch(() => {
-            setAlertTxt('탈퇴 중 에러발생')
+            onAlertTxt('탈퇴 중 에러발생')
             onLoading(false)
         })
     }
@@ -130,7 +119,7 @@ const UserPage = (props) => {
                 else setNameCheck(true)
             })
             .catch(() => {
-                setAlertTxt('이름 체크 중 에러발생')
+                onAlertTxt('이름 체크 중 에러발생')
             })
         } else {
           setNameCheck(false)
@@ -154,13 +143,13 @@ const UserPage = (props) => {
                     );
                 }
                 onUser({...state.user, name : name})
-                setAlertTxt('닉네임 변경이 완료되었습니다')
+                onAlertTxt('닉네임 변경이 완료되었습니다')
             } else {
-                setAlertTxt('닉네임 변경을 실패하였습니다')
+                onAlertTxt('닉네임 변경을 실패하였습니다')
             }
         })
         .catch(() => {
-            setAlertTxt('닉네임 변경 중 에러발생')
+            onAlertTxt('닉네임 변경 중 에러발생')
             onLoading(false)
         })
       }
@@ -181,9 +170,10 @@ const UserPage = (props) => {
             birth : '',
             own : -1
         })
-        AsyncStorage.removeItem('user');
-        setAlertTxt('로그아웃이 완료되었습니다')
-        setLogout(true)
+        AsyncStorage.removeItem('token');
+        AsyncStorage.removeItem('userSeq');
+        onAlertTxt('로그아웃이 완료되었습니다')
+        onPage(3)
     }
 
     const onSecret = () => {
@@ -201,7 +191,7 @@ const UserPage = (props) => {
             onLoading(false)
         })
         .catch(() => {
-            setAlertTxt('패스워드 체크 중 에러발생')
+            onAlertTxt('패스워드 체크 중 에러발생')
             onLoading(false)
         })
     }
@@ -286,7 +276,7 @@ const UserPage = (props) => {
                 <Text style={styles.myBut}>로그아웃</Text>
             </Pressable>
             <Pressable onPress={() => openLink('https://kr.freepik.com/')}>
-                <Text style={{textAlign:'center',fontSize:17,color:'darkgray',fontWeight:'bold',marginVertical:20}}>
+                <Text style={{textAlign:'center',fontSize:15,color:'darkgray',fontWeight:'bold',marginVertical:20}}>
                 Images Designed By FreePik</Text>
             </Pressable>
             <Modal
@@ -377,16 +367,6 @@ const UserPage = (props) => {
                     </View>
                 </View>
             </Modal>
-            <Modal
-                animationType="fade"
-                visible={alertTxt !== ''}
-                transparent={true}>
-                <View style={{flex:1,flexDirection:'column-reverse'}}>
-                    <View style={styles.alert}>
-                        <Text style={styles.alertTxt}>{alertTxt}</Text>
-                    </View>
-                </View>
-            </Modal>
         </ScrollView>
     );
 };
@@ -467,27 +447,6 @@ const styles = StyleSheet.create({
         marginVertical: 3,
         borderRadius: 5
     },
-    //alert
-    alert : {
-        padding: 10,
-        marginBottom: 70,
-        borderRadius: 10,
-        width: '95%',
-        alignSelf: 'center',
-        backgroundColor: '#666666',
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5,
-    },
-    alertTxt : {
-        color: 'whitesmoke',
-        textAlign: 'center',
-    }
 })
 
 export default UserPage;

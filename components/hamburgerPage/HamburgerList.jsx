@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { Dimensions, FlatList, Image, Keyboard, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Dimensions, FlatList, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import star from '../../assets/burger/star.png';
 import starNone from '../../assets/burger/star_none.png';
 import won from '../../assets/burger/won.png';
@@ -26,17 +26,12 @@ const HamburgerList = (props) => {
     const onView = (num) => {
         dispatch({ type: 'SET_VIEW' , payload : num });
     };
-     /////////////alert애니메이션//////////////
-     const [alertTxt,setAlertTxt] = useState('')
 
-     useEffect(()=> {
-         if(alertTxt !== '') {
-             setTimeout(() => {
-                 setAlertTxt('')
-             }, 2000)
-         }
-     },[alertTxt])
-     ////////////////////////////////////////////
+    const onAlertTxt = (txt) => {
+        dispatch({ type: 'SET_ALERTTXT' , payload : txt });
+    };
+    
+    ////////////////////////////////////////////
 
     const [type,setType] = useState(-1)
     const [burgers,setBurgers] = useState([])
@@ -89,22 +84,22 @@ const HamburgerList = (props) => {
                             onLoading(false)
                             setLoading(false)
                         }).catch(() => {
-                            setAlertTxt('불러오기 중 에러발생')
+                            onAlertTxt('불러오기 중 에러발생')
                             onLoading(false)
                             setLoading(false)
                         })
                     }).catch(() => {
-                        setAlertTxt('불러오기 중 에러발생')
+                        onAlertTxt('불러오기 중 에러발생')
                         onLoading(false)
                         setLoading(false)
                     })
                 }).catch(() => {
-                    setAlertTxt('불러오기 중 에러발생')
+                    onAlertTxt('불러오기 중 에러발생')
                     onLoading(false)
                     setLoading(false)
                 })
             }).catch(() => {
-                setAlertTxt('불러오기 중 에러발생')
+                onAlertTxt('불러오기 중 에러발생')
                 onLoading(false)
                 setLoading(false)
             })
@@ -228,16 +223,6 @@ const HamburgerList = (props) => {
             </Pressable>}}
                 alwaysBounceVertical={false}
             />
-            <Modal 
-                animationType="fade"
-                visible={alertTxt !== ''}
-                transparent={true}>
-                <View style={{flex:1,flexDirection:'column-reverse'}}>
-                    <View style={styles.alert}>
-                        <Text style={styles.alertTxt}>{alertTxt}</Text>
-                    </View>
-                </View>
-            </Modal>
         </View>
     );
 };
@@ -336,27 +321,6 @@ const styles = StyleSheet.create({
         marginVertical: 3,
         borderRadius: 5
     },
-    //alert
-    alert : {
-        padding: 10,
-        marginBottom: 70,
-        borderRadius: 10,
-        width: '95%',
-        alignSelf: 'center',
-        backgroundColor: '#666666',
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5,
-    },
-    alertTxt : {
-        color: 'whitesmoke',
-        textAlign: 'center',
-    }
 });
 
 export default HamburgerList;

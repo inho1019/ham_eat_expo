@@ -15,21 +15,10 @@ const UserRegister = (props) => {
         dispatch({ type: 'SET_LOADING' , payload : bool });
     };
     
-    /////////////alert애니메이션//////////////
-    const [alertTxt,setAlertTxt] = useState('')
-
-    useEffect(()=> {
-        if(alertTxt !== '') {
-            setTimeout(() => {
-                setAlertTxt('')
-                if(complete) {
-                  setComplete(false)
-                  navigation.navigate('Login')
-                }
-            }, 2000)
-        }
-    },[alertTxt])
-    ////////////이메일 정규식//////////////////
+    const onAlertTxt = (txt) => {
+      dispatch({ type: 'SET_ALERTTXT' , payload : txt });
+    };
+    /////////////////////////////////////////////
     const emailPattern = (email) => {
       const emailRegex = /^[a-zA-Z0-9_+&*-]+(?:\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,7}$/;
       return emailRegex.test(email);
@@ -53,6 +42,7 @@ const UserRegister = (props) => {
       name : '',
       gender : 0,
       birth : new Date(),
+      secretKey : ''
     })
 
     const onInput = (name, value) => {
@@ -65,6 +55,7 @@ const UserRegister = (props) => {
     const [email,setEmail] = useState('')
     
     const [count,setCount] = useState(-1)
+    const [authDate,setAuthDate] = useState()
     const [getAuth,setGetAuth] = useState('')
     const [auth,setAuth] = useState('')
 
@@ -72,8 +63,6 @@ const UserRegister = (props) => {
     const [authCom,setAuthCom] = useState(false)
 
     const [nameCheck,setNameCheck] = useState(false)
-
-    const [complete,setComplete] = useState(false)
     
     const [cal,setCal] = useState(false)
 
@@ -88,17 +77,20 @@ const UserRegister = (props) => {
             .then(res => {
               setGetAuth(res.data)
               setAuthGo(true)
+              let currentDate = new Date();
+              currentDate.setMinutes(currentDate.getMinutes() + 3);
+              setAuthDate(currentDate)
               setCount(180)
               onLoading(false)
             })
           } else {
             onLoading(false)
-            setAlertTxt('중복된 이메일입니다')
+            onAlertTxt('중복된 이메일입니다')
             setEmail('')
           }
         })
       } else {
-        setAlertTxt('올바른 이메일을 입력하세요')
+        onAlertTxt('올바른 이메일을 입력하세요')
         setEmail('')
       }
     }
@@ -107,24 +99,25 @@ const UserRegister = (props) => {
       if(auth == getAuth) {
         setAuthGo(false)
         setAuthCom(true)
-        setAlertTxt('인증 성공')
+        onAlertTxt('인증 성공')
       } else {
-        setAlertTxt('인증번호를 확인해주세요')
+        onAlertTxt('인증번호를 확인해주세요')
         setAuth('')
       }
     }
 
     useEffect(() => {
       if(authGo) {
-        if(count === 0) {
+        if(authDate < new Date()) {
           setAuthGo(false)
           setCount(-1)
-          setAlertTxt('인증 가능시간이 초과되었습니다')
+          setAuthDate()
+          onAlertTxt('인증 가능시간이 초과되었습니다')
           setGetAuth('')
         } else {
           setTimeout(() => {
-            setCount(count - 1)
-          }, 999)
+            setCount(parseInt((authDate - new Date())/1000))
+          }, 1000)
         }
       }
     },[count])
@@ -163,21 +156,20 @@ const UserRegister = (props) => {
             .then(res => {
               onLoading(false)
               if(res.data) {
-                setComplete(true)
-                setAlertTxt('회원가입이 완료되었습니다')
+                onAlertTxt('회원가입이 완료되었습니다')
+                navigation.navigate('Login')
               } else {
-                setComplete(true)
-                setAlertTxt('회원가입에 실패 :: 관리자 문의 요망')
+                onAlertTxt('회원가입에 실패 :: 관리자 문의 요망')
               }
             })
           } else {
-            setAlertTxt('중복이거나 사용 불가한 닉네임입니다')
+            onAlertTxt('중복이거나 사용 불가한 닉네임입니다')
           }
         } else {
-          setAlertTxt('비밀번호가 일치하지 않습니다')
+          onAlertTxt('비밀번호가 일치하지 않습니다')
         }
       } else {
-        setAlertTxt('비밀번호 형식이 올바르지 않습니다')
+        onAlertTxt('비밀번호 형식이 올바르지 않습니다')
       }
     }
 
@@ -245,16 +237,6 @@ const UserRegister = (props) => {
               <Text style={styles.butTxt}>회원가입</Text>
             </Pressable>
           </View>}
-          <Modal 
-              animationType="fade"
-              visible={alertTxt !== ''}
-              transparent={true}>
-              <View style={{flex:1,flexDirection:'column-reverse'}}>
-                  <View style={styles.alert}>
-                      <Text style={styles.alertTxt}>{alertTxt}</Text>
-                  </View>
-              </View>
-          </Modal>
           <Modal 
               animationType="fade"
               visible={cal}
@@ -346,27 +328,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'gray'
   },
-  //alert
-  alert : {
-    padding: 10,
-    marginBottom: 70,
-    borderRadius: 10,
-    width: '95%',
-    alignSelf: 'center',
-    backgroundColor: '#666666',
-    shadowColor: '#000',
-    shadowOffset: {
-        width: 0,
-        height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  alertTxt : {
-      color: 'whitesmoke',
-      textAlign: 'center',
-  }
   })
 
 export default UserRegister;

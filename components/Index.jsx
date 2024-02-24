@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Image, Keyboard, Modal, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
+import { Image, Keyboard, Modal, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
 import { DefaultTheme } from '@react-navigation/native';
 import NavBar from './NavBar';
 import Main from './mainPage/Main';
@@ -29,6 +29,20 @@ const Index = () => {
         dispatch({ type: 'SET_PAGE' , payload : num });
     };
 
+    const onAlertTxt = (txt) => {
+        dispatch({ type: 'SET_ALERTTXT' , payload : txt });
+    }
+
+    useEffect(()=> {
+        if(state.alertTxt !== '') {
+            const timeoutId = setTimeout(() => {
+                onAlertTxt('')
+            }, 2000)
+       
+            return () => clearTimeout(timeoutId);
+        }
+    },[state.alertTxt])
+
      /////////// 키보드 활성화 여부 확인////////
      const [key,setKey] = useState(false)
 
@@ -52,7 +66,7 @@ const Index = () => {
      ///////////////////////////////////////////
 
     return (
-        <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+        <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()} disabled={!key}>
             <View style={styles.container}>
                 <View style={[styles.screenContainer,{height: '92%'}]}>
                     {
@@ -82,6 +96,18 @@ const Index = () => {
                         <Image source={loadingImg} style={{width:100,height:100}}/>
                     </View>
                 </Modal>
+                <Modal
+                    animationType="fade"
+                    visible={state.alertTxt !== ''}
+                    transparent={true}>
+                    <TouchableWithoutFeedback onPress={() => dispatch({ type: 'SET_ALERTTXT', payload: '' })}>
+                        <View style={{flex:1,flexDirection:'column-reverse'}}>
+                            <View style={styles.alert}>
+                                <Text style={styles.alertTxt}>{state.alertTxt}</Text>
+                            </View>
+                        </View>
+                    </TouchableWithoutFeedback>
+                </Modal>
             </View>
         </TouchableWithoutFeedback>
     );
@@ -98,7 +124,28 @@ const styles = StyleSheet.create({
     },
     screenContainer : {
         height: '92%'
-    }
+    },
+    ///////////alert///////////
+    alert : {
+        padding: 10,
+        marginBottom: 70,
+        borderRadius: 10,
+        width: '95%',
+        alignSelf: 'center',
+        backgroundColor: '#666666',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+    },
+    alertTxt : {
+        color: 'whitesmoke',
+        textAlign: 'center',
+    },
 });
 
 export default Index

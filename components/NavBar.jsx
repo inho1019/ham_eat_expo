@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Dimensions, Easing, Image, Keyboard, Pressable, StyleSheet, View } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { Animated, Dimensions, Easing, Image, Pressable, StyleSheet, View } from 'react-native';
 import home from '../assets/navbar/home_tab.png'
 import burger from '../assets/navbar/burger_tab.png'
 import board from '../assets/navbar/board_tab.png'

@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Dimensions, Easing, Image, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useRef, useState } from 'react';
+import { Animated, Dimensions, Easing, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import HamburgerStore from './HamburgerStore';
 import HamburgerMake from './HamburgerMake';
 import HamburgerWrite from './HamburgerWrite';
@@ -13,21 +13,6 @@ const HamburgerForm = (props) => {
 
     const windowHeight = Dimensions.get('window').height*0.85;
     
-    //////////////alert////////////////////
-    const [alertTxt,setAlertTxt] = useState('')
-
-    const onAlert = (txt) => {
-        setAlertTxt(txt)
-    }
-
-    useEffect(()=> {
-        if(alertTxt !== '') {
-            setTimeout(() => {
-                setAlertTxt('')
-            }, 2000)
-        }
-    },[alertTxt])
-
     ///////////// 애니메이션//////////////
     const fren = useRef(new Animated.Value(1)).current;
     const hand = useRef(new Animated.Value(1)).current;
@@ -84,6 +69,12 @@ const HamburgerForm = (props) => {
         dispatch({ type: 'SET_LOADING' , payload : bool });
     };
 
+    const onAlertTxt = (txt) => {
+        dispatch({ type: 'SET_ALERTTXT' , payload : txt });
+    };
+
+    /////////////////////////////////////////////////////////////
+
     const onType = (num) => {
         if(num === 2) {
             setPage(2)
@@ -128,23 +119,25 @@ const HamburgerForm = (props) => {
                         axios.post(`https://hameat.onrender.com/rating/write`,ratingDTO)
                         .then(() => {
                             onLoading(false)
-                            navigation.navigate('Home', { alertTxt:'등록이 완료되었습니다' })
+                            onAlertTxt('등록이 완료되었습니다')
+                            navigation.navigate('Home')
                         })
                         .catch(() => {
-                            setAlertTxt('평가 등록 중 에러발생')
+                            onAlertTxt('평가 등록 중 에러발생')
                             onLoading(false)
                         })
                     } else {
                         onLoading(false)
-                        navigation.navigate('Home', { alertTxt:'등록이 완료되었습니다' })
+                        onAlertTxt('등록이 완료되었습니다')
+                        navigation.navigate('Home')
                     }
                 })
                 .catch(() => {
-                    setAlertTxt('버거 등록 중 에러발생')
+                    onAlertTxt('버거 등록 중 에러발생')
                     onLoading(false)
                 })
-            } else setAlertTxt('설명을 입력해 주세요');
-        } else setAlertTxt('이름을 입력해 주세요')
+            } else onAlertTxt('설명을 입력해 주세요');
+        } else onAlertTxt('이름을 입력해 주세요')
     }
     
     return (
@@ -176,26 +169,16 @@ const HamburgerForm = (props) => {
             </View>
             <View style={{height:windowHeight,paddingVertical: '1%'}}>
                 <HamburgerStore onBack={onBack} navigation={navigation} 
-                route={route} type={burgerDTO.type} onStore={onStore} onLoading={onLoading} onAlert={onAlert}/>
+                route={route} type={burgerDTO.type} onStore={onStore} onLoading={onLoading} onAlert={onAlertTxt}/>
             </View>
             <View style={{height:windowHeight,paddingVertical: '1%'}}>
-                <HamburgerMake onBack={onBack} navigation={navigation} onAlert={onAlert}
+                <HamburgerMake onBack={onBack} navigation={navigation} onAlert={onAlertTxt}
                     route={route} onLoading={onLoading} onMakes={onMake}/>
             </View>
             <View style={{height:windowHeight,paddingVertical: '1%'}}>
-                <HamburgerWrite onBack={onBack} navigation={navigation} onAlert={onAlert}
+                <HamburgerWrite onBack={onBack} navigation={navigation} onAlert={onAlertTxt}
                     onInput={onInput} burgerDTO={burgerDTO} onSubmit={onSubmit}/>
             </View>
-            <Modal 
-                animationType="fade"
-                visible={alertTxt !== ''}
-                transparent={true}>
-                <View style={{flex:1,flexDirection:'column-reverse'}}>
-                    <View style={styles.alert}>
-                        <Text style={styles.alertTxt}>{alertTxt}</Text>
-                    </View>
-                </View>
-            </Modal>
         </ScrollView>
     );
 };
@@ -213,28 +196,7 @@ const styles = StyleSheet.create({
         fontSize: 30,
         fontFamily: 'esamanruMedium',
         textAlign: 'center',
-    },
-    ///////////alert///////////
-    alert : {
-        padding: 10,
-        marginBottom: 70,
-        borderRadius: 10,
-        width: '95%',
-        alignSelf: 'center',
-        backgroundColor: '#666666',
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5,
-    },
-    alertTxt : {
-        color: 'whitesmoke',
-        textAlign: 'center',
-    },
+    }
 });
 
 export default HamburgerForm;

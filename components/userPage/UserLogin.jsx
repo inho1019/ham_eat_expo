@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Easing, Linking, Modal, Pressable, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
+import { Animated, Easing, Keyboard, Linking, Pressable, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
 import { useAppContext } from '../api/ContextAPI';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -8,17 +8,6 @@ const UserLogin = (props) => {
 
   const {navigation} = props;
 
-  /////////////alert애니메이션//////////////
-  const [alertTxt,setAlertTxt] = useState('')
-
-  useEffect(()=> {
-      if(alertTxt !== '') {
-          setTimeout(() => {
-              setAlertTxt('')
-          }, 2000)
-      }
-  },[alertTxt])
-  ///////////// 애니메이션//////////////
   const loginBut = useRef(new Animated.Value(0)).current;
   const registerBut = useRef(new Animated.Value(0)).current;
 
@@ -66,8 +55,8 @@ const UserLogin = (props) => {
   /////////////state/////////////////////////
   const { state, dispatch } = useAppContext();
 
-  const onCount = (num) => {
-      dispatch({ type: 'SET_COUNT' , payload : num });
+  const onDate = (date) => {
+      dispatch({ type: 'SET_DATE' , payload : date });
   };
 
   const onLoading = (bool) => {
@@ -82,71 +71,89 @@ const UserLogin = (props) => {
     dispatch({ type: 'SET_PAGE' , payload : num });
   };
 
-  useEffect(() => {
-    if(state.count > 0) {
-      setTimeout(() => {
-        onCount(state.count - 1)
-      }, 999)
-    } 
-  },[state.count])
+  const onAlertTxt = (txt) => {
+    dispatch({ type: 'SET_ALERTTXT' , payload : txt });
+  };
+
   ///////////////////////////////////////////
+  
   const [loginDTO,setLoginDTO] = useState({
     email : '',
     pwd : ''
   })
-
+  
   const [save,setSave] = useState(false)
   const [wrong,setWrong] = useState(0)
-
+  const [count,setCount] = useState(9999)
+  
   const onInput = (name, value) => {
     setLoginDTO({
-        ...loginDTO,
-        [name] : value
+      ...loginDTO,
+      [name] : value
     })
   }
-
+  
   const onSub = () => {
+    Keyboard.dismiss()
     onLoading(true)
     axios.post(`https://hameat.onrender.com/user/login`,loginDTO)
     .then(res => {
-      onLoading(false)
       aniLog(0)
       setLoginDTO({
         ...loginDTO,
         pwd : ''
       })
       if(res.data.bool) {
-        onUser(res.data.userDTO)
-        if(save) {
-          AsyncStorage.setItem(
-            'user',
-            JSON.stringify(res.data.userDTO)
-          );
-        }
-        onPage(4)
-      } else {
-        setAlertTxt('이메일 또는 비밀번호가 올바르지 않습니다 :: ' + (wrong + 1) + '회')
-        if(wrong < 4) {
-          setWrong(wrong + 1)
+        axios.post(`https://hameat.onrender.com/jwt/getToken`,{ userSeq : res.data.userDTO.userSeq })
+        .then(res2 =>{
+          onLoading(false)
+          onUser(res.data.userDTO)
+          if(save) {
+                AsyncStorage.multiSet([
+                ['token', res2.data],
+                ['userSeq', res.data.userDTO.userSeq.toString()],
+            ])
+          }
+          onAlertTxt('로그인 성공')
+          onPage(4)
+        })
         } else {
-          setWrong(0)
-          onCount(60)
+          onLoading(false)
+          onAlertTxt('이메일 또는 비밀번호가 올바르지 않습니다 :: ' + (wrong + 1) + '회')
+          if(wrong < 4) {
+            setWrong(wrong + 1)
+          } else {
+            setWrong(0)
+            let currentDate = new Date();
+            currentDate.setMinutes(currentDate.getMinutes() + 1);
+            onDate(currentDate)
+            setCount(60)
+          }
         }
-      }
-    })
-    .catch(() => {
-      setAlertTxt('로그인 중 에러발생')
-      onLoading(false)
-    })
-  }
+      })
+      .catch(() => {
+        onAlertTxt('로그인 중 에러발생')
+        onLoading(false)
+      })
+    }
 
-  const openLink = (url) => {
+    useEffect(() => {
+      if(state.date < new Date()) {
+        setCount(-1)
+      } else {
+        setTimeout(() => {
+          setCount(parseInt((state.date - new Date())/1000))
+        }, 1000)
+      }
+    },[count])
+    
+    const openLink = (url) => {
       Linking.openURL(url)
       .catch((err) => console.error('Error opening external link:', err));
-  };
-
-  return (
-    <View style={{ flex: 1, justifyContent: 'center'}}>
+    };
+    
+    return (
+      <View style={{ flex: 1, justifyContent: 'center'}}>
       <View style={styles.loginBox}>
         <View style={{ flexDirection: 'row' }}><Text style={styles.h3}>이메일</Text></View>
         <TextInput style={styles.txtBox} placeholder='이메일 입력' value={loginDTO.email} onChangeText={(text) => onInput('email',text)}/>
@@ -163,10 +170,10 @@ const UserLogin = (props) => {
           <Text style={{verticalAlign:'middle',fontWeight:'bold'}}>자동 로그인</Text>
         </View>
         <View style={{flexDirection:'row', justifyContent:'space-around', marginVertical: 15}}>
-          {state.count > 0 ? <View 
+          {count > 0 ? <View 
           >
             <View style={[styles.wrg]}>
-              <Text style={[styles.wrgTxt]}>{state.count}</Text>
+              <Text style={[styles.wrgTxt]}>{count > 60 ? '로딩중' : count}</Text>
             </View>
           </View> :
           <Pressable 
@@ -190,19 +197,9 @@ const UserLogin = (props) => {
         </View>
       </View>
       <Pressable onPress={() => openLink('https://kr.freepik.com/')}>
-        <Text style={{textAlign:'center',fontSize:17,color:'darkgray',fontWeight:'bold',marginTop:10}}>
+        <Text style={{textAlign:'center',fontSize:15,color:'darkgray',fontWeight:'bold',marginTop:5}}>
         Images Designed By FreePik</Text>
       </Pressable>
-      <Modal
-        animationType="fade"
-        visible={alertTxt !== ''}
-        transparent={true}>
-        <View style={{flex:1,flexDirection:'column-reverse'}}>
-            <View style={styles.alert}>
-                <Text style={styles.alertTxt}>{alertTxt}</Text>
-            </View>
-        </View>
-      </Modal>
     </View>
   );
 };
@@ -253,27 +250,6 @@ const styles = StyleSheet.create({
     fontWeight : 'bold',
     fontSize : 15
   },
-  //alert
-  alert : {
-    padding: 10,
-    marginBottom: 70,
-    borderRadius: 10,
-    width: '95%',
-    alignSelf: 'center',
-    backgroundColor: '#666666',
-    shadowColor: '#000',
-    shadowOffset: {
-        width: 0,
-        height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  alertTxt : {
-      color: 'whitesmoke',
-      textAlign: 'center',
-  }
 })
 
 export default UserLogin;

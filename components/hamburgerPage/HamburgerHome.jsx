@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Dimensions, Image, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import burgerAdd from '../../assets/burger/burger_add.png'
 import star from '../../assets/burger/star.png'
 import starNone from '../../assets/burger/star_none.png'
@@ -31,16 +31,10 @@ const HamburgerHome = (props) => {
     const onView = (num) => {
         dispatch({ type: 'SET_VIEW' , payload : num });
     };
-    /////////////alert애니메이션//////////////
-    const [alertTxt,setAlertTxt] = useState('')
 
-    useEffect(()=> {
-        if(alertTxt !== '') {
-            setTimeout(() => {
-                setAlertTxt('')
-            }, 2000)
-        }
-    },[alertTxt])
+    const onAlertTxt = (txt) => {
+        dispatch({ type: 'SET_ALERTTXT' , payload : txt });
+    };
     ////////////////////////////////////////////
 
     useEffect(()=>{
@@ -48,7 +42,6 @@ const HamburgerHome = (props) => {
             navigation.navigate('View',{ burgerSeq : state.view })
             onView(-1)
         }
-        setAlertTxt(route.params?.alertTxt || '') 
         const unsubscribe = navigation.addListener('focus', () => {
             axios.get(`https://hameat.onrender.com/rating/listNew`)
             .then(res => {
@@ -77,32 +70,32 @@ const HamburgerHome = (props) => {
                                     setFirst(false)
                                 })
                                 .catch(() => {
-                                    setAlertTxt('불러오기 중 에러발생')
+                                    onAlertTxt('불러오기 중 에러발생')
                                     setFirst(false)
                                 })
                             })
                             .catch(() => {
-                                setAlertTxt('불러오기 중 에러발생')
+                                onAlertTxt('불러오기 중 에러발생')
                                 setFirst(false)
                             })
                         })
                         .catch(() => {
-                            setAlertTxt('불러오기 중 에러발생')       
+                            onAlertTxt('불러오기 중 에러발생')       
                             setFirst(false)
                         })
                     })
                     .catch(() => {
-                        setAlertTxt('불러오기 중 에러발생')   
+                        onAlertTxt('불러오기 중 에러발생')   
                         setFirst(false)
                     })
                 })
                 .catch(() => {
-                    setAlertTxt('불러오기 중 에러발생')
+                    onAlertTxt('불러오기 중 에러발생')
                     setFirst(false)
                 })
             })
             .catch(() => {
-                setAlertTxt('불러오기 중 에러발생')
+                onAlertTxt('불러오기 중 에러발생')
                 setFirst(false)
             })
         });
@@ -287,16 +280,6 @@ const HamburgerHome = (props) => {
                     )}
                 </View>
             }
-            <Modal 
-                animationType="fade"
-                visible={alertTxt !== ''}
-                transparent={true}>
-                <View style={{flex:1,flexDirection:'column-reverse'}}>
-                    <View style={styles.alert}>
-                        <Text style={styles.alertTxt}>{alertTxt}</Text>
-                    </View>
-                </View>
-            </Modal>
         </ScrollView>
     );
 };
@@ -419,27 +402,6 @@ const styles = StyleSheet.create({
     ratingTxt : {
         fontSize: 15
     },
-    //alert
-    alert : {
-        padding: 10,
-        marginBottom: 70,
-        borderRadius: 10,
-        width: '95%',
-        alignSelf: 'center',
-        backgroundColor: '#666666',
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5,
-    },
-    alertTxt : {
-        color: 'whitesmoke',
-        textAlign: 'center',
-    }
 });
 
 export default HamburgerHome;

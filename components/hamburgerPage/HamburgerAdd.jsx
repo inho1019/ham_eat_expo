@@ -1,29 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import React, { useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import axios from 'axios';
 import { useAppContext } from '../api/ContextAPI';
-import Map from '../Map';
 
 const HamburgerAdd = (props) => {
-    const {navigation,route} = props;
-
-      /////////////alert애니메이션//////////////
-      const [alertTxt,setAlertTxt] = useState('')
-
-      useEffect(()=> {
-          if(alertTxt !== '') {
-              setTimeout(() => {
-                  setAlertTxt('')
-              }, 2000)
-          }
-      },[alertTxt])
-      ////////////////////////////////////////////
+    const {route} = props;
 
     const { state , dispatch } = useAppContext();
 
     const onLoading = (bool) => {
         dispatch({ type: 'SET_LOADING' , payload : bool });
     };
+
+    const onAlertTxt = (txt) => {
+        dispatch({ type: 'SET_ALERTTXT' , payload : txt });
+    };
+
+////////////////////////////////////////////////////////////////////
 
     const [ingreDTO,setIngreDTO] = useState({
         type : -1,
@@ -42,9 +35,9 @@ const HamburgerAdd = (props) => {
         axios.post('https://hameat.onrender.com/ingre/write',ingreDTO)
         .then(res => {
             onLoading(false)
-            setAlertTxt('재료가 등록되었습니다')
+            onAlertTxt('재료가 등록되었습니다')
         }).catch(() => {
-            setAlertTxt('등록 중 에러발생')
+            onAlertTxt('등록 중 에러발생')
             onLoading(false)
         })
     }
@@ -60,10 +53,10 @@ const HamburgerAdd = (props) => {
         axios.post('https://hameat.onrender.com/store/write',storeDTO)
         .then(res => {
             onLoading(false)
-            setAlertTxt('메장이 등록되었습니다')
+            onAlertTxt('메장이 등록되었습니다')
         })
         .catch(() => {
-            setAlertTxt('등록 중 에러발생')
+            onAlertTxt('등록 중 에러발생')
             onLoading(false)
         })
       }
@@ -160,16 +153,6 @@ const HamburgerAdd = (props) => {
                     <Text style={styles.addButTxt}>등록</Text>
                 </Pressable>
             </View>}
-            <Modal 
-                animationType="fade"
-                visible={alertTxt !== ''}
-                transparent={true}>
-                <View style={{flex:1,flexDirection:'column-reverse'}}>
-                    <View style={styles.alert}>
-                        <Text style={styles.alertTxt}>{alertTxt}</Text>
-                    </View>
-                </View>
-            </Modal>
         </ScrollView>
     );
 }
@@ -215,26 +198,5 @@ const styles = StyleSheet.create({
         fontWeight:'bold',
         color: 'white'
     },
-    //alert
-    alert : {
-        padding: 10,
-        marginBottom: 70,
-        borderRadius: 10,
-        width: '95%',
-        alignSelf: 'center',
-        backgroundColor: '#666666',
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5,
-    },
-    alertTxt : {
-        color: 'whitesmoke',
-        textAlign: 'center',
-    }
 });
 export default HamburgerAdd;

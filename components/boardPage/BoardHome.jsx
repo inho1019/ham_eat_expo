@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Dimensions, Image, Linking, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, Image, Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import noticeImg from '../../assets/board/notice.png'
 import axios from 'axios';
 import { useAppContext } from '../api/ContextAPI';
@@ -15,19 +15,11 @@ const BoardHome = (props) => {
         dispatch({ type: 'SET_VIEW' , payload : num });
     };
 
+    const onAlertTxt = (txt) => {
+        dispatch({ type: 'SET_ALERTTXT' , payload : txt });
+    };
+
     const windowWidth = Dimensions.get('window').width;
-
-    /////////////alert애니메이션//////////////
-    const [alertTxt,setAlertTxt] = useState('')
-
-    useEffect(()=> {
-        if(alertTxt !== '') {
-            setTimeout(() => {
-                setAlertTxt('')
-            }, 2000)
-        }
-    },[alertTxt])
-    ////////////////////////////////////////////
     ////////////////////////////////////////////
     const getToday = (logTime) => {
         const date = new Date(logTime)
@@ -78,27 +70,27 @@ const BoardHome = (props) => {
                                 setFirst(false)
                             })
                             .catch(() => {
-                                setAlertTxt('불러오기 중 에러발생')
+                                onAlertTxt('불러오기 중 에러발생')
                                 setFirst(false)
                             })
                         })
                         .catch(() => {
-                            setAlertTxt('불러오기 중 에러발생')
+                            onAlertTxt('불러오기 중 에러발생')
                             setFirst(false)
                         })
                     })
                     .catch(() => {
-                        setAlertTxt('불러오기 중 에러발생')
+                        onAlertTxt('불러오기 중 에러발생')
                         setFirst(false)
                     })
                 })
                 .catch(() => {
-                    setAlertTxt('불러오기 중 에러발생')
+                    onAlertTxt('불러오기 중 에러발생')
                     setFirst(false)
                 })
             })
             .catch(() => {
-                setAlertTxt('불러오기 중 에러발생')
+                onAlertTxt('불러오기 중 에러발생')
                 setFirst(false)
             })
         });
@@ -271,16 +263,6 @@ const BoardHome = (props) => {
                 </View>
             }
             <ImageModal imgModal={imgModal} src={'http' + imageArray[0]} onClose={onClose}/>
-            <Modal
-                animationType="fade"
-                visible={alertTxt !== ''}
-                transparent={true}>
-                <View style={{flex:1,flexDirection:'column-reverse'}}>
-                    <View style={styles.alert}>
-                        <Text style={styles.alertTxt}>{alertTxt}</Text>
-                    </View>
-                </View>
-            </Modal>
         </ScrollView>
     );
 };
@@ -417,27 +399,6 @@ const styles = StyleSheet.create({
         marginVertical: 3,
         borderRadius: 5
     },
-    //alert
-    alert : {
-        padding: 10,
-        marginBottom: 70,
-        borderRadius: 10,
-        width: '95%',
-        alignSelf: 'center',
-        backgroundColor: '#666666',
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5,
-    },
-    alertTxt : {
-        color: 'whitesmoke',
-        textAlign: 'center',
-    }
 });
 
 export default BoardHome;
