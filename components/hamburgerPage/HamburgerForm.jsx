@@ -53,7 +53,8 @@ const HamburgerForm = (props) => {
         make: '',//json형식
         name: '',
         content: '',
-        price: ''
+        price: '',
+        status: 0
     })
 
     const onInput = (name, value) => {

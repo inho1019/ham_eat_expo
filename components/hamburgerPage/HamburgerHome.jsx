@@ -43,49 +43,34 @@ const HamburgerHome = (props) => {
             onView(-1)
         }
         const unsubscribe = navigation.addListener('focus', () => {
-            axios.get(`https://hameat.onrender.com/rating/listNew`)
+            axios.get(`https://hameat.onrender.com/ingre/list`)
             .then(res => {
-                setNewRating(res.data)
-                axios.get(`https://hameat.onrender.com/ingre/list`)
+                setIngres(res.data)
+                Promise.all([
+                    axios.get(`https://hameat.onrender.com/rating/listNew`),
+                    axios.get(`https://hameat.onrender.com/burger/listHome/0`),
+                    axios.get(`https://hameat.onrender.com/burger/listHome/1`),
+                    axios.get(`https://hameat.onrender.com/burger/listHome/2`)
+                ])
                 .then(res => {
-                    setIngres(res.data)
-                    axios.get(`https://hameat.onrender.com/burger/listHome/0`)
-                    .then(res0 => {
-                        setFren(res0.data)
-                        axios.get(`https://hameat.onrender.com/burger/listHome/1`)
-                        .then(res1 => {
-                            setHand(res1.data)
-                            axios.get(`https://hameat.onrender.com/burger/listHome/2`)
-                            .then(res2 => {
-                                setDiy(res2.data)
-                                const ran = Math.floor(Math.random() * 3)
-                                setMakeDTO(ran === 0 ? JSON.parse(res0.data[0].make) : 
-                                            ran === 1 ? JSON.parse(res1.data[0].make) : JSON.parse(res2.data[0].make))
-                                setBurger(ran === 0 ? res0.data[0] : 
-                                            ran === 1 ? res1.data[0] : res2.data[0])
-                                axios.get(`https://hameat.onrender.com/rating/listSeq/${
-                                            ran === 0 ? res0.data[0].burgerSeq : ran === 1 ? res1.data[0].burgerSeq : res2.data[0].burgerSeq}`)
-                                .then(res => {
-                                    setRatings(res.data)
-                                    setFirst(false)
-                                })
-                                .catch(() => {
-                                    onAlertTxt('불러오기 중 에러발생')
-                                    setFirst(false)
-                                })
-                            })
-                            .catch(() => {
-                                onAlertTxt('불러오기 중 에러발생')
-                                setFirst(false)
-                            })
-                        })
-                        .catch(() => {
-                            onAlertTxt('불러오기 중 에러발생')       
-                            setFirst(false)
-                        })
+                    setNewRating(res[0].data)
+                    setFren(res[1].data)
+                    setHand(res[2].data)
+                    setDiy(res[3].data)
+                    const ran = Math.floor(Math.random() * 3)
+                    setMakeDTO(ran === 0 ? JSON.parse(res[1].data[0].make) : 
+                                ran === 1 ? JSON.parse(res[2].data[0].make) : JSON.parse(res[3].data[0].make))
+                    setBurger(ran === 0 ? res[1].data[0] : 
+                                ran === 1 ? res[2].data[0] : res[3].data[0])
+                    axios.get(`https://hameat.onrender.com/rating/listSeq/${
+                                ran === 0 ? res[1].data[0].burgerSeq : ran === 1 ? 
+                                res[2].data[0].burgerSeq : res[3].data[0].burgerSeq}`)
+                    .then(res => {
+                        setRatings(res.data)
+                        setFirst(false)
                     })
                     .catch(() => {
-                        onAlertTxt('불러오기 중 에러발생')   
+                        onAlertTxt('불러오기 중 에러발생')
                         setFirst(false)
                     })
                 })
@@ -95,7 +80,7 @@ const HamburgerHome = (props) => {
                 })
             })
             .catch(() => {
-                onAlertTxt('불러오기 중 에러발생')
+                onAlertTxt('불러오기 중 에러발생')   
                 setFirst(false)
             })
         });
@@ -146,7 +131,9 @@ const HamburgerHome = (props) => {
                             <Image 
                             source={{ uri : ingres.find(ing => ing.ingreSeq === makeDTO[0]).type !== 0 ? 
                                 ingres.find(ing => ing.ingreSeq === makeDTO[0]).image :
-                                'https://codingdiary.s3.eu-west-2.amazonaws.com/burger/normal_bun.png'}} 
+                                ingres.find(ing => ing.ingreSeq === makeDTO[0]).name === '먹물 번' ? 
+                                'https://postfiles.pstatic.net/MjAyNDAyMjVfMTY4/MDAxNzA4ODQxNDg2OTk0.9RaLSfxW7Tzloqsvz40r1omqWehGg7bZbh7st9OBmQkg.2JdsHC1yle6BINWRnsSUQib_A5GWvLE3mh2HhqXoQ9Ig.PNG/ink_bun.png?type=w966'
+                                : 'https://postfiles.pstatic.net/MjAyNDAyMjVfNiAg/MDAxNzA4ODM5MDMxNzQ5.-eK1dABinObEUaWkHVMu03zQ818I4VUbkhhdwf7AlQIg.xFI7_6ktqqav2Uj-iqp-yy4F_b6WR9xbopK5xWIP0p4g.PNG/normal_bun.png?type=w966'}} 
                                 style={{width: burger.size === 0 ? '50%' : burger.size === 2 ? '90%' : '70%',alignSelf:'center',
                                 aspectRatio: 500/(ingres.find(ing => ing.ingreSeq === makeDTO[0]).type !== 0 ? 
                                 ingres.find(ing => ing.ingreSeq === makeDTO[0]).height : 160), 

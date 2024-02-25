@@ -83,6 +83,7 @@ const HamburgerView = (props) => {
     const onPage = (num) => {
         dispatch({ type: 'SET_PAGE' , payload : num });
     };
+
     const onLoading = (bool) => {
         dispatch({ type: 'SET_LOADING' , payload : bool });
     };
@@ -135,26 +136,31 @@ const HamburgerView = (props) => {
     const [store,setStore] = useState(false)
     const [fold,setFold] = useState(true)
     const [placeDTO,setPlaceDTO] = useState()
+    const [status,setStatus] = useState(false)
+    const [priceList,setPriceList] = useState([])
+    const [price,setPrice] = useState('')
 
     useEffect(() => {
-        navigation.setOptions({
-            title: ''
-        });
-        onLoading(true)
-        axios.get(`https://hameat.onrender.com/rating/listSeq/${route.params?.burgerSeq}`)
-            .then(res => {
-            setRatings(res.data)
-            axios.get(`https://hameat.onrender.com/ingre/list`)
-            .then(res => {
-                setIngres(res.data)
-                axios.get(`https://hameat.onrender.com/burger/view/${route.params?.burgerSeq}`)
+        if(!status) {
+            if(first) {
+                navigation.setOptions({
+                    title: ''
+                });
+                onLoading(true)
+                Promise.all([
+                    axios.get(`https://hameat.onrender.com/rating/listSeq/${route.params?.burgerSeq}`),
+                    axios.get(`https://hameat.onrender.com/ingre/list`),
+                    axios.get(`https://hameat.onrender.com/burger/view/${route.params?.burgerSeq}`),
+                ])
                 .then(res => {
-                    setBurgerDTO(res.data)
-                    setMakeDTO(JSON.parse(res.data[0].make))
+                    setRatings(res[0].data)
+                    setIngres(res[1].data)
+                    setBurgerDTO(res[2].data)
+                    setMakeDTO(JSON.parse(res[2].data[0].make))
                     navigation.setOptions({
-                        title: res.data[0].name
+                        title: res[2].data[0].name
                     });
-                    axios.get(`https://hameat.onrender.com/store/getSeq/${res.data[0].storeSeq}`)
+                    axios.get(`https://hameat.onrender.com/store/getSeq/${res[2].data[0].storeSeq}`)
                     .then(res => {
                         setStoreDTO(res.data)
                         onLoading(false)
@@ -171,19 +177,33 @@ const HamburgerView = (props) => {
                     onLoading(false)
                     setFirst(false)
                 })
+            } else {
+                onLoading(true)
+                axios.get(`https://hameat.onrender.com/burger/view/${route.params?.burgerSeq}`)
+                .then(res => {
+                    setBurgerDTO(res.data)
+                    onLoading(false)
+                })
+                .catch(() => {
+                    onAlertTxt('불러오기 중 에러발생')
+                    onLoading(false)
+                    setFirst(false)
+                })
+            }
+        } else {
+            onLoading(true)
+            axios.get(`https://hameat.onrender.com/status/list/${route.params?.burgerSeq}`)
+            .then(res => {
+                setPriceList(res.data)
+                onLoading(false)
             })
             .catch(() => {
                 onAlertTxt('불러오기 중 에러발생')
                 onLoading(false)
                 setFirst(false)
             })
-        })
-        .catch(() => {
-            onAlertTxt('불러오기 중 에러발생')
-            onLoading(false)
-            setFirst(false)
-        })
-    },[route])
+        }
+    },[route,status])
 
     const onSub = () => {
         if(content.length > 0) {
@@ -225,6 +245,7 @@ const HamburgerView = (props) => {
             onAlertTxt('평가 내용을 입력해주세요')
         }
     }
+
     const onDelete = (ratingSeq) => {
         onLoading(true)
         axios.delete(`https://hameat.onrender.com/rating/delete/${ratingSeq}`,)
@@ -238,6 +259,7 @@ const HamburgerView = (props) => {
             onLoading(false)
         })
     }
+
     const onPlace = (data) => {
         setPlaceDTO({
             placeName : data.place_name,
@@ -247,6 +269,76 @@ const HamburgerView = (props) => {
             latitude: data.y,
             placeId: data.id
         })
+    }
+
+    const onStatus = (num) => {
+        const statusDTO = {
+            type : 0,
+            burgerSeq : route.params?.burgerSeq,
+            userSeq : state.user.userSeq,
+            req : num
+        }
+        onLoading(true)
+        axios.post(`https://hameat.onrender.com/status/write`,statusDTO)
+        .then(res => {
+            if(res.data === 0) {
+                onAlertTxt('30일 이내에 신청한 내역이 존재합니다')
+                onLoading(false)
+            } else if(res.data === 1) {
+                axios.get(`https://hameat.onrender.com/burger/status/${route.params?.burgerSeq}`)
+                .then(() => { 
+                    onAlertTxt('변동 신청이 완료되었습니다')
+                    onLoading(false)
+                })
+                .catch(() => {
+                    onAlertTxt('변동 중 에러발생')
+                    onLoading(false)
+                })
+            } else {
+                onAlertTxt('변동 중 에러발생')
+            }
+        })
+        .catch(() => {
+            onAlertTxt('변동 중 에러발생')
+            onLoading(false)
+        })
+
+    }
+
+    const onPrice = () => {
+        if(price === '') {
+            onAlertTxt('가격을 입력해주세요')
+        } else {
+            const statusDTO = {
+                type : 1,
+                burgerSeq : route.params?.burgerSeq,
+                userSeq : state.user.userSeq,
+                req : price
+            }
+            onLoading(true)
+            axios.post(`https://hameat.onrender.com/status/write`,statusDTO)
+            .then(res1 => {           
+                axios.get(`https://hameat.onrender.com/status/list/${route.params?.burgerSeq}`)
+                .then(res2 => {
+                    setPriceList(res2.data)
+                    onLoading(false)
+                    setPrice('')
+                    if(res1.data === 0) {
+                        onAlertTxt('신청한 내역이 존재합니다')
+                    } else if(res1.data === 1) {
+                        onAlertTxt('변동 신청이 완료되었습니다')
+                    } else if(res1.data === 2) {
+                        onAlertTxt('조건을 충족하여 가격이 변동되었습니다')
+                    } else {
+                        onAlertTxt('변동 중 에러발생')
+                    }
+                })
+            })
+            .catch(() => {
+                onAlertTxt('변동 중 에러발생')
+                onLoading(false)
+            })
+        }
     }
     return (
         <View>
@@ -299,15 +391,23 @@ const HamburgerView = (props) => {
                 </View>}
                 {!first && burgerDTO[0] && <View style={{marginBottom:15}}>
                     <Text style={styles.h1}>{burgerDTO[0].name}</Text>
-                    {burgerDTO[0].type !== 2 &&<View style={{flexDirection:'row',justifyContent:'center', marginTop:5}}>
-                        <Image source={won} style={{height:25,width:25}}/>
-                        <Text style={{fontSize: 17,textAlignVertical:'center'}}> 
-                        &nbsp;{burgerDTO[0].price <= 0 ? '가격 정보가 없습니다' : burgerDTO[0].price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") }</Text>
+                    {burgerDTO[0].type !== 2 &&<View style={{flexDirection:'row',justifyContent:'center', marginTop:10, marginBottom:5}}>
+                        <Pressable
+                            onPress={() => state.user.userSeq === -1 ? 
+                                onAlertTxt('로그인 후 이용가능') : setStatus(true)}
+                            style={({pressed}) => [styles.statusIn,{opacity: pressed ? 0.7 : 1 }]}
+                            >
+                            <Image source={won} style={{height:25,width:25}}/>
+                            <Text style={{fontSize: 17,textAlignVertical:'center'}}> 
+                            &nbsp;{burgerDTO[0].price <= 0 ? '가격 정보 없음' : burgerDTO[0].price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") }</Text>
+                            <Text style={[styles.status,{backgroundColor:burgerDTO[0].status === 0 ? '#2E8DFF' : 'tomato'}]}>
+                                {burgerDTO[0].status === 0 ? '판매중' : '단종' }</Text>
+                        </Pressable>
                     </View>}
                     <View style={{flexDirection:'row',marginHorizontal: '5%',justifyContent:'space-between',marginBottom: 5}}>
                         {burgerDTO[0].type !== 2 &&<Text style={styles.h3}>{storeDTO ? storeDTO.name : '없는 매장'}</Text>}
                         {burgerDTO[0].type === 2 && <Text style={styles.h3}>{burgerDTO[1] ? burgerDTO[1].name : '탈퇴 회원'}</Text>}
-                        {storeDTO && <View style={{flexDirection:'row',backgroundColor:'lightgray',borderRadius:5,padding:3}}>    
+                        {storeDTO && <View style={{flexDirection:'row',backgroundColor:'whitesmoke',borderRadius:5,padding:3}}>    
                             {storeDTO.type === 1 && <Pressable onPress={() => onMapStore()}
                             style={{marginHorizontal:5}}>
                                 <Image source={mapIcon} style={{height:30,width:30}}/>
@@ -382,6 +482,57 @@ const HamburgerView = (props) => {
             <View {...panResponder3.panHandlers} style={styles.reviewOpen}>
                 <Image style={styles.dragImg} source={drag}/>
             </View>
+                <Modal 
+                    animationType="fade"
+                    visible={status}
+                    transparent={true}>
+                        <View style={{flex:1,justifyContent:'center',backgroundColor: '#00000050'}}>
+                        <Pressable style={{position:'absolute',top:10,right:10}}
+                            onPress={() => setStatus(false)}>
+                            <Image source={deleteImg} style={{width:40,height:40}}/>
+                        </Pressable>
+                            <View style={styles.statusModal}>
+                                <View style={{flexDirection:'row',marginBottom:20}}><Text style={styles.h2}>판매 여부</Text></View>
+                                <View style={{flexDirection:'row',justifyContent:'space-evenly'}}>
+                                    <Pressable
+                                        onPress={() => onStatus(0)}
+                                        style={({pressed}) => [styles.statBut,{backgroundColor: '#2E8DFF' ,opacity: pressed ? 0.7 : 1}]}>
+                                        <Text style={styles.statButTxt}>판매중</Text>
+                                    </Pressable>
+                                    <Pressable
+                                        onPress={() => onStatus(1)}
+                                        style={({pressed}) => [styles.statBut,{backgroundColor: 'tomato' ,opacity: pressed ? 0.7 : 1}]}>
+                                        <Text style={styles.statButTxt}>단종</Text>
+                                    </Pressable>
+                                </View>
+                                <View style={{flexDirection:'row',marginTop:20}}><Text style={styles.h2}>가격 변동</Text></View>
+                                <View style={{flexDirection:'row',justifyContent:'space-around',paddingHorizontal:'4%',marginTop:20}}>
+                                    <TextInput 
+                                        keyboardType="numeric"
+                                        value={price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} 
+                                        style={styles.txtBox}
+                                        onChangeText={(text) => setPrice(text.replace(/[^0-9]/g, ''))} />
+                                    <Pressable
+                                        onPress={ onPrice }
+                                        style={({pressed}) => [styles.priceBut,{opacity: pressed ? 0.7 : 1}]}>
+                                        <Text style={styles.priceButTxt}>신청</Text>
+                                    </Pressable>
+                                </View>
+                                <Text style={{marginHorizontal:20,marginBottom: 10,fontSize: 12}}>
+                                    *2개 이상의 동일한 요청 발생시 가격 변동</Text>
+                                <View style={{flexDirection:'row'}}><Text style={styles.h2}>신청 기록</Text></View>
+                                <Text style={{marginHorizontal:20,marginVertical: 5,fontSize: 12}}>*가격 변동 시 초기화</Text>
+                                <ScrollView style={styles.priceList}>
+                                    {priceList.map((item,index) => <Pressable key={index}
+                                        style={({pressed}) => ({padding:7, borderBottomWidth:1, borderBottomColor:'lightgray',
+                                            backgroundColor: pressed ? 'whitesmoke' : 'white'})}
+                                        onPress={() => setPrice(item.req)}>
+                                        <Text style={{fontSize:15,fontWeight:'bold',color:'gray'}}>{item.req}원 | {getToday(item.logTime)}</Text>
+                                    </Pressable>)}
+                                </ScrollView>
+                            </View>
+                        </View>
+                </Modal>
                 <Modal 
                     animationType="fade"
                     visible={mapModal}
@@ -548,6 +699,76 @@ const styles = StyleSheet.create({
         height: 40,
         top: 30,
         right: 30
+    },
+    status : {
+        marginLeft: 10,
+        borderRadius: 5,
+        width: 70,
+        alignItems :'center',
+        textAlign:'center',
+        fontSize: 16,
+        fontWeight:'bold',
+        color:'white'
+    },
+    statusIn : {
+        flexDirection:'row',
+        padding:5,
+        borderRadius: 5,
+        borderWidth:2,
+        borderColor:'lightgray',
+        backgroundColor:'whitesmoke'
+    },
+    ////////status Modal////////
+    statusModal : {
+        backgroundColor: 'white',
+        elevation: 10,
+        borderRadius: 20,
+        padding: 10,
+        paddingVertical: 30,
+        marginHorizontal: '4%',
+    },
+    statBut : {
+        width: 100,
+        paddingVertical: 10,
+        borderRadius: 10
+    },
+    statButTxt : {
+        textAlign:'center',
+        fontSize: 17,
+        fontWeight:'bold',
+        color: 'white'
+    },
+    priceList : {
+        borderRadius: 5,
+        borderWidth: 1,
+        borderColor: 'darkgray',
+        height: '25 %',
+        marginHorizontal: '4%',
+        overflow:'hidden',
+    },
+    txtBox : {
+        width: '60%',
+        fontSize: 15,
+        borderRadius: 5,
+        borderWidth: 1,
+        borderColor: 'darkgray',
+        marginBottom: 10,
+        padding: 3
+    },
+    priceBut : {
+        width: '20%',
+        borderRadius: 5,
+        justifyContent: 'center',
+        borderWidth: 2,
+        borderColor:'lightgray',
+        backgroundColor :'whitesmoke',
+        height: 35,
+    },
+    priceButTxt : {
+        textAlign:'center',
+        fontWeight:'bold',
+        fontSize: 15,
+        color: 'gray'
     },
     /////////평점///////////////
     starOut : {

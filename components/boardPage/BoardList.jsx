@@ -128,7 +128,10 @@ const BoardList = (props) => {
                     onPress={() =>  (!route.params?.userSeq && searchParam === undefined) ? navigation.navigate('View',{ boardSeq : data.item[0].boardSeq }) 
                     : onGo(2,data.item[0].boardSeq) }
                     style={({pressed}) => [styles.item,{backgroundColor: pressed ? 'whitesmoke' : 'white'}]}>
-                    <Text style={styles.h2} numberOfLines={1} ellipsizeMode="tail">{data.item[0].title}</Text>
+                    <View style={{flexDirection:'row'}}>
+                        <Text style={[styles.h2,{maxWidth:'90%'}]} numberOfLines={1} ellipsizeMode="tail">{data.item[0].title}</Text>
+                        <Text style={styles.h2c}>[{data.item[2]}]</Text>
+                    </View>
                     <View style={{flexDirection:'row',justifyContent:'space-between'}}>
                         <View style={{flexDirection:'row'}}>
                             <Text style={styles.h3}>{data.item[1] ? data.item[1].name : '탈퇴 회원'}</Text>
@@ -176,6 +179,13 @@ const styles = StyleSheet.create({
     h2 : {
         fontSize :18,
         marginBottom: 2
+    },
+    h2c : {
+        fontSize :18,
+        textAlignVertical: 'center',
+        marginLeft:5,
+        fontWeight:'bold',
+        color:'gray'
     },
     h3 : {
         fontSize: 15,

@@ -134,7 +134,9 @@ const HamburgerMake = (props) => {
                         {makeDTO.length > 0 && <Image 
                         source={{ uri : ingres.find(ing => ing.ingreSeq === makeDTO[0]).type !== 0 ? 
                             ingres.find(ing => ing.ingreSeq === makeDTO[0]).image :
-                            'https://codingdiary.s3.eu-west-2.amazonaws.com/burger/normal_bun.png'}} 
+                            ingres.find(ing => ing.ingreSeq === makeDTO[0]).name === '먹물 번' ? 
+                            'https://postfiles.pstatic.net/MjAyNDAyMjVfMTY4/MDAxNzA4ODQxNDg2OTk0.9RaLSfxW7Tzloqsvz40r1omqWehGg7bZbh7st9OBmQkg.2JdsHC1yle6BINWRnsSUQib_A5GWvLE3mh2HhqXoQ9Ig.PNG/ink_bun.png?type=w966'
+                            : 'https://postfiles.pstatic.net/MjAyNDAyMjVfNiAg/MDAxNzA4ODM5MDMxNzQ5.-eK1dABinObEUaWkHVMu03zQ818I4VUbkhhdwf7AlQIg.xFI7_6ktqqav2Uj-iqp-yy4F_b6WR9xbopK5xWIP0p4g.PNG/normal_bun.png?type=w966'}} 
                             style={{width: size === 0 ? '50%' : size === 2 ? '90%' : '70%',alignSelf:'center',
                             aspectRatio: 500/(ingres.find(ing => ing.ingreSeq === makeDTO[0]).type !== 0 ? 
                             ingres.find(ing => ing.ingreSeq === makeDTO[0]).height : 160), 
@@ -227,12 +229,16 @@ const HamburgerMake = (props) => {
                         </Pressable>
                     )}
                     {makeDTO.length > 0 && 
-                        <Pressable 
-                            style={styles.ingreItem}
-                            onPress={() => onMake(ingres.find(ing => ing.name == '추가 번').ingreSeq)}>
-                            <Image source={{ uri: ingres.find(ing => ing.name == '추가 번').image }} style={styles.ingreImage} resizeMode='contain'/>
-                            <Text style={{fontSize:15}}>추가 번</Text>
-                        </Pressable>
+                        ingres.filter(ing => ing.type === 0 && ing.name === '추가 번')
+                        .map((item,index) => 
+                            <Pressable 
+                                key={index}
+                                style={styles.ingreItem}
+                                onPress={() => onMake(item.ingreSeq)}>
+                                <Image source={{ uri: item.image }} style={styles.ingreImage} resizeMode='contain'/>
+                                <Text style={{fontSize:15}}>추가 번</Text>
+                            </Pressable>
+                        )
                     }
                     </View>
                 </ScrollView>

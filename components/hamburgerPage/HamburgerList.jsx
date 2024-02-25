@@ -66,29 +66,25 @@ const HamburgerList = (props) => {
         const unsubscribe = navigation.addListener('focus', () => {
             onLoading(true)
             setLoading(true)
-            axios.get((!route.params?.userSeq && searchParam === undefined) ? `https://hameat.onrender.com/rating/listType/${route.params?.type}`
-                    : `https://hameat.onrender.com/rating/listAll`)
-            .then(res => {
-                setRatings(res.data)
-                axios.get(`https://hameat.onrender.com/ingre/list`)
+            axios.get(`https://hameat.onrender.com/ingre/list`)
                 .then(res => {
                     setIngres(res.data)
-                    axios.get( (!route.params?.userSeq && searchParam === undefined) ? `https://hameat.onrender.com/store/list/${route.params?.type}`
-                    : `https://hameat.onrender.com/store/listAll`)
-                    .then(res => {
-                        setStores(res.data)
+                    Promise.all([
+                        axios.get((!route.params?.userSeq && searchParam === undefined) ? `https://hameat.onrender.com/rating/listType/${route.params?.type}`
+                        : `https://hameat.onrender.com/rating/listAll`),
+                        axios.get( (!route.params?.userSeq && searchParam === undefined) ? `https://hameat.onrender.com/store/list/${route.params?.type}`
+                        : `https://hameat.onrender.com/store/listAll`),
                         axios.get( (!route.params?.userSeq && searchParam === undefined) ? `https://hameat.onrender.com/burger/list/${route.params?.type}`
-                            : `https://hameat.onrender.com/burger/listAll`)
-                        .then(res => {
-                            setBurgers(res.data)
-                            onLoading(false)
-                            setLoading(false)
-                        }).catch(() => {
-                            onAlertTxt('불러오기 중 에러발생')
-                            onLoading(false)
-                            setLoading(false)
-                        })
-                    }).catch(() => {
+                        : `https://hameat.onrender.com/burger/listAll`)
+                    ])
+                    .then(res => {
+                        setRatings(res[0].data)
+                        setStores(res[1].data)
+                        setBurgers(res[2].data)
+                        onLoading(false)
+                        setLoading(false)
+                    })
+                    .catch(() => {
                         onAlertTxt('불러오기 중 에러발생')
                         onLoading(false)
                         setLoading(false)
@@ -98,12 +94,7 @@ const HamburgerList = (props) => {
                     onLoading(false)
                     setLoading(false)
                 })
-            }).catch(() => {
-                onAlertTxt('불러오기 중 에러발생')
-                onLoading(false)
-                setLoading(false)
             })
-        });
         return unsubscribe;
     },[navigation,route])
 
@@ -191,7 +182,9 @@ const HamburgerList = (props) => {
                             <Image 
                             source={{ uri : ingres.find(ing => ing.ingreSeq === makeDTO[0]).type !== 0 ? 
                                 ingres.find(ing => ing.ingreSeq === makeDTO[0]).image :
-                                'https://codingdiary.s3.eu-west-2.amazonaws.com/burger/normal_bun.png'}} 
+                                ingres.find(ing => ing.ingreSeq === makeDTO[0]).name === '먹물 번' ? 
+                                'https://postfiles.pstatic.net/MjAyNDAyMjVfMTY4/MDAxNzA4ODQxNDg2OTk0.9RaLSfxW7Tzloqsvz40r1omqWehGg7bZbh7st9OBmQkg.2JdsHC1yle6BINWRnsSUQib_A5GWvLE3mh2HhqXoQ9Ig.PNG/ink_bun.png?type=w966'
+                                : 'https://postfiles.pstatic.net/MjAyNDAyMjVfNiAg/MDAxNzA4ODM5MDMxNzQ5.-eK1dABinObEUaWkHVMu03zQ818I4VUbkhhdwf7AlQIg.xFI7_6ktqqav2Uj-iqp-yy4F_b6WR9xbopK5xWIP0p4g.PNG/normal_bun.png?type=w966'}} 
                                 style={{width: data.item[0].size === 0 ? '50%' : data.item[0].size === 2 ? '90%' : '70%',alignSelf:'center',
                                 aspectRatio: 500/(ingres.find(ing => ing.ingreSeq === makeDTO[0]).type !== 0 ? 
                                 ingres.find(ing => ing.ingreSeq === makeDTO[0]).height : 160), 
@@ -202,10 +195,12 @@ const HamburgerList = (props) => {
                         {data.item[0].type !== 2 && <Text style={styles.itemStore}>{stores.find(str => str.storeSeq === data.item[0].storeSeq) ? 
                         stores.find(str => str.storeSeq === data.item[0].storeSeq).name : '없는 매장'}</Text>}
                         {data.item[0].type === 2 && <Text style={styles.itemStore}>{data.item[1] ? data.item[1].name : '탈퇴 회원'}</Text>}{/* userSeq를 통한 유저명 가져오기 */}
-                        {data.item[0].type !== 2 &&<View style={{flexDirection:'row',justifyContent:'center',marginTop:3}}>
-                            <Image source={won} style={{width:23,height:23}}/>
+                        {data.item[0].type !== 2 &&<View style={{flexDirection:'row',justifyContent:'space-evenly',marginTop:3}}>
+                            <View style={{flexDirection:'row',justifyContent:'center'}}><Image source={won} style={{width:23,height:23}}/>
                             <Text style={{fontSize:15,textAlignVertical:'center'}}>
-                            &nbsp;{data.item[0].price <= 0 ? '가격 정보가 없습니다' : data.item[0].price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") }</Text>
+                            &nbsp;{data.item[0].price <= 0 ? '가격 정보 없음' : data.item[0].price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") }</Text></View>
+                            <Text style={[styles.status,{backgroundColor:data.item[0].status === 0 ? '#2E8DFF' : 'tomato'}]}>
+                                {data.item[0].status === 0 ? '판매중' : '단종' }</Text>
                         </View>}
                         <View style={[styles.starBox,{ width: data.item[0].type === 2 ? '80%' : '70%', margin: data.item[0].type === 2 ? 12 : 2 }]}>
                             <View style={[styles.starBack,{width : 
@@ -320,6 +315,15 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
         marginVertical: 3,
         borderRadius: 5
+    },
+    status : {
+        borderRadius: 5,
+        width: 60,
+        alignItems :'center',
+        textAlign:'center',
+        fontSize: 15,
+        fontWeight:'bold',
+        color:'white'
     },
 });
 

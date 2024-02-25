@@ -20,6 +20,9 @@ const BoardView = (props) => {
         dispatch({ type: 'SET_ALERTTXT' , payload : txt });
     };
 
+    const onPage = (num) => {
+        dispatch({ type: 'SET_PAGE' , payload : num });
+    };
     ////////////////////////////////////////////
 
     const [imgModal,setImgModal] = useState(false)
@@ -286,13 +289,15 @@ const BoardView = (props) => {
                 </View></TouchableWithoutFeedback>}
                 ListFooterComponent={() => <View style={{paddingBottom:100}}/>}
             />
-            {state.user.userSeq !== -1 && <View><TextInput style={styles.commentInput} value={commentDTO.content}
+            {state.user.userSeq !== -1 ? <View><TextInput style={styles.commentInput} value={commentDTO.content}
                 onChangeText={(text) => setCommentDTO({...commentDTO, content : text})} 
                 onSubmitEditing={ onSub } placeholder='댓글 입력'/>
             <Pressable onPress={ onSub }>
                 <Image source={commentAdd} style={styles.commentAdd}/>
             </Pressable>
-            </View>}
+            </View> : <Pressable style={styles.commentInput} onPress={() => onPage(3)}>
+                <Text style={{fontSize:16,textAlign:'center',fontWeight:'bold'}}>로그인 후 댓글 작성</Text>
+            </Pressable>}
             <ImageModal imgModal={imgModal} src={imgSrc} onClose={onClose}/>
         </View>
     );

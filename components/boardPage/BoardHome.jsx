@@ -52,42 +52,20 @@ const BoardHome = (props) => {
             onView(-1)
         }
         const unsubscribe = navigation.addListener('focus', () => {
-            axios.get(`https://hameat.onrender.com/board/listHome/0`)
-            .then(res0 => {
-                setFree(res0.data)
-                axios.get(`https://hameat.onrender.com/board/listHome/1`)
-                .then(res1 => {
-                    setEvent(res1.data)
-                    axios.get(`https://hameat.onrender.com/board/listHome/2`)
-                    .then(res2 => {
-                        setNotice(res2.data)
-                        axios.get(`https://hameat.onrender.com/board/best/0`)
-                        .then(res3 => {
-                            setBestFree(res3.data)
-                            axios.get(`https://hameat.onrender.com/board/best/1`)
-                            .then(res4 => {
-                                setBestEvent(res4.data)
-                                setFirst(false)
-                            })
-                            .catch(() => {
-                                onAlertTxt('불러오기 중 에러발생')
-                                setFirst(false)
-                            })
-                        })
-                        .catch(() => {
-                            onAlertTxt('불러오기 중 에러발생')
-                            setFirst(false)
-                        })
-                    })
-                    .catch(() => {
-                        onAlertTxt('불러오기 중 에러발생')
-                        setFirst(false)
-                    })
-                })
-                .catch(() => {
-                    onAlertTxt('불러오기 중 에러발생')
-                    setFirst(false)
-                })
+            Promise.all([
+                axios.get(`https://hameat.onrender.com/board/listHome/0`),
+                axios.get(`https://hameat.onrender.com/board/listHome/1`),
+                axios.get(`https://hameat.onrender.com/board/listHome/2`),
+                axios.get(`https://hameat.onrender.com/board/best/0`),
+                axios.get(`https://hameat.onrender.com/board/best/1`)
+            ])
+            .then(res => {
+                setFree(res[0].data)
+                setEvent(res[1].data)
+                setNotice(res[2].data)
+                setBestFree(res[3].data)
+                setBestEvent(res[4].data)
+                setFirst(false)
             })
             .catch(() => {
                 onAlertTxt('불러오기 중 에러발생')
