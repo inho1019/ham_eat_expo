@@ -85,10 +85,10 @@ const Carousel = () => {
                     <Text style={{fontSize:20,fontWeight: carouselDTO.type === 0 ? 'bold' : '400'}}>외부</Text>
                 </Pressable>
                 <Pressable onPress={() => setCarouselDTO({...carouselDTO,type : 1})}>
-                    <Text style={{fontSize:20,fontWeight: carouselDTO.type === 1 ? 'bold' : '400'}}>글</Text>
+                    <Text style={{fontSize:20,fontWeight: carouselDTO.type === 1 ? 'bold' : '400'}}>버거</Text>
                 </Pressable>
                 <Pressable onPress={() => setCarouselDTO({...carouselDTO,type : 2})}>
-                    <Text style={{fontSize:20,fontWeight: carouselDTO.type === 2 ? 'bold' : '400'}}>버거</Text>
+                    <Text style={{fontSize:20,fontWeight: carouselDTO.type === 2 ? 'bold' : '400'}}>글</Text>
                 </Pressable>
             </View>
             <Text style={styles.h4}>Image</Text>

@@ -7,7 +7,7 @@ import Map from '../Map';
 
 
 const HamburgerWrite = (props) => {
-    const {onBack,onInput,onAlert,burgerDTO,onSubmit} = props
+    const {onBack,onInput,onAlert,burgerDTO,onSubmit,updateBool} = props
 
     const [rating,setRating] = useState(false)
     const [price,setPrice] = useState(true)
@@ -108,7 +108,7 @@ const HamburgerWrite = (props) => {
                         onChangeText={(text) => onInput('price', text.replace(/[^0-9]/g, ''))} />
                 </View>}
                 </View>}
-                <View style={{flexDirection: 'row'}}>
+                {!updateBool && <View style={{flexDirection: 'row'}}>
                     <Text style={[styles.h3,{marginTop: '3%'}]}>평가</Text>
                     <Switch 
                         trackColor={{ false: "#767577", true: "#81b0ff" }}
@@ -116,7 +116,7 @@ const HamburgerWrite = (props) => {
                         onValueChange={() => setRating(!rating)}
                         value={rating}
                     />
-                </View>
+                </View>}
                 {rating && <View>
                     <View style={styles.starBox} {...panResponder.panHandlers} onLayout={starLayout}>
                         <View style={[styles.starBack,{width : rate + '%'}]}/>

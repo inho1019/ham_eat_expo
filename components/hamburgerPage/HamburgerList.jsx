@@ -22,7 +22,6 @@ const HamburgerList = (props) => {
         dispatch({ type: 'SET_PAGE' , payload : num });
     };
 
-
     const onView = (num) => {
         dispatch({ type: 'SET_VIEW' , payload : num });
     };
@@ -41,7 +40,7 @@ const HamburgerList = (props) => {
     const [strPick,setStrPick] = useState(-1)
     const [search,setSearch] = useState('')
 
-    const [loading,setLoading] = useState(false)
+    const [first,setFirst] = useState(true)
 
     useEffect(()=>{
         if( route.params?.search ) {
@@ -65,36 +64,29 @@ const HamburgerList = (props) => {
         }
         const unsubscribe = navigation.addListener('focus', () => {
             onLoading(true)
-            setLoading(true)
-            axios.get(`https://hameat.onrender.com/ingre/list`)
-                .then(res => {
-                    setIngres(res.data)
-                    Promise.all([
-                        axios.get((!route.params?.userSeq && searchParam === undefined) ? `https://hameat.onrender.com/rating/listType/${route.params?.type}`
-                        : `https://hameat.onrender.com/rating/listAll`),
-                        axios.get( (!route.params?.userSeq && searchParam === undefined) ? `https://hameat.onrender.com/store/list/${route.params?.type}`
-                        : `https://hameat.onrender.com/store/listAll`),
-                        axios.get( (!route.params?.userSeq && searchParam === undefined) ? `https://hameat.onrender.com/burger/list/${route.params?.type}`
-                        : `https://hameat.onrender.com/burger/listAll`)
-                    ])
-                    .then(res => {
-                        setRatings(res[0].data)
-                        setStores(res[1].data)
-                        setBurgers(res[2].data)
-                        onLoading(false)
-                        setLoading(false)
-                    })
-                    .catch(() => {
-                        onAlertTxt('불러오기 중 에러발생')
-                        onLoading(false)
-                        setLoading(false)
-                    })
-                }).catch(() => {
-                    onAlertTxt('불러오기 중 에러발생')
-                    onLoading(false)
-                    setLoading(false)
-                })
+            Promise.all([
+                axios.get(`https://hameat.onrender.com/ingre/list`),
+                axios.get((!route.params?.userSeq && searchParam === undefined) ? `https://hameat.onrender.com/rating/listType/${route.params?.type}`
+                : `https://hameat.onrender.com/rating/listAll`),
+                axios.get( (!route.params?.userSeq && searchParam === undefined) ? `https://hameat.onrender.com/store/list/${route.params?.type}`
+                : `https://hameat.onrender.com/store/listAll`),
+                axios.get( (!route.params?.userSeq && searchParam === undefined) ? `https://hameat.onrender.com/burger/list/${route.params?.type}`
+                : `https://hameat.onrender.com/burger/listAll`)
+            ])
+            .then(res => {
+                setIngres(res[0].data)
+                setRatings(res[1].data)
+                setStores(res[2].data)
+                setBurgers(res[3].data)
+                onLoading(false)
+                setFirst(false)
             })
+            .catch(() => {
+                onLoading(false)
+                setFirst(false)
+                onAlertTxt('불러오기 중 에러발생')
+            })
+        })
         return unsubscribe;
     },[navigation,route])
 
@@ -119,7 +111,7 @@ const HamburgerList = (props) => {
                     <Text style={{fontSize: 17}}>#{item.name} </Text>
                 </Pressable>)}
             </ScrollView>}
-            {(loading && searchParam !== undefined) && 
+            {(first && searchParam !== undefined) && 
             <View style={{width:'95%',aspectRatio:5/6, marginLeft:'2.5%'}}>
                 <View style={[styles.itemSkel,{height:'24%',marginVertical:'0.5%'}]}>
                     <Skel height={'100%'} width={windowWidth*0.95}/>
@@ -134,7 +126,7 @@ const HamburgerList = (props) => {
                     <Skel height={'100%'} width={windowWidth*0.95}/>
                 </View>
             </View>}
-            {!loading && burgers.filter(bgs => route.params?.userSeq ? 
+            {!first && burgers.filter(bgs => route.params?.userSeq ? 
                                         (bgs[1] && bgs[1].userSeq === route.params?.userSeq)
                                             : ( bgs[0].name.includes(search) || search.includes(bgs[0].name) || 
                                             search.includes(bgs[0].content) || bgs[0].content.includes(search) ||
@@ -143,7 +135,7 @@ const HamburgerList = (props) => {
                                             .map(stt => stt.storeSeq).includes(bgs[0].storeSeq)))
                                             && (strPick >= 0 ? bgs[0].storeSeq === strPick : bgs)).length === 0 && 
                                             <Text style={styles.noList}>결과가 없습니다</Text>}
-            <FlatList
+            {!first && <FlatList
                 style={{flex : 1}}
                 data={burgers.filter(bgs => route.params?.userSeq ? 
                                         (bgs[1] && bgs[1].userSeq === route.params?.userSeq)
@@ -156,13 +148,16 @@ const HamburgerList = (props) => {
                                             )}
                 renderItem={(data) => {
                 const makeDTO = JSON.parse(data.item[0].make)
+                const inDTO = makeDTO.map(md => {
+                    const ingreIt = ingres.find(ing => ing.ingreSeq === md);
+                    return ingreIt !== undefined ? ingreIt : ingres[0]
+                });
+                const lastMargin = windowWidth*inDTO.filter(ing => ing.type !== 4)[inDTO.filter(ing => ing.type !== 4).length - 1].height
 
-                return <Pressable style={({pressed})  => [styles.burgerItem,{elevation : pressed ? 0.5 : 4,
-                        borderTopColor: pressed ? 'whitesmoke' : 'white', height: data.index !== 0 ? 120 : (
-                            stores.filter(str => strPick !== -1 ? str.storeSeq === strPick : (search.includes(str.name) || str.name.includes(search))).length > 0 &&
-                            (!route.params?.userSeq && searchParam === undefined) && type !== 2) ? 160 : 120,
-                        paddingTop: (stores.filter(str => strPick !== -1 ? str.storeSeq === strPick : (search.includes(str.name) || str.name.includes(search))).length > 0 &&
-                            (!route.params?.userSeq && searchParam === undefined) && type !== 2 && data.index === 0) && 40}]} 
+                return <Pressable style={({pressed})  => [styles.burgerItem,{elevation : pressed ? 0.5 : 5,
+                        borderTopColor: pressed ? 'whitesmoke' : 'white',
+                        marginTop: (stores.filter(str => strPick !== -1 ? str.storeSeq === strPick : (search.includes(str.name) || str.name.includes(search))).length > 0 &&
+                            (!route.params?.userSeq && searchParam === undefined) && type !== 2 && data.index === 0) && 42}]} 
                         key={data.index} onPress={() => (!route.params?.userSeq && searchParam === undefined) ? navigation.navigate('View', { burgerSeq : data.item[0].burgerSeq }) 
                         : onGo(1,data.item[0].burgerSeq)}>
                         <View style={styles.makeContainer}>
@@ -188,15 +183,16 @@ const HamburgerList = (props) => {
                                 style={{width: data.item[0].size === 0 ? '50%' : data.item[0].size === 2 ? '90%' : '70%',alignSelf:'center',
                                 aspectRatio: 500/(ingres.find(ing => ing.ingreSeq === makeDTO[0]).type !== 0 ? 
                                 ingres.find(ing => ing.ingreSeq === makeDTO[0]).height : 160), 
-                                zIndex: -makeDTO.length+999,marginTop: data.item[0].size === 0 ? 4 : data.item[0].size === 1 ? 3 : 0}} />
+                                zIndex: -makeDTO.length+999, marginTop: data.item[0].size === 0 ? lastMargin * 0.0001 : 
+                                                                        data.item[0].size === 1 ? lastMargin * 0.00008 : lastMargin * 0.00001}}/>
                         </View>
                     <View style={styles.infoContainer}>
                         <Text style={styles.itemName}>{data.item[0].name}</Text>
                         {data.item[0].type !== 2 && <Text style={styles.itemStore}>{stores.find(str => str.storeSeq === data.item[0].storeSeq) ? 
                         stores.find(str => str.storeSeq === data.item[0].storeSeq).name : '없는 매장'}</Text>}
                         {data.item[0].type === 2 && <Text style={styles.itemStore}>{data.item[1] ? data.item[1].name : '탈퇴 회원'}</Text>}{/* userSeq를 통한 유저명 가져오기 */}
-                        {data.item[0].type !== 2 &&<View style={{flexDirection:'row',justifyContent:'space-evenly',marginTop:3}}>
-                            <View style={{flexDirection:'row',justifyContent:'center'}}><Image source={won} style={{width:23,height:23}}/>
+                        {data.item[0].type !== 2 &&<View style={{flexDirection:'row',justifyContent:'center',marginVertical:4}}>
+                            <View style={{flexDirection:'row',justifyContent:'center'}}><Image source={won} style={{width:22,height:22}}/>
                             <Text style={{fontSize:15,textAlignVertical:'center'}}>
                             &nbsp;{data.item[0].price <= 0 ? '가격 정보 없음' : data.item[0].price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") }</Text></View>
                             <Text style={[styles.status,{backgroundColor:data.item[0].status === 0 ? '#2E8DFF' : 'tomato'}]}>
@@ -216,8 +212,10 @@ const HamburgerList = (props) => {
                         </View>
                     </View>
             </Pressable>}}
+                ListHeaderComponent={() => <View style={{paddingBottom:5}}/>}
+                ListFooterComponent={() => <View style={{paddingBottom:10}}/>}
                 alwaysBounceVertical={false}
-            />
+            />}
         </View>
     );
 };
@@ -263,8 +261,9 @@ const styles = StyleSheet.create({
         paddingVertical: 1,
         marginHorizontal: '1%',
         borderRadius: 10,
-        marginBottom: 3,
-        marginTop: 1,
+        marginBottom: 4,
+        marginTop: 2,
+        height: 127,
         backgroundColor:'white',
     },
     itemName : {
@@ -323,7 +322,8 @@ const styles = StyleSheet.create({
         textAlign:'center',
         fontSize: 15,
         fontWeight:'bold',
-        color:'white'
+        color:'white',
+        marginLeft: 10
     },
 });
 

@@ -24,7 +24,7 @@ const Search = (props) => {
             duration: 500,
             useNativeDriver: false,
             easing: Easing.out(Easing.ease)
-            }).start(() => setAning(false));
+        }).start(() => setAning(false));
     }
 
     const boardHeight = {

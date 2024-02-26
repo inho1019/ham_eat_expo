@@ -14,6 +14,7 @@ const HamburgerHome = (props) => {
 
     const [ingres,setIngres] = useState([])
     const [makeDTO,setMakeDTO] = useState([])
+    const [lastMargin,setLastMargin] = useState(0)
     const [burger,setBurger] = useState({})
     const [fren,setFren] = useState([])
     const [hand,setHand] = useState([])
@@ -44,8 +45,8 @@ const HamburgerHome = (props) => {
         }
         const unsubscribe = navigation.addListener('focus', () => {
             axios.get(`https://hameat.onrender.com/ingre/list`)
-            .then(res => {
-                setIngres(res.data)
+            .then(ing => {
+                setIngres(ing.data)
                 Promise.all([
                     axios.get(`https://hameat.onrender.com/rating/listNew`),
                     axios.get(`https://hameat.onrender.com/burger/listHome/0`),
@@ -58,8 +59,14 @@ const HamburgerHome = (props) => {
                     setHand(res[2].data)
                     setDiy(res[3].data)
                     const ran = Math.floor(Math.random() * 3)
-                    setMakeDTO(ran === 0 ? JSON.parse(res[1].data[0].make) : 
-                                ran === 1 ? JSON.parse(res[2].data[0].make) : JSON.parse(res[3].data[0].make))
+                    const mkDTO = ran === 0 ? JSON.parse(res[1].data[0].make) : 
+                                  ran === 1 ? JSON.parse(res[2].data[0].make) : JSON.parse(res[3].data[0].make)
+                    setMakeDTO(mkDTO)
+                    const inDTO = mkDTO.map(md => {
+                        const ingreIt = ing.data.find(ing => ing.ingreSeq === md);
+                        return ingreIt !== undefined ? ingreIt : ing.data[0]
+                    });
+                    setLastMargin(windowWidth*inDTO.filter(ing => ing.type !== 4)[inDTO.filter(ing => ing.type !== 4).length - 1].height)
                     setBurger(ran === 0 ? res[1].data[0] : 
                                 ran === 1 ? res[2].data[0] : res[3].data[0])
                     axios.get(`https://hameat.onrender.com/rating/listSeq/${
@@ -137,7 +144,8 @@ const HamburgerHome = (props) => {
                                 style={{width: burger.size === 0 ? '50%' : burger.size === 2 ? '90%' : '70%',alignSelf:'center',
                                 aspectRatio: 500/(ingres.find(ing => ing.ingreSeq === makeDTO[0]).type !== 0 ? 
                                 ingres.find(ing => ing.ingreSeq === makeDTO[0]).height : 160), 
-                                zIndex: -makeDTO.length,marginTop: burger.size === 0 ? 7 : burger.size === 1 ? 3 : 0}} />
+                                zIndex: -makeDTO.length,marginTop: burger.size === 0 ? lastMargin * 0.00013 : 
+                                                                   burger.size === 1 ? lastMargin * 0.000065 : lastMargin * 0.00004}}/>
                         </View>
                         <View style={styles.infoContainer}>
                             <Text style={{fontWeight:'bold',fontSize:22,textAlign:'center'}}>{burger.name}</Text>

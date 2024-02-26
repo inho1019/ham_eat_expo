@@ -63,6 +63,9 @@ const UserRegister = (props) => {
     const [authCom,setAuthCom] = useState(false)
 
     const [nameCheck,setNameCheck] = useState(false)
+
+    const [policy,setPolicy] = useState(true)
+    const [policyTxt,setPolicyTxt] = useState('')
     
     const [cal,setCal] = useState(false)
 
@@ -105,6 +108,19 @@ const UserRegister = (props) => {
         setAuth('')
       }
     }
+
+    useEffect(() => {
+      onLoading(true)
+      axios.get('https://hameat.onrender.com/policy')
+      .then(res => {
+        setPolicyTxt(res.data.replace(/<br>/g, '\n'))
+        onLoading(false)
+      })
+      .catch(() => {
+        onAlertTxt('정책 불러오기 중 에러발생')
+        onLoading(false)
+    })
+    },[])
 
     useEffect(() => {
       if(authGo) {
@@ -174,7 +190,20 @@ const UserRegister = (props) => {
     }
 
     return (
-      <ScrollView style={{ flex: 1, paddingTop: 30 }}>
+      <View style={{ flex: 1}}>
+        {policy ? <View>
+          <View style={{ flexDirection : 'row' , marginVertical: 10}}><Text style={styles.h3}>개인정보 처리 방침</Text></View>
+          <ScrollView style={styles.policyScroll}>
+              <Text style={{flexWrap: 'wrap',paddingBottom: 100}}>{policyTxt}</Text>
+          </ScrollView>
+          <Pressable style={styles.but} onPress={() => {
+            setPolicy(false)
+            onAlertTxt('개인정보 처리 방침에 동의하셨습니다')
+          }}>
+            <Text style={styles.butTxt}>동의</Text>
+          </Pressable>
+        </View>  
+      : <ScrollView style={{ flex: 1, paddingTop: 30 }}>
           <View style={{ flexDirection : 'row' }}><Text style={styles.h3}>이메일</Text></View>
           <TextInput style={[styles.txtBox,{color:authCom ? 'darkgray' : 'black'}]} 
             value={email} onChangeText={(text) => !authCom && setEmail(text)} 
@@ -266,14 +295,23 @@ const UserRegister = (props) => {
                     setMonth(day.month)
                     setDay(day.day)
                   }}
-                />
+                  />
               </View>
           </Modal>
-      </ScrollView>
+        </ScrollView>}
+    </View>
     );
 };
 
 const styles = StyleSheet.create({
+  policyScroll : {
+    padding: 10,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: 'darkgray',
+    height: '70%',
+    marginHorizontal: '4%',
+  },
   h3 : {
     borderTopColor: 'white',
     borderTopWidth: 10,

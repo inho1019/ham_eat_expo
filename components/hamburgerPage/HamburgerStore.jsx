@@ -9,10 +9,11 @@ import MapModal from '../MapModal';
 
 const HamburgerStore = (props) => {
 
-    const {onBack,navigation,onStore,onLoading,type,onAlert} = props
+    const {onBack,navigation,onStore,onLoading,type,onAlert,burgerDTO,updateBool} = props
 
     const [stores,setStores] = useState([])
     const [search,setSearch] = useState('')
+    const [upStoreSeq,setUpStoreSeq] = useState(-1)
 
     ///////////////////지도모달/////////////////
     const [storeTouch,setStoreTouch] = useState(true)
@@ -69,7 +70,14 @@ const HamburgerStore = (props) => {
             })
         });
         return unsubscribe;
-      }, [navigation,type]);
+    }, [navigation,type]);
+
+
+    useEffect(() => {
+        if(updateBool && burgerDTO.storeSeq !== -1 && upStoreSeq === -1) {
+            setUpStoreSeq(burgerDTO.storeSeq)
+        }
+    },[burgerDTO])
 
     return (
         <View>
@@ -85,7 +93,7 @@ const HamburgerStore = (props) => {
             <ScrollView style={styles.storeList}>
                 {stores.filter(str => str.name.includes(search)).map((item, index) => <Pressable key={index} 
                     onPress={() => storeTouch && onStore(item.storeSeq)} style={({pressed})  => [styles.storeBut,
-                        {backgroundColor: pressed ? 'whitesmoke' : 'white'}
+                        {backgroundColor: pressed ? 'whitesmoke' : upStoreSeq === item.storeSeq ? 'lightgray' : 'white'}
                     ]}>
                     <Text style={styles.storeTxt}>{item.name}</Text>
                     {type === 1 && <Pressable

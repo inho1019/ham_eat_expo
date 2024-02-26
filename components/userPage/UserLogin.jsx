@@ -82,7 +82,7 @@ const UserLogin = (props) => {
     pwd : ''
   })
   
-  const [save,setSave] = useState(false)
+  const [save,setSave] = useState(true)
   const [wrong,setWrong] = useState(0)
   const [count,setCount] = useState(9999)
   

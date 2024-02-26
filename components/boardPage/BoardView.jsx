@@ -56,27 +56,30 @@ const BoardView = (props) => {
         });
         const unsubscribe = navigation.addListener('focus', () => {
             onLoading(true)
-            axios.get(`https://hameat.onrender.com/board/view/${route.params?.boardSeq}`)
-            .then(res =>{
-                setBoardDTO(res.data)
-                navigation.setOptions({
-                    title: res.data[0].title
-                });
+            Promise.all([
+                axios.get(`https://hameat.onrender.com/board/view/${route.params?.boardSeq}`),
                 axios.get(`https://hameat.onrender.com/comment/list/${route.params?.boardSeq}`)
-                .then(res => {
-                    setCommentList(res.data)
-                    onLoading(false)
-                })
-                .catch(() => {
-                    onAlertTxt('불러오기 중 에러발생')
-                    onLoading(false)
-                })
-            }).catch(() => {
+            ])
+            .then(res => {
+                onLoading(false)
+                if(res[0].data) {
+                    setBoardDTO(res[0].data)
+                    setCommentList(res[1].data)
+                    navigation.setOptions({
+                        title: res[0].data[0].title
+                    });
+                } else {
+                    onAlertTxt('삭제된 글입니다')
+                    navigation.goBack(-1)
+                }
+            })
+            .catch(() => {
                 onAlertTxt('불러오기 중 에러발생')
                 onLoading(false)
             })
         })
         return unsubscribe;
+
     },[route,navigation])
 
     const onFav = () => {
@@ -230,10 +233,13 @@ const BoardView = (props) => {
                                         </View>
                                     </View>}
                                 </View>
+                                <View style={{flexDirection:'row',justifyContent:'space-between'}}>
                                 <View style={{flexDirection:'row'}}>
                                     <Text style={styles.h3}>조회 {boardDTO[0].hit}</Text>
                                     <Text style={styles.h3}> | 추천 {JSON.parse(boardDTO[0].fav).length}</Text>
                                     <Text style={styles.h3}> | {getToday(boardDTO[0].logTime)}</Text>
+                                </View>
+                                <Text style={styles.h3}>NO.{boardDTO[0].boardSeq}</Text>
                                 </View>
                             </View>
                         </View>

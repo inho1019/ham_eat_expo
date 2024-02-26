@@ -18,7 +18,7 @@ import max from '../../assets/main/max.png'
 import min from '../../assets/main/min.png'
 
 const HamburgerMake = (props) => {
-    const{onBack,onAlert,route,onLoading,onMakes} = props
+    const{onBack,onAlert,route,onLoading,onMakes,updateBool,burgerDTO} = props
 
 ///////////드래그 이벤트////////////
     const [resc,setResc] = useState(true)
@@ -32,7 +32,7 @@ const HamburgerMake = (props) => {
             onPanResponderGrant: () => {
                 setAction(true)
             },
-            onPanResponderRelease: (event, gestureState) => {
+            onPanResponderRelease: (_, gestureState) => {
                 if (gestureState.dy > 50 || gestureState.dy < -50) {
                     if (gestureState.dy <= (250 - (burCon-49.5)*9) && gestureState.dy >= (-250 + (ingCon-49.5)*9)) {
                         setBurCon(burCon + parseInt(gestureState.dy/9))
@@ -50,6 +50,7 @@ const HamburgerMake = (props) => {
             },
         })
     },[burCon,ingCon,resc])
+
 ///////////////////
     const [ingres,setIngres] = useState([])
     const [size,setSize] = useState(-1)
@@ -66,6 +67,8 @@ const HamburgerMake = (props) => {
     const [fillBox,setFillBox] = useState(true)
     const [sauBox,setSauBox] = useState(true)
 
+    const [first,setFirst] = useState(true)
+
     const windowWidth = Dimensions.get('window').width;
 
     const onMake = (num) => {
@@ -79,6 +82,14 @@ const HamburgerMake = (props) => {
             onAlert('3가지 이상의 재료를 선택해 주세요');
         }
     }
+
+    useEffect(() => {
+        if(updateBool && burgerDTO.make.length > 0 && first && ingres.length > 0) {
+            setSize(burgerDTO.size)
+            setMakeDTO(JSON.parse(burgerDTO.make))
+            setFirst(false)
+        }
+    },[burgerDTO,ingres])
 
     useEffect(() => {
         onLoading(true)

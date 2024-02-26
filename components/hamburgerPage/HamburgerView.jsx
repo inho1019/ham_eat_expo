@@ -1,6 +1,6 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
-import { Dimensions, FlatList, Image, Keyboard, Modal, PanResponder, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, TouchableWithoutFeedback, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Animated, Dimensions, Easing, FlatList, Image, Keyboard, Modal, PanResponder, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, TouchableWithoutFeedback, View } from 'react-native';
 import addImg from '../../assets/burger/add_review.png'
 import deleteImg from '../../assets/burger/delete.png'
 import drag from '../../assets/burger/drag.png'
@@ -26,7 +26,24 @@ const HamburgerView = (props) => {
     const [rate,setRate] = useState(0)
     const [content,setContent] = useState('')
     const [first,setFirst] = useState(true)
+    ///////////애니메이션///////////////
+    const ingreBox = useRef(new Animated.Value(0)).current;
 
+    const aniIng = (num) => {
+        Animated.timing(ingreBox, {
+            toValue: num,
+            duration: 500,
+            useNativeDriver: false,
+            easing: Easing.out(Easing.ease)
+        }).start();
+    }
+
+    const ingreAni = {
+        right: ingreBox.interpolate({
+        inputRange: [0, 1],
+        outputRange: [-99, 0],
+        }),
+    };
     ///////////드래그 이벤트////////////
     const [starWidth, setStarWidth] = useState(0);
 
@@ -138,6 +155,7 @@ const HamburgerView = (props) => {
     const [placeDTO,setPlaceDTO] = useState()
     const [status,setStatus] = useState(false)
     const [priceList,setPriceList] = useState([])
+    const [lastMargin,setLastMargin] = useState(0)
     const [price,setPrice] = useState('')
 
     useEffect(() => {
@@ -153,24 +171,35 @@ const HamburgerView = (props) => {
                     axios.get(`https://hameat.onrender.com/burger/view/${route.params?.burgerSeq}`),
                 ])
                 .then(res => {
-                    setRatings(res[0].data)
-                    setIngres(res[1].data)
-                    setBurgerDTO(res[2].data)
-                    setMakeDTO(JSON.parse(res[2].data[0].make))
-                    navigation.setOptions({
-                        title: res[2].data[0].name
-                    });
-                    axios.get(`https://hameat.onrender.com/store/getSeq/${res[2].data[0].storeSeq}`)
-                    .then(res => {
-                        setStoreDTO(res.data)
+                    if(res[2].data) {
+                        setRatings(res[0].data)
+                        setIngres(res[1].data)
+                        setBurgerDTO(res[2].data)
+                        setMakeDTO(JSON.parse(res[2].data[0].make))
+                        const inDTO = JSON.parse(res[2].data[0].make).map(md => {
+                            const ingreIt = res[1].data.find(ing => ing.ingreSeq === md);
+                            return ingreIt !== undefined ? ingreIt : res[1].data[0]
+                        });
+                        setLastMargin(windowWidth*inDTO.filter(ing => ing.type !== 4)[inDTO.filter(ing => ing.type !== 4).length - 1].height)
+                        navigation.setOptions({
+                            title: res[2].data[0].name
+                        });
+                        axios.get(`https://hameat.onrender.com/store/getSeq/${res[2].data[0].storeSeq}`)
+                        .then(res => {
+                            setStoreDTO(res.data)
+                            onLoading(false)
+                            setFirst(false)
+                        })
+                        .catch(() => {
+                            onAlertTxt('불러오기 중 에러발생')
+                            onLoading(false)
+                            setFirst(false)
+                        })
+                    } else {
+                        onAlertTxt('삭제된 버거입니다')
                         onLoading(false)
-                        setFirst(false)
-                    })
-                    .catch(() => {
-                        onAlertTxt('불러오기 중 에러발생')
-                        onLoading(false)
-                        setFirst(false)
-                    })
+                        navigation.goBack(-1)
+                    }
                 })
                 .catch(() => {
                     onAlertTxt('불러오기 중 에러발생')
@@ -306,6 +335,7 @@ const HamburgerView = (props) => {
     }
 
     const onPrice = () => {
+        Keyboard.dismiss()
         if(price === '') {
             onAlertTxt('가격을 입력해주세요')
         } else {
@@ -340,15 +370,82 @@ const HamburgerView = (props) => {
             })
         }
     }
+
+    const onPriceDelete = (seq) => {
+        onLoading(true)
+        axios.delete(`https://hameat.onrender.com/status/delete/${seq}`)
+        .then(() => {
+            axios.get(`https://hameat.onrender.com/status/list/${route.params?.burgerSeq}`)
+            .then(res => {
+                setPriceList(res.data)
+                onLoading(false)
+                onAlertTxt('삭제 완료')
+            })
+            .catch(() => {
+                onAlertTxt('삭제 중 에러발생')
+                onLoading(false)
+            })
+
+        })
+        .catch(() => {
+            onAlertTxt('삭제 중 에러발생')
+            onLoading(false)
+        })
+    }
+
+    const [deleteCount,setDeleteCount] = useState(0)
+
+    const onBurgerDelete = () => {
+        if(deleteCount === 0) {
+            onAlertTxt('한번 더 클릭시 삭제됩니다')
+            setDeleteCount(1)
+            setTimeout(() => setDeleteCount(0),5000)
+        } else {
+            onLoading(true)
+            axios.delete(`https://hameat.onrender.com/burger/delete/${route.params?.burgerSeq}`)
+            .then(() => {
+                onLoading(false)
+                navigation.goBack(-1)
+                onAlertTxt('삭제 완료')
+            })
+        }
+    }
+
+    useEffect(() => {
+        aniIng(fold ? 0 : 1)
+    },[fold])
+
     return (
         <View>
             <ScrollView style={{height:'95%'}}>
+                {!first && <Text style={styles.num}>NO.{burgerDTO[0].burgerSeq}</Text>}
                 <Pressable onPress={() => setFold(!fold)} style={styles.fold}>
                     <Image source={fold ? foldT : foldF} style={{height:40,width:40}}/>
                 </Pressable>
+                {!first && <Animated.View style={[styles.ingreInfo,ingreAni]} ref={ingreBox}>
+                        {ingres.sort((a, b) => a.type - b.type).map((item,index) => makeDTO.includes(item.ingreSeq) && 
+                        <Text key={index} style={styles.ingreTxt}>
+                            {item.name} X {makeDTO.filter(md => md === item.ingreSeq).length}
+                        </Text>)}
+                    </Animated.View>}
                 {first && <View style={{width:200,height:200,overflow:'hidden',
                     alignSelf:'center', borderRadius:5, marginVertical:'5%'}}>
                         <Skel height={200} width={200}/>
+                </View>}
+                {!first && ((burgerDTO[1] && burgerDTO[1].userSeq === state.user.userSeq) || state.user.own === 2) && 
+                <View style={{flexDirection:'row',position:'absolute',top:28,left:7,zIndex:9999}}>
+                    <View style={{flexDirection:'column'}}>
+                        <Pressable onPress={() => navigation.navigate('Update', { updateSeq : burgerDTO[0].burgerSeq })}
+                            style={[styles.itemBut,{backgroundColor:'#2E8DFF'}]}>
+                            <Text style={styles.itemButTxt}>수정</Text>
+                        </Pressable>
+                    </View>
+                    { burgerDTO[0].type === 2 && <View style={{flexDirection:'column'}}>
+                        <Pressable onPress={ onBurgerDelete }
+                            style={[styles.itemBut,{backgroundColor:'tomato'}]}>
+                            <Text style={styles.itemButTxt}>삭제</Text>
+                        </Pressable>
+                    </View> }
                 </View>}
                 {!first && makeDTO.length > 0 && <Pressable 
                     onPress={() => setFold(!fold)}
@@ -369,11 +466,14 @@ const HamburgerView = (props) => {
                     <Image 
                     source={{ uri : ingres.find(ing => ing.ingreSeq === makeDTO[0]).type !== 0 ? 
                         ingres.find(ing => ing.ingreSeq === makeDTO[0]).image :
-                        'https://codingdiary.s3.eu-west-2.amazonaws.com/burger/normal_bun.png'}} 
+                        ingres.find(ing => ing.ingreSeq === makeDTO[0]).name === '먹물 번' ? 
+                        'https://postfiles.pstatic.net/MjAyNDAyMjVfMTY4/MDAxNzA4ODQxNDg2OTk0.9RaLSfxW7Tzloqsvz40r1omqWehGg7bZbh7st9OBmQkg.2JdsHC1yle6BINWRnsSUQib_A5GWvLE3mh2HhqXoQ9Ig.PNG/ink_bun.png?type=w966'
+                        : 'https://postfiles.pstatic.net/MjAyNDAyMjVfNiAg/MDAxNzA4ODM5MDMxNzQ5.-eK1dABinObEUaWkHVMu03zQ818I4VUbkhhdwf7AlQIg.xFI7_6ktqqav2Uj-iqp-yy4F_b6WR9xbopK5xWIP0p4g.PNG/normal_bun.png?type=w966'}}
                         style={{width: burgerDTO[0].size === 0 ? '50%' : burgerDTO[0].size === 2 ? '90%' : '70%',alignSelf:'center',
                         aspectRatio: 500/(ingres.find(ing => ing.ingreSeq === makeDTO[0]).type !== 0 ? 
                         ingres.find(ing => ing.ingreSeq === makeDTO[0]).height : 160), 
-                        zIndex: -makeDTO.length,marginTop: burgerDTO[0].size === 0 ? 7 : burgerDTO[0].size === 1 ? 3 : 0}} />
+                        zIndex: -makeDTO.length, marginTop: burgerDTO[0].size === 0 ? lastMargin * 0.00018 : 
+                                                            burgerDTO[0].size === 1 ? lastMargin * 0.00007 : lastMargin * 0.00005}}/>
                 </Pressable>}
                 {first && <View style={{width:150,height:50,overflow:'hidden',
                     alignSelf:'center', borderRadius:5, marginVertical:'2%'}}>
@@ -492,7 +592,7 @@ const HamburgerView = (props) => {
                             <Image source={deleteImg} style={{width:40,height:40}}/>
                         </Pressable>
                             <View style={styles.statusModal}>
-                                <View style={{flexDirection:'row',marginBottom:20}}><Text style={styles.h2}>판매 여부</Text></View>
+                                <View style={{flexDirection:'row',marginBottom:20}}><Text style={styles.h2}>판매 여부 변동</Text></View>
                                 <View style={{flexDirection:'row',justifyContent:'space-evenly'}}>
                                     <Pressable
                                         onPress={() => onStatus(0)}
@@ -511,6 +611,7 @@ const HamburgerView = (props) => {
                                         keyboardType="numeric"
                                         value={price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} 
                                         style={styles.txtBox}
+                                        onSubmitEditing={ onPrice }
                                         onChangeText={(text) => setPrice(text.replace(/[^0-9]/g, ''))} />
                                     <Pressable
                                         onPress={ onPrice }
@@ -519,16 +620,20 @@ const HamburgerView = (props) => {
                                     </Pressable>
                                 </View>
                                 <Text style={{marginHorizontal:20,marginBottom: 10,fontSize: 12}}>
-                                    *2개 이상의 동일한 요청 발생시 가격 변동</Text>
+                                    *2개 이상의 동일한 신청 발생시 가격 변동</Text>
                                 <View style={{flexDirection:'row'}}><Text style={styles.h2}>신청 기록</Text></View>
                                 <Text style={{marginHorizontal:20,marginVertical: 5,fontSize: 12}}>*가격 변동 시 초기화</Text>
                                 <ScrollView style={styles.priceList}>
-                                    {priceList.map((item,index) => <Pressable key={index}
-                                        style={({pressed}) => ({padding:7, borderBottomWidth:1, borderBottomColor:'lightgray',
-                                            backgroundColor: pressed ? 'whitesmoke' : 'white'})}
-                                        onPress={() => setPrice(item.req)}>
-                                        <Text style={{fontSize:15,fontWeight:'bold',color:'gray'}}>{item.req}원 | {getToday(item.logTime)}</Text>
-                                    </Pressable>)}
+                                    {priceList.map((item,index) => <View key={index}
+                                        style={styles.priceItem}>
+                                        <Text style={{fontSize:15,fontWeight:'bold',color:'gray'}}>
+                                            {item.req.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}원 | {getToday(item.logTime)}</Text>
+                                        <Pressable 
+                                            onPress={() => item.userSeq === state.user.userSeq ? onPriceDelete(item.statusSeq) : setPrice(item.req)}
+                                            style={[styles.itemBut,{backgroundColor: item.userSeq === state.user.userSeq ? 'tomato' : '#2E8DFF'}]}>
+                                            <Text style={styles.itemButTxt}>{item.userSeq === state.user.userSeq ? '취소' : '선택'}</Text>
+                                        </Pressable>
+                                    </View>)}
                                 </ScrollView>
                             </View>
                         </View>
@@ -647,9 +752,9 @@ const styles = StyleSheet.create({
     },
     h1 : {
         textAlign : 'center',
-        fontSize: 25,
-        fontWeight: 'bold',
-        marginTop: 10
+        fontSize: 27,
+        fontFamily: 'esamanruMedium',
+        marginVertical: 5
     },
     h2 : {
         borderTopColor: 'white',
@@ -667,6 +772,19 @@ const styles = StyleSheet.create({
         borderBottomWidth: 4,
         borderBottomColor: 'lightgray',
         marginTop: 5
+    },
+    itemBut : {
+        marginHorizontal: 3,
+        width: 35,
+        height: 25,
+        justifyContent:'center',
+        alignItems:'center',
+        borderRadius: 5,
+    },
+    itemButTxt : {
+        color:'white',
+        fontWeight: 'bold',
+        fontSize: 13
     },
     line : {
         marginVertical: 2,
@@ -698,7 +816,16 @@ const styles = StyleSheet.create({
         width:40,
         height: 40,
         top: 30,
-        right: 30
+        right: 30,
+        fontSize: 15,
+        color:'gray'
+    },
+    num : {
+        position: 'absolute',
+        fontFamily: 'esamanruMedium',
+        fontSize: 10,
+        top: 10,
+        left: 10
     },
     status : {
         marginLeft: 10,
@@ -713,10 +840,31 @@ const styles = StyleSheet.create({
     statusIn : {
         flexDirection:'row',
         padding:5,
-        borderRadius: 5,
+        borderRadius: 10,
         borderWidth:2,
         borderColor:'lightgray',
-        backgroundColor:'whitesmoke'
+        backgroundColor:'whitesmoke',
+    },
+    ingreInfo : {
+        position: 'absolute',
+        top: 90,
+        paddingHorizontal: 7,
+        width: 100,
+        opacity: 0.5,
+        zIndex: 9999,
+        borderWidth: 1,
+        borderColor:'black',
+        borderRightWidth: 0,
+        paddingBottom: 5
+    },
+    ingreTxt : {
+        fontSize: 13,
+        marginVertical: 1,
+        fontWeight:'bold',
+        paddingBottom: 3,
+        paddingTop: 2,
+        borderBottomColor: 'black',
+        borderBottomWidth: 1
     },
     ////////status Modal////////
     statusModal : {
@@ -742,7 +890,7 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         borderWidth: 1,
         borderColor: 'darkgray',
-        height: '25 %',
+        height: '25%',
         marginHorizontal: '4%',
         overflow:'hidden',
     },
@@ -769,6 +917,16 @@ const styles = StyleSheet.create({
         fontWeight:'bold',
         fontSize: 15,
         color: 'gray'
+    },
+    priceItem : {
+        padding:7, 
+        borderBottomWidth:1, 
+        borderBottomColor:'lightgray', 
+        backgroundColor:'white',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        borderTopLeftRadius:5,
+        borderTopRightRadius:5,
     },
     /////////평점///////////////
     starOut : {

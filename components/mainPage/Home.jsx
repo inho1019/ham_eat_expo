@@ -21,6 +21,18 @@ const Home = (props) => {
     const onLoading = (bool) => {
         dispatch({ type: 'SET_LOADING' , payload : bool });
     };
+
+    const onPage = (num) => {
+        dispatch({ type: 'SET_PAGE' , payload : num });
+    };
+
+    const onView = (num) => {
+        dispatch({ type: 'SET_VIEW' , payload : num });
+    };
+
+    const onAlertTxt = (txt) => {
+        dispatch({ type: 'SET_ALERTTXT' , payload : txt });
+      };
     //////////캐러셀/////////////
     const [carousel,setCarousel] = useState([]);
     
@@ -88,8 +100,13 @@ const Home = (props) => {
     },[navigation])
 
     const onSearch = () => {
-        setMapStop(true)
-        requestAnimationFrame(() => navigation.navigate('Search', { search : search }))
+        if(search.length > 0) {
+            setMapStop(true)
+            requestAnimationFrame(() => navigation.navigate('Search', { search : search }))
+            setSearch('')
+        } else {
+            onAlertTxt('검색어를 입력해주세요') 
+        }
     }
 
     const onMapSearch = (txt) => {
@@ -101,6 +118,12 @@ const Home = (props) => {
         Linking.openURL(url)
         .catch((err) => console.error('Error opening external link:', err));
     };
+
+    const onGo = (a,b) => {
+        onPage(a)
+        onView(b)
+    }
+
 
     return (
         <KeyboardAvoidingView style={{flex:1}}>
@@ -141,7 +164,7 @@ const Home = (props) => {
                             </View>
                             {carousel.map((item,index) => <Pressable
                             key={index}
-                            onPress={() => item.type === 0 && openLink(item.url)}
+                            onPress={() => item.type === 0 ? openLink(item.url) : onGo(item.type,item.seq)}
                             style={{width: itemWidth,height: '100%'}}>
                                 <Image source={{uri : item.image}} style={{width:'100%',height: '100%'}} resizeMode='cover'/>
                             </Pressable>)}

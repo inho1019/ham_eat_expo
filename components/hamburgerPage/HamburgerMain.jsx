@@ -17,6 +17,7 @@ const HamburgerMain = (props) => {
             <Stack.Navigator initialRouteName="Home" screenOptions={navHeader}>
                 <Stack.Screen name="Home" component={HamburgerHome} options={{ headerShown: false }}/>
                 <Stack.Screen name="Form" component={HamburgerForm} options={{ headerTitle: '버거 등록'}}/>
+                <Stack.Screen name="Update" component={HamburgerForm} options={{ headerTitle: '버거 수정'}}/>
                 <Stack.Screen name="Add" component={HamburgerMap} options={{ headerTitle: '등록'}}/>
                 <Stack.Screen name="List" component={HamburgerList}/>
                 <Stack.Screen name="View" component={HamburgerView}/>

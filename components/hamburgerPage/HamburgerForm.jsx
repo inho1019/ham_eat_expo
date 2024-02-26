@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Dimensions, Easing, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import HamburgerStore from './HamburgerStore';
 import HamburgerMake from './HamburgerMake';
@@ -74,6 +74,30 @@ const HamburgerForm = (props) => {
         dispatch({ type: 'SET_ALERTTXT' , payload : txt });
     };
 
+    //////////////////Update 시//////////////////////////////////
+
+    const [updateBool,setUpdateBool] = useState(false)
+
+    useEffect(() => {
+        if(route.params?.updateSeq !== undefined && !updateBool) {
+            setUpdateBool(true)
+            onLoading(true)
+            navigation.setOptions({
+                title: '버거 수정'
+            });
+            axios.get(`https://hameat.onrender.com/burger/view/${route.params?.updateSeq}`)
+            .then(res => {
+                setBurgerDTO(res.data[0])
+                onLoading(false)
+            })
+            .catch(() => {
+                onAlertTxt('불러오기 중 에러발생')
+                onLoading(false)
+                navigation.goBack(-1)
+            })
+        }
+    },[route])
+
     /////////////////////////////////////////////////////////////
 
     const onType = (num) => {
@@ -113,30 +137,53 @@ const HamburgerForm = (props) => {
         if(burgerDTO.name.length > 0) {
             if(burgerDTO.content.length > 0) {
                 onLoading(true)
-                axios.post(`https://hameat.onrender.com/burger/write`, {...burgerDTO, userSeq : state.user.userSeq} )
-                .then(res => {
-                    if(bool) {
-                        const ratingDTO = {...dto, burgerSeq : res.data.burgerSeq, type : burgerDTO.type, userSeq : state.user.userSeq }
-                        axios.post(`https://hameat.onrender.com/rating/write`,ratingDTO)
-                        .then(() => {
+                if(updateBool) {
+                    Promise.all([
+                        axios.put(`https://hameat.onrender.com/burger/update`, burgerDTO),
+                        axios.put(`https://hameat.onrender.com/rating/updateType`, burgerDTO)
+                    ])
+                    .then(() => {
+                        axios.get(`https://hameat.onrender.com/burger/status/${route.params?.updateSeq}`)
+                        .then(() => { 
+                            onAlertTxt('수정이 완료되었습니다')
                             onLoading(false)
-                            onAlertTxt('등록이 완료되었습니다')
                             navigation.navigate('Home')
                         })
                         .catch(() => {
-                            onAlertTxt('평가 등록 중 에러발생')
+                            onAlertTxt('수정 중 에러발생')
                             onLoading(false)
                         })
-                    } else {
+                    })
+                    .catch(() => {
+                        onAlertTxt('수정 중 에러발생')
                         onLoading(false)
-                        onAlertTxt('등록이 완료되었습니다')
-                        navigation.navigate('Home')
-                    }
-                })
-                .catch(() => {
-                    onAlertTxt('버거 등록 중 에러발생')
-                    onLoading(false)
-                })
+                    })
+                } else {
+                    axios.post(`https://hameat.onrender.com/burger/write`, {...burgerDTO, userSeq : state.user.userSeq} )
+                    .then(res => {
+                        if(bool) {
+                            const ratingDTO = {...dto, burgerSeq : res.data.burgerSeq, type : burgerDTO.type, userSeq : state.user.userSeq }
+                            axios.post(`https://hameat.onrender.com/rating/write`,ratingDTO)
+                            .then(() => {
+                                onLoading(false)
+                                onAlertTxt('등록이 완료되었습니다')
+                                navigation.navigate('Home')
+                            })
+                            .catch(() => {
+                                onAlertTxt('평가 등록 중 에러발생')
+                                onLoading(false)
+                            })
+                        } else {
+                            onLoading(false)
+                            onAlertTxt('등록이 완료되었습니다')
+                            navigation.navigate('Home')
+                        }
+                    })
+                    .catch(() => {
+                        onAlertTxt('버거 등록 중 에러발생')
+                        onLoading(false)
+                    })
+                }
             } else onAlertTxt('설명을 입력해 주세요');
         } else onAlertTxt('이름을 입력해 주세요')
     }
@@ -151,34 +198,37 @@ const HamburgerForm = (props) => {
                     onPressIn={() => aniFren(1.2)}
                     onPressOut={() => aniFren(1)}
                 >
-                    <Animated.Text style={[styles.handText,{ transform: [{scale : fren}] }]}>프렌차이즈 버거</Animated.Text>
+                    <Animated.Text style={[styles.handText,{ transform: [{scale : fren}], 
+                        color : updateBool && burgerDTO.type === 0 ? 'darkgray' : 'black' }]}>프렌차이즈 버거</Animated.Text>
                 </Pressable>
                 <Pressable style={{marginVertical:'7%'}}
                     onPress={() => onType(1)}
                     onPressIn={() => aniHand(1.2)}
                     onPressOut={() => aniHand(1)}
                 >
-                    <Animated.Text style={[styles.handText,{ transform: [{scale : hand}] }]}>수제 버거</Animated.Text>
+                    <Animated.Text style={[styles.handText,{ transform: [{scale : hand}], 
+                        color : updateBool && burgerDTO.type === 1 ? 'darkgray' : 'black' }]}>수제 버거</Animated.Text>
                 </Pressable>
                 <Pressable style={{marginVertical:'7%'}}
                     onPress={() => onType(2)}
                     onPressIn={() => aniMine(1.2)}
                     onPressOut={() => aniMine(1)}
                 >
-                    <Animated.Text style={[styles.handText,{ transform: [{scale : mine}] }]}>DIY 버거</Animated.Text>
+                    <Animated.Text style={[styles.handText,{ transform: [{scale : mine}], 
+                        color : updateBool && burgerDTO.type === 2 ? 'darkgray' : 'black' }]}>DIY 버거</Animated.Text>
                 </Pressable>
             </View>
             <View style={{height:windowHeight,paddingVertical: '1%'}}>
-                <HamburgerStore onBack={onBack} navigation={navigation} 
+                <HamburgerStore onBack={onBack} navigation={navigation} updateBool={updateBool} burgerDTO={burgerDTO}
                 route={route} type={burgerDTO.type} onStore={onStore} onLoading={onLoading} onAlert={onAlertTxt}/>
             </View>
             <View style={{height:windowHeight,paddingVertical: '1%'}}>
                 <HamburgerMake onBack={onBack} navigation={navigation} onAlert={onAlertTxt}
-                    route={route} onLoading={onLoading} onMakes={onMake}/>
+                    route={route} onLoading={onLoading} onMakes={onMake} updateBool={updateBool} burgerDTO={burgerDTO}/>
             </View>
             <View style={{height:windowHeight,paddingVertical: '1%'}}>
                 <HamburgerWrite onBack={onBack} navigation={navigation} onAlert={onAlertTxt}
-                    onInput={onInput} burgerDTO={burgerDTO} onSubmit={onSubmit}/>
+                    onInput={onInput} burgerDTO={burgerDTO} onSubmit={onSubmit} updateBool={updateBool}/>
             </View>
         </ScrollView>
     );
