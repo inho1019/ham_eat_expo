@@ -218,13 +218,15 @@ const BoardView = (props) => {
                             <View style={{width:'100%'}}>
                                 <View style={{flexDirection:'row',justifyContent:'space-between'}}>
                                     <Text style={styles.h2}>{boardDTO[1] ? boardDTO[1].name : '탈퇴 회원'}</Text>
-                                    {boardDTO[1].userSeq === state.user.userSeq && <View style={{flexDirection:'row'}}>
+                                    {(boardDTO[1] && 
+                                        boardDTO[1].userSeq === state.user.userSeq || state.user.own === 2) && <View style={{flexDirection:'row'}}>
+                                        {boardDTO[1].userSeq === state.user.userSeq && 
                                         <View style={{flexDirection:'column'}}>
                                             <Pressable onPress={onUpdate}
                                                 style={[styles.itemBut,{backgroundColor:'#2E8DFF'}]}>
                                                 <Text style={styles.itemButTxt}>수정</Text>
                                             </Pressable>
-                                        </View>
+                                        </View>}
                                         <View style={{flexDirection:'column'}}>
                                         <Pressable onPress={onDelete}
                                             style={[styles.itemBut,{backgroundColor:'tomato'}]}>

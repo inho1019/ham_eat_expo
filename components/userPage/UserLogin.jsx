@@ -6,7 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const UserLogin = (props) => {
 
-  const {navigation} = props;
+  const {navigation,route} = props;
 
   const loginBut = useRef(new Animated.Value(0)).current;
   const registerBut = useRef(new Animated.Value(0)).current;
@@ -81,6 +81,16 @@ const UserLogin = (props) => {
     email : '',
     pwd : ''
   })
+  
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      if(route.params?.email) {
+        setLoginDTO({...loginDTO,email:route.params?.email})
+      }
+    })
+
+    return unsubscribe;
+  },[navigation,route])
   
   const [save,setSave] = useState(true)
   const [wrong,setWrong] = useState(0)

@@ -8,9 +8,8 @@ import star from '../../assets/burger/star.png'
 import starNone from '../../assets/burger/star_none.png'
 import starOne from '../../assets/burger/star_one.png'
 import people from '../../assets/burger/people.png'
-import foldT from '../../assets/burger/fold_true.png'
-import foldF from '../../assets/burger/fold_false.png'
 import won from '../../assets/burger/won.png'
+import tab from '../../assets/burger/tab.png'
 import mapIcon from '../../assets/burger/map.png'
 import searchIcon from '../../assets/main/search.png'
 import { useAppContext } from '../api/ContextAPI';
@@ -39,9 +38,24 @@ const HamburgerView = (props) => {
     }
 
     const ingreAni = {
-        right: ingreBox.interpolate({
+        left: ingreBox.interpolate({
         inputRange: [0, 1],
-        outputRange: [-99, 0],
+        outputRange: [-106, 0],
+        }),
+    };
+
+    const tabAni = {
+        width: ingreBox.interpolate({
+            inputRange: [0, 1],
+            outputRange: [40, 0],
+        }),
+        borderTopRightRadius: ingreBox.interpolate({
+            inputRange: [0, 1],
+            outputRange: [40, 0],
+        }),
+        borderBottomRightRadius: ingreBox.interpolate({
+            inputRange: [0, 1],
+            outputRange: [40, 0],
         }),
     };
     ///////////드래그 이벤트////////////
@@ -157,14 +171,19 @@ const HamburgerView = (props) => {
     const [priceList,setPriceList] = useState([])
     const [lastMargin,setLastMargin] = useState(0)
     const [price,setPrice] = useState('')
+    const [tabModal,setTabModal] = useState(false)
 
     useEffect(() => {
         if(!status) {
             if(first) {
                 navigation.setOptions({
-                    title: ''
+                    title: '',
+                    headerRight: () => (
+                        <Pressable onPress={() => setTabModal(true)}>
+                            <Image source={tab} style={{width:30,height:30}}/>
+                        </Pressable>
+                    )
                 });
-                onLoading(true)
                 Promise.all([
                     axios.get(`https://hameat.onrender.com/rating/listSeq/${route.params?.burgerSeq}`),
                     axios.get(`https://hameat.onrender.com/ingre/list`),
@@ -187,23 +206,19 @@ const HamburgerView = (props) => {
                         axios.get(`https://hameat.onrender.com/store/getSeq/${res[2].data[0].storeSeq}`)
                         .then(res => {
                             setStoreDTO(res.data)
-                            onLoading(false)
                             setFirst(false)
                         })
                         .catch(() => {
                             onAlertTxt('불러오기 중 에러발생')
-                            onLoading(false)
                             setFirst(false)
                         })
                     } else {
                         onAlertTxt('삭제된 버거입니다')
-                        onLoading(false)
                         navigation.goBack(-1)
                     }
                 })
                 .catch(() => {
                     onAlertTxt('불러오기 중 에러발생')
-                    onLoading(false)
                     setFirst(false)
                 })
             } else {
@@ -418,63 +433,53 @@ const HamburgerView = (props) => {
     return (
         <View>
             <ScrollView style={{height:'95%'}}>
-                {!first && <Text style={styles.num}>NO.{burgerDTO[0].burgerSeq}</Text>}
-                <Pressable onPress={() => setFold(!fold)} style={styles.fold}>
-                    <Image source={fold ? foldT : foldF} style={{height:40,width:40}}/>
-                </Pressable>
-                {!first && <Animated.View style={[styles.ingreInfo,ingreAni]} ref={ingreBox}>
+                {!first && <Animated.View style={[styles.ingreOut,ingreAni]} ref={ingreBox}>
+                    <Pressable style={styles.ingreInfo} onPress={() => setFold(true)}>
                         {ingres.sort((a, b) => a.type - b.type).map((item,index) => makeDTO.includes(item.ingreSeq) && 
                         <Text key={index} style={styles.ingreTxt}>
                             {item.name} X {makeDTO.filter(md => md === item.ingreSeq).length}
                         </Text>)}
+                    </Pressable>
+                    <Pressable onPress={() => setFold(false)}>
+                        <Animated.View style={[styles.fold,tabAni]} ref={ingreBox}>
+                            <Image source={searchIcon} style={{height:20,width:20}}/>
+                        </Animated.View>    
+                    </Pressable>
                     </Animated.View>}
-                {first && <View style={{width:200,height:200,overflow:'hidden',
-                    alignSelf:'center', borderRadius:5, marginVertical:'5%'}}>
-                        <Skel height={200} width={200}/>
-                </View>}
-                {!first && ((burgerDTO[1] && burgerDTO[1].userSeq === state.user.userSeq) || state.user.own === 2) && 
-                <View style={{flexDirection:'row',position:'absolute',top:28,left:7,zIndex:9999}}>
-                    <View style={{flexDirection:'column'}}>
-                        <Pressable onPress={() => navigation.navigate('Update', { updateSeq : burgerDTO[0].burgerSeq })}
-                            style={[styles.itemBut,{backgroundColor:'#2E8DFF'}]}>
-                            <Text style={styles.itemButTxt}>수정</Text>
-                        </Pressable>
-                    </View>
-                    { burgerDTO[0].type === 2 && <View style={{flexDirection:'column'}}>
-                        <Pressable onPress={ onBurgerDelete }
-                            style={[styles.itemBut,{backgroundColor:'tomato'}]}>
-                            <Text style={styles.itemButTxt}>삭제</Text>
-                        </Pressable>
-                    </View> }
-                </View>}
-                {!first && makeDTO.length > 0 && <Pressable 
-                    onPress={() => setFold(!fold)}
-                    style={styles.makeContainer}>
-                    {makeDTO.map((item,index) => {
-                        const getIngre = ingres.find(ing => ing.ingreSeq === item)
-                        return <Image key={index} style={
-                            {width: burgerDTO[0].size === 0 ? '50%' : burgerDTO[0].size === 2 ? '90%' : '70%',
-                            aspectRatio: getIngre.width / getIngre.height + 
-                                (burgerDTO[0].size === 0 ? - 0.3 : burgerDTO[0].size === 2 && + 0.4),
-                            marginBottom: fold ? (((getIngre.type === 2 || getIngre.type === 3) && 
-                                getIngre.height > 170 ? -(windowWidth*0.158) : -(windowWidth*0.126)) + 
-                                (burgerDTO[0].size === 0 ? + (windowWidth*0.023) : burgerDTO[0].size === 2 && + -(windowWidth*0.019))) : 0,
-                            zIndex:-index,alignSelf: 'center'}}
-                            source={{ uri : getIngre.image}}
-                            resizeMode='stretch'/>
-                        })}
-                    <Image 
-                    source={{ uri : ingres.find(ing => ing.ingreSeq === makeDTO[0]).type !== 0 ? 
-                        ingres.find(ing => ing.ingreSeq === makeDTO[0]).image :
-                        ingres.find(ing => ing.ingreSeq === makeDTO[0]).name === '먹물 번' ? 
-                        'https://postfiles.pstatic.net/MjAyNDAyMjVfMTY4/MDAxNzA4ODQxNDg2OTk0.9RaLSfxW7Tzloqsvz40r1omqWehGg7bZbh7st9OBmQkg.2JdsHC1yle6BINWRnsSUQib_A5GWvLE3mh2HhqXoQ9Ig.PNG/ink_bun.png?type=w966'
-                        : 'https://postfiles.pstatic.net/MjAyNDAyMjVfNiAg/MDAxNzA4ODM5MDMxNzQ5.-eK1dABinObEUaWkHVMu03zQ818I4VUbkhhdwf7AlQIg.xFI7_6ktqqav2Uj-iqp-yy4F_b6WR9xbopK5xWIP0p4g.PNG/normal_bun.png?type=w966'}}
-                        style={{width: burgerDTO[0].size === 0 ? '50%' : burgerDTO[0].size === 2 ? '90%' : '70%',alignSelf:'center',
-                        aspectRatio: 500/(ingres.find(ing => ing.ingreSeq === makeDTO[0]).type !== 0 ? 
-                        ingres.find(ing => ing.ingreSeq === makeDTO[0]).height : 160), 
-                        zIndex: -makeDTO.length, marginTop: burgerDTO[0].size === 0 ? lastMargin * 0.00018 : 
-                                                            burgerDTO[0].size === 1 ? lastMargin * 0.00007 : lastMargin * 0.00005}}/>
-                </Pressable>}
+                <View style={{borderBottomColor:'whitesmoke',borderBottomWidth:20,paddingBottom:15,marginBottom:12}}>
+                    {first && <View style={{width:200,height:200,overflow:'hidden',
+                        alignSelf:'center', borderRadius:5, marginVertical:'5%'}}>
+                            <Skel height={200} width={200}/>
+                    </View>}
+                    {!first && makeDTO.length > 0 && <Pressable 
+                        onPress={() => setFold(!fold)}
+                        style={styles.makeContainer}>
+                        {makeDTO.map((item,index) => {
+                            const getIngre = ingres.find(ing => ing.ingreSeq === item)
+                            return <Image key={index} style={
+                                {width: burgerDTO[0].size === 0 ? '50%' : burgerDTO[0].size === 2 ? '90%' : '70%',
+                                aspectRatio: getIngre.width / getIngre.height + 
+                                    (burgerDTO[0].size === 0 ? - 0.3 : burgerDTO[0].size === 2 && + 0.4),
+                                marginBottom: fold ? (((getIngre.type === 2 || getIngre.type === 3) && 
+                                    getIngre.height > 170 ? -(windowWidth*0.158) : -(windowWidth*0.126)) + 
+                                    (burgerDTO[0].size === 0 ? + (windowWidth*0.023) : burgerDTO[0].size === 2 && + -(windowWidth*0.019))) : 0,
+                                zIndex:-index,alignSelf: 'center'}}
+                                source={{ uri : getIngre.image}}
+                                resizeMode='stretch'/>
+                            })}
+                        <Image 
+                        source={{ uri : ingres.find(ing => ing.ingreSeq === makeDTO[0]).type !== 0 ? 
+                            ingres.find(ing => ing.ingreSeq === makeDTO[0]).image :
+                            ingres.find(ing => ing.ingreSeq === makeDTO[0]).name === '먹물 번' ? 
+                            'https://postfiles.pstatic.net/MjAyNDAyMjVfMTY4/MDAxNzA4ODQxNDg2OTk0.9RaLSfxW7Tzloqsvz40r1omqWehGg7bZbh7st9OBmQkg.2JdsHC1yle6BINWRnsSUQib_A5GWvLE3mh2HhqXoQ9Ig.PNG/ink_bun.png?type=w966'
+                            : 'https://postfiles.pstatic.net/MjAyNDAyMjVfNiAg/MDAxNzA4ODM5MDMxNzQ5.-eK1dABinObEUaWkHVMu03zQ818I4VUbkhhdwf7AlQIg.xFI7_6ktqqav2Uj-iqp-yy4F_b6WR9xbopK5xWIP0p4g.PNG/normal_bun.png?type=w966'}}
+                            style={{width: burgerDTO[0].size === 0 ? '50%' : burgerDTO[0].size === 2 ? '90%' : '70%',alignSelf:'center',
+                            aspectRatio: 500/(ingres.find(ing => ing.ingreSeq === makeDTO[0]).type !== 0 ? 
+                            ingres.find(ing => ing.ingreSeq === makeDTO[0]).height : 160), 
+                            zIndex: -makeDTO.length, marginTop: burgerDTO[0].size === 0 ? lastMargin * 0.00018 : 
+                                                                burgerDTO[0].size === 1 ? lastMargin * 0.00007 : lastMargin * 0.00005}}/>
+                    </Pressable>}
+                </View>
                 {first && <View style={{width:150,height:50,overflow:'hidden',
                     alignSelf:'center', borderRadius:5, marginVertical:'2%'}}>
                         <Skel width={150} height={50}/>
@@ -491,7 +496,7 @@ const HamburgerView = (props) => {
                 </View>}
                 {!first && burgerDTO[0] && <View style={{marginBottom:15}}>
                     <Text style={styles.h1}>{burgerDTO[0].name}</Text>
-                    {burgerDTO[0].type !== 2 &&<View style={{flexDirection:'row',justifyContent:'center', marginTop:10, marginBottom:5}}>
+                    {burgerDTO[0].type !== 2 &&<View style={{flexDirection:'row',justifyContent:'center', marginTop:15, marginBottom:5}}>
                         <Pressable
                             onPress={() => state.user.userSeq === -1 ? 
                                 onAlertTxt('로그인 후 이용가능') : setStatus(true)}
@@ -738,6 +743,60 @@ const HamburgerView = (props) => {
                         </TouchableWithoutFeedback>  
                     </View>
                 </Modal>
+                <Modal
+                    animationType="fade"
+                    visible={tabModal}
+                    transparent={true}>
+                    <TouchableWithoutFeedback onPress={() => setTabModal(false)}>
+                        <View style={{flex:1,justifyContent:'center',backgroundColor: '#00000050'}}>
+                            {!first && 
+                            <View style={styles.tabBox}>
+                                <Text style={styles.num}>NO.{burgerDTO[0].burgerSeq} {burgerDTO[0].name}</Text>
+                                {((burgerDTO[1] && burgerDTO[1].userSeq === state.user.userSeq) || state.user.own === 2) && <View>
+                                    <Pressable onPress={() => {
+                                            setTabModal(false)
+                                            navigation.navigate('Update', { updateSeq : burgerDTO[0].burgerSeq })
+                                        }}
+                                        style={({pressed}) => [styles.tabBut,{backgroundColor: pressed ? 'whitesmoke' : 'white'}]}>
+                                        <Text style={styles.tabButTxt}>버거 수정</Text>
+                                    </Pressable>
+                                    {(burgerDTO[0].type === 2 || state.user.own === 2) &&
+                                    <Pressable onPress={ onBurgerDelete }
+                                        style={({pressed}) => [styles.tabBut,{backgroundColor: pressed ? 'whitesmoke' : 'white'}]}>
+                                        <Text style={styles.tabButTxt}>버거 삭제</Text>
+                                    </Pressable>}      
+                                </View>}
+                                <Pressable
+                                    style={({pressed}) => [styles.tabBut,{backgroundColor: pressed ? 'whitesmoke' : 'white'}]}
+                                    onPress={() => {
+                                        if(state.user.userSeq === -1) onAlertTxt('로그인 후 이용가능') 
+                                        else {
+                                        setStatus(true)
+                                        setTabModal(false)
+                                    }}}>
+                                    <Text style={styles.tabButTxt}>변동 신청</Text>
+                                </Pressable>
+                                {storeDTO && <View>    
+                                    {storeDTO.type === 1 && <Pressable onPress={() => {
+                                        onMapStore()
+                                        setTabModal(false)
+                                    }}
+                                    style={({pressed}) => [styles.tabBut,{backgroundColor: pressed ? 'whitesmoke' : 'white'}]}>
+                                        <Text style={styles.tabButTxt}>매장 위치</Text>
+                                    </Pressable>}
+                                    {(storeDTO.type === 0 || storeDTO.type === 1) && <Pressable 
+                                    style={({pressed}) => [styles.tabBut,{backgroundColor: pressed ? 'whitesmoke' : 'white'}]}
+                                    onPress={() => {
+                                        navigation.navigate('List',{ type : storeDTO.type, search: storeDTO.name })
+                                        setTabModal(false)
+                                    }}>
+                                        <Text style={styles.tabButTxt}>매장 검색</Text>
+                                    </Pressable>}
+                                </View>}
+                            </View>}
+                        </View>
+                    </TouchableWithoutFeedback>
+                </Modal>
         </View>
     );
 };
@@ -752,8 +811,8 @@ const styles = StyleSheet.create({
     },
     h1 : {
         textAlign : 'center',
-        fontSize: 27,
-        fontFamily: 'esamanruMedium',
+        fontSize: 25,
+        fontWeight: 'bold',
         marginVertical: 5
     },
     h2 : {
@@ -811,21 +870,12 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 40,
         paddingHorizontal: '2%'
     },
-    fold : {
-        position: 'absolute',
-        width:40,
-        height: 40,
-        top: 30,
-        right: 30,
-        fontSize: 15,
-        color:'gray'
-    },
     num : {
-        position: 'absolute',
-        fontFamily: 'esamanruMedium',
-        fontSize: 10,
-        top: 10,
-        left: 10
+        fontSize: 16,
+        alignSelf:'center',
+        color: 'gray',
+        fontWeight:'bold',
+        marginVertical: 10
     },
     status : {
         marginLeft: 10,
@@ -845,17 +895,30 @@ const styles = StyleSheet.create({
         borderColor:'lightgray',
         backgroundColor:'whitesmoke',
     },
-    ingreInfo : {
+    ingreOut : {
+        width: 100,
         position: 'absolute',
-        top: 90,
+        flexDirection:'row',
+        top: 15,
+        zIndex: 9999,
+    },
+    fold : {
+        height: 40,
+        opacity: 0.5,
+        backgroundColor:'#666666',
+        justifyContent:'center',
+        alignItems:'center',
+        overflow:'hidden'
+    },
+    ingreInfo : {
         paddingHorizontal: 7,
         width: 100,
         opacity: 0.5,
-        zIndex: 9999,
         borderWidth: 1,
         borderColor:'black',
-        borderRightWidth: 0,
-        paddingBottom: 5
+        backgroundColor:'white',
+        borderLeftWidth: 0,
+        paddingBottom: 5,
     },
     ingreTxt : {
         fontSize: 13,
@@ -1064,6 +1127,25 @@ const styles = StyleSheet.create({
         paddingTop: 3,
         marginTop: 3
     },
+    ///////////tabModal//////////
+    tabBox : {
+        width: '70%',
+        borderRadius: 5,
+        overflow:'hidden',
+        backgroundColor:'white',
+        alignSelf:'center',
+        elevation:5
+    },
+    tabBut : {
+        width: '100%',
+        height: 50,
+        justifyContent:'center',
+    },
+    tabButTxt: {
+        fontSize: 17,
+        fontWeight: 'bold',
+        textAlign:'center'
+    }
 })
 
 export default HamburgerView;

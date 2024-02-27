@@ -22,6 +22,7 @@ const HamburgerHome = (props) => {
     const [newRating,setNewRating] = useState([])
     const [ratings,setRatings] = useState([])
     const [first,setFirst] = useState(true)
+    const [starLod,setStartLod] = useState(false)
    
     const { state, dispatch } = useAppContext();
 
@@ -54,6 +55,8 @@ const HamburgerHome = (props) => {
                     axios.get(`https://hameat.onrender.com/burger/listHome/2`)
                 ])
                 .then(res => {
+                    setFirst(false)
+                    setStartLod(true)
                     setNewRating(res[0].data)
                     setFren(res[1].data)
                     setHand(res[2].data)
@@ -74,11 +77,11 @@ const HamburgerHome = (props) => {
                                 res[2].data[0].burgerSeq : res[3].data[0].burgerSeq}`)
                     .then(res => {
                         setRatings(res.data)
-                        setFirst(false)
+                        setStartLod(false)
                     })
                     .catch(() => {
                         onAlertTxt('불러오기 중 에러발생')
-                        setFirst(false)
+                        setStartLod(false)
                     })
                 })
                 .catch(() => {
@@ -152,11 +155,19 @@ const HamburgerHome = (props) => {
                             <View style={styles.recomContent}>
                                 <Text style={{padding: 8,fontSize:16,textAlign:'center',color:'gray'}} >"{burger.content}"</Text>
                             </View>
-                            <View style={styles.starBox}>
-                                <View style={[styles.starBack,{width : 
+
+                               <View style={styles.starBox}>
+                                { starLod ? 
+                                <View style={[styles.itemSkel,{height:'100%'}]}>
+                                    <Skel height={'100%'} width={windowWidth*0.45}/>
+                                </View>
+                                : <View>
+                                    <View style={[styles.starBack,{width : 
                                     ratings.reduce((acc, cur) => acc + cur[0].rate , 0) * 20 / ratings.length + '%'}]}/>
-                                <Image source={ratings.length > 0 ? star : starNone } style={styles.starImg}/>
-                            </View>
+                                    <Image source={ratings.length > 0 ? star : starNone } style={styles.starImg}/>
+                                </View>
+                                }
+                                </View>
                         </View>
                     </Pressable>}</View>
                 }

@@ -86,10 +86,8 @@ const BoardList = (props) => {
     return (
         <View style={{flex : 1}}>
         {(!route.params?.userSeq && searchParam === undefined) && 
-        <View style={{justifyContent: 'center',paddingTop: 2}}>
             <TextInput value={search} onChangeText={(text) => setSearch(text)} 
-                style={styles.searchBox} placeholder={'글 검색'}/>
-        </View>}
+                style={styles.searchBox} placeholder={'글 검색'}/>}
             {(loading && searchParam !== undefined) && 
             <View style={{width:'95%',aspectRatio:5/4, marginLeft:'2.5%'}}>
                 <View style={[styles.itemSkel,{height:'15%',marginVertical:'1%'}]}>
@@ -112,18 +110,22 @@ const BoardList = (props) => {
                 </View>
             </View>}
             {!loading && boardList.filter(bdl => route.params?.userSeq ? 
-                                            (bdl[1] && bdl[1].userSeq === route.params?.userSeq)
-                                                : (bdl[0].title.includes(search) || search.includes(bdl[0].title) || 
-                                                bdl[0].content.includes(search) || search.includes(bdl[0].content) || 
-                                                (bdl[1] && search.includes(bdl[1].name)))).length === 0 && 
-                                                <Text style={styles.noList}>결과가 없습니다</Text>}
+                (bdl[1] && bdl[1].userSeq === route.params?.userSeq)
+                    : (bdl[0].title.replace(/\s/g, '').toLowerCase().includes(search.replace(/\s/g, '').toLowerCase()) 
+                    || search.replace(/\s/g, '').toLowerCase().includes(bdl[0].title.replace(/\s/g, '').toLowerCase()) || 
+                    bdl[0].content.replace(/\s/g, '').toLowerCase().includes(search.replace(/\s/g, '').toLowerCase()) || 
+                    search.replace(/\s/g, '').toLowerCase().includes(bdl[0].content.replace(/\s/g, '').toLowerCase()) || 
+                    (bdl[1] && search.replace(/\s/g, '').toLowerCase().includes(bdl[1].name.replace(/\s/g, '').toLowerCase())))).length === 0 && 
+                    <Text style={styles.noList}>결과가 없습니다</Text>}
             <FlatList
                 style={{flex: 1}}
                 data={boardList.filter(bdl => route.params?.userSeq ? 
-                                        (bdl[1] && bdl[1].userSeq === route.params?.userSeq)
-                                            :(bdl[0].title.includes(search) || search.includes(bdl[0].title) || 
-                                            bdl[0].content.includes(search) || search.includes(bdl[0].content) || 
-                                            (bdl[1] && search.includes(bdl[1].name))))}
+                    (bdl[1] && bdl[1].userSeq === route.params?.userSeq)
+                        :(bdl[0].title.replace(/\s/g, '').toLowerCase().includes(search.replace(/\s/g, '').toLowerCase()) || 
+                        search.replace(/\s/g, '').toLowerCase().includes(bdl[0].title.replace(/\s/g, '').toLowerCase()) || 
+                        bdl[0].content.replace(/\s/g, '').toLowerCase().includes(search.replace(/\s/g, '').toLowerCase()) || 
+                        search.replace(/\s/g, '').toLowerCase().includes(bdl[0].content.replace(/\s/g, '').toLowerCase()) || 
+                        (bdl[1] && search.replace(/\s/g, '').toLowerCase().includes(bdl[1].name.replace(/\s/g, '').toLowerCase()))))}
                 renderItem={(data) => <Pressable
                     onPress={() =>  (!route.params?.userSeq && searchParam === undefined) ? navigation.navigate('View',{ boardSeq : data.item[0].boardSeq }) 
                     : onGo(2,data.item[0].boardSeq) }
@@ -143,6 +145,7 @@ const BoardList = (props) => {
                         </View>
                     </View>
                 </Pressable>}
+                ListHeaderComponent={() => (!route.params?.userSeq && searchParam === undefined) && <View style={{paddingBottom:56}}/>}
                 alwaysBounceVertical={false}
             />
             { (!route.params?.userSeq && searchParam === undefined) && 
@@ -164,8 +167,10 @@ const styles = StyleSheet.create({
         fontWeight:'bold'
     },
     searchBox : {
+        position: 'absolute',
+        top: 10,
         borderRadius: 5,
-        marginVertical: 5,
+        zIndex: 9999,
         backgroundColor: '#e5e5e5',
         color:'#505050',
         height: 40,
@@ -173,7 +178,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         paddingVertical: 3,
         alignSelf: 'center',
-        width: '95%',
+        width: '96%',
         overflow:'hidden'
     },
     h2 : {

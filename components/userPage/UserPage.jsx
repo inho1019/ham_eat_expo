@@ -90,9 +90,10 @@ const UserPage = (props) => {
                     birth : '',
                     own : -1
                 })
-                AsyncStorage.removeItem('user');
-                onAlertTxt('탈퇴가 완료되었습니다')
-                setLogout(true)
+                AsyncStorage.removeItem('token');
+                AsyncStorage.removeItem('userSeq');
+                onAlertTxt('탈퇴가 완료되었습니다');
+                onPage(3);
             } else {
                 onAlertTxt('탈퇴를 실패하였습니다')
             }

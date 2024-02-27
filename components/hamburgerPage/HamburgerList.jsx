@@ -98,10 +98,8 @@ const HamburgerList = (props) => {
     return (
         <View style={{flex : 1}}>
             {(!route.params?.userSeq && searchParam === undefined) &&
-            <View style={{paddingTop:2,justifyContent: 'center'}}>
-                <TextInput value={search} onChangeText={(text) => setSearch(text)} 
-                    style={styles.searchBox} placeholder={type === 2 ? '버거 및 유저 검색' : '버거 및 가게 검색'}/>
-            </View>}
+            <TextInput value={search} onChangeText={(text) => setSearch(text)} 
+                style={styles.searchBox} placeholder={type === 2 ? '버거 및 유저 검색' : '버거 및 가게 검색'}/>}
             {(!route.params?.userSeq && searchParam === undefined) && type !== 2 &&<ScrollView style={styles.storeBox} horizontal={strPick === -1 ? true : false}>
                 {stores.filter(str => strPick !== -1 ? str.storeSeq === strPick : (search.includes(str.name) || str.name.includes(search)))
                     .map((item,index) => <Pressable key={index}
@@ -127,25 +125,31 @@ const HamburgerList = (props) => {
                 </View>
             </View>}
             {!first && burgers.filter(bgs => route.params?.userSeq ? 
-                                        (bgs[1] && bgs[1].userSeq === route.params?.userSeq)
-                                            : ( bgs[0].name.includes(search) || search.includes(bgs[0].name) || 
-                                            search.includes(bgs[0].content) || bgs[0].content.includes(search) ||
-                                            (bgs[1] && search.includes(bgs[1].name)) || 
-                                            (strPick === -1 && stores.filter(str => search.includes(str.name) || str.name.includes(search))
-                                            .map(stt => stt.storeSeq).includes(bgs[0].storeSeq)))
-                                            && (strPick >= 0 ? bgs[0].storeSeq === strPick : bgs)).length === 0 && 
-                                            <Text style={styles.noList}>결과가 없습니다</Text>}
+                (bgs[1] && bgs[1].userSeq === route.params?.userSeq)
+                    : ( bgs[0].name.replace(/\s/g, '').toLowerCase().includes(search.replace(/\s/g, '').toLowerCase()) || 
+                    search.replace(/\s/g, '').toLowerCase().includes(bgs[0].name.replace(/\s/g, '').toLowerCase()) || 
+                    search.replace(/\s/g, '').toLowerCase().includes(bgs[0].content.replace(/\s/g, '').toLowerCase()) || 
+                    bgs[0].content.replace(/\s/g, '').toLowerCase().includes(search.replace(/\s/g, '').toLowerCase()) ||
+                    (bgs[1] && search.replace(/\s/g, '').toLowerCase().includes(bgs[1].name.replace(/\s/g, '').toLowerCase())) || 
+                    (strPick === -1 && stores.filter(str => search.replace(/\s/g, '').toLowerCase().includes(str.name.replace(/\s/g, '').toLowerCase()) || 
+                    str.name.replace(/\s/g, '').toLowerCase().includes(search.replace(/\s/g, '').toLowerCase()))
+                    .map(stt => stt.storeSeq).includes(bgs[0].storeSeq)))
+                    && (strPick >= 0 ? bgs[0].storeSeq === strPick : bgs)).length === 0 && 
+                <Text style={styles.noList}>결과가 없습니다</Text>}
             {!first && <FlatList
                 style={{flex : 1}}
                 data={burgers.filter(bgs => route.params?.userSeq ? 
-                                        (bgs[1] && bgs[1].userSeq === route.params?.userSeq)
-                                            : ( bgs[0].name.includes(search) || search.includes(bgs[0].name) || 
-                                            search.includes(bgs[0].content) || bgs[0].content.includes(search) ||
-                                            (bgs[1] && search.includes(bgs[1].name)) || 
-                                            (strPick === -1 && stores.filter(str => search.includes(str.name) || str.name.includes(search))
-                                            .map(stt => stt.storeSeq).includes(bgs[0].storeSeq)))
-                                            && (strPick >= 0 ? bgs[0].storeSeq === strPick : bgs)
-                                            )}
+                    (bgs[1] && bgs[1].userSeq === route.params?.userSeq)
+                        : ( bgs[0].name.replace(/\s/g, '').toLowerCase().includes(search.replace(/\s/g, '').toLowerCase()) || 
+                        search.replace(/\s/g, '').toLowerCase().includes(bgs[0].name.replace(/\s/g, '').toLowerCase()) || 
+                        search.replace(/\s/g, '').toLowerCase().includes(bgs[0].content.replace(/\s/g, '').toLowerCase()) ||
+                        bgs[0].content.replace(/\s/g, '').toLowerCase().includes(search.replace(/\s/g, '').toLowerCase()) ||
+                        (bgs[1] && search.replace(/\s/g, '').toLowerCase().includes(bgs[1].name.replace(/\s/g, '').toLowerCase())) || 
+                        (strPick === -1 && stores.filter(str => search.replace(/\s/g, '').toLowerCase().includes(str.name.replace(/\s/g, '').toLowerCase()) || 
+                        str.name.replace(/\s/g, '').toLowerCase().includes(search.replace(/\s/g, '').toLowerCase()))
+                        .map(stt => stt.storeSeq).includes(bgs[0].storeSeq)))
+                        && (strPick >= 0 ? bgs[0].storeSeq === strPick : bgs)
+                    )}
                 renderItem={(data) => {
                 const makeDTO = JSON.parse(data.item[0].make)
                 const inDTO = makeDTO.map(md => {
@@ -157,7 +161,7 @@ const HamburgerList = (props) => {
                 return <Pressable style={({pressed})  => [styles.burgerItem,{elevation : pressed ? 0.5 : 5,
                         borderTopColor: pressed ? 'whitesmoke' : 'white',
                         marginTop: (stores.filter(str => strPick !== -1 ? str.storeSeq === strPick : (search.includes(str.name) || str.name.includes(search))).length > 0 &&
-                            (!route.params?.userSeq && searchParam === undefined) && type !== 2 && data.index === 0) && 42}]} 
+                            (!route.params?.userSeq && searchParam === undefined) && type !== 2 && data.index === 0) ? 44 : 1}]} 
                         key={data.index} onPress={() => (!route.params?.userSeq && searchParam === undefined) ? navigation.navigate('View', { burgerSeq : data.item[0].burgerSeq }) 
                         : onGo(1,data.item[0].burgerSeq)}>
                         <View style={styles.makeContainer}>
@@ -212,7 +216,7 @@ const HamburgerList = (props) => {
                         </View>
                     </View>
             </Pressable>}}
-                ListHeaderComponent={() => <View style={{paddingBottom:5}}/>}
+                ListHeaderComponent={() => (!route.params?.userSeq && searchParam === undefined) && <View style={{paddingBottom:56}}/>}
                 ListFooterComponent={() => <View style={{paddingBottom:10}}/>}
                 alwaysBounceVertical={false}
             />}
@@ -229,16 +233,18 @@ const styles = StyleSheet.create({
         fontWeight:'bold'
     },
     searchBox : {
+        position: 'absolute',
+        top: 10,
         borderRadius: 5,
+        zIndex: 9999,
         backgroundColor: '#e5e5e5',
         color:'#505050',
         height: 40,
         fontSize: 18,
         paddingHorizontal: 10,
         paddingVertical: 3,
-        marginVertical: 5,
         alignSelf: 'center',
-        width: '95%',
+        width: '96%',
         overflow:'hidden'
     },
     makeContainer : {

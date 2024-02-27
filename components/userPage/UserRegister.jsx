@@ -173,7 +173,7 @@ const UserRegister = (props) => {
               onLoading(false)
               if(res.data) {
                 onAlertTxt('회원가입이 완료되었습니다')
-                navigation.navigate('Login')
+                navigation.navigate('Login', { email : email } )
               } else {
                 onAlertTxt('회원가입에 실패 :: 관리자 문의 요망')
               }
