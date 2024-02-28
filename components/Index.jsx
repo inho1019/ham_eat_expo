@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Image, Keyboard, Modal, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Animated, Easing, Image, Keyboard, Modal, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
 import { DefaultTheme } from '@react-navigation/native';
 import NavBar from './NavBar';
 import Main from './mainPage/Main';
@@ -32,39 +32,55 @@ const Index = () => {
     const onAlertTxt = (txt) => {
         dispatch({ type: 'SET_ALERTTXT' , payload : txt });
     }
+    /////////////////////////////////////////////
+    const navref = useRef(new Animated.Value(1)).current;
 
+    const aniNav = (num) => {
+        Animated.timing(navref, {
+            toValue: num,
+            duration: 300,
+            useNativeDriver: true,
+            easing: Easing.out(Easing.ease)
+          }).start();
+    }
+
+    ///////////////////////////////////////////////
     useEffect(()=> {
         if(state.alertTxt !== '') {
             const timeoutId = setTimeout(() => {
                 onAlertTxt('')
             }, 2000)
-       
+            
             return () => clearTimeout(timeoutId);
         }
     },[state.alertTxt])
-
-     /////////// 키보드 활성화 여부 확인////////
-     const [key,setKey] = useState(false)
-
-     useEffect(() => {
-         const keyShow = () => {
-             setKey(true)
-         };
-     
-         const keyHide = () => {
-             setKey(false)
-         };
-     
-         const keyShowListner = Keyboard.addListener('keyboardDidShow', keyShow);
-         const keyHideListner = Keyboard.addListener('keyboardDidHide', keyHide);
-     
-         return () => {
-           keyShowListner.remove();
-           keyHideListner.remove();
-         };
-       }, []);
-     ///////////////////////////////////////////
-
+    
+    /////////// 키보드 활성화 여부 확인////////
+    const [key,setKey] = useState(false)
+    
+    useEffect(() => {
+        const keyShow = () => {
+            setKey(true)
+        };
+        
+        const keyHide = () => {
+            setKey(false)
+        };
+        
+        const keyShowListner = Keyboard.addListener('keyboardDidShow', keyShow);
+        const keyHideListner = Keyboard.addListener('keyboardDidHide', keyHide);
+        
+        return () => {
+            keyShowListner.remove();
+            keyHideListner.remove();
+        };
+    }, []);
+    ///////////////////////////////////////////
+    useEffect(() => {
+        if(key) aniNav(0)
+        else aniNav(1)
+    },[key])
+    
     return (
         <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()} disabled={!key}>
             <View style={styles.container}>
@@ -85,8 +101,8 @@ const Index = () => {
                         state.page === 4 && <UserMypageMain navTheme={navTheme} navHeader={navHeader}/>
                     }
                 </View>
-                <View style={{height: key ? 0 : '8%',overflow:'hidden',opacity: key ? 0 : 1}}>
-                    <NavBar onPage={onPage} page={state.page}/>
+                <View style={{height: '8%'}}>
+                    <NavBar onPage={onPage} page={state.page} navref={navref} keyBool={key}/>
                 </View>
                 <Modal
                     animationType="fade"

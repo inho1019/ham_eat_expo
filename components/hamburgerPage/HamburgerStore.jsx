@@ -15,6 +15,8 @@ const HamburgerStore = (props) => {
     const [search,setSearch] = useState('')
     const [upStoreSeq,setUpStoreSeq] = useState(-1)
 
+    const [loading,setLoading] = useState(false)
+
     ///////////////////지도모달/////////////////
     const [storeTouch,setStoreTouch] = useState(true)
     const [mapModal,setMapModal] = useState(false)
@@ -44,29 +46,35 @@ const HamburgerStore = (props) => {
 
     useEffect(() => {
         onLoading(true)
+        setLoading(true)
         axios.get(`https://hameat.onrender.com/store/list/${type}`)
         .then(res => {
             setStores(res.data)
             onLoading(false)
+            setLoading(false)
         })
         .catch(() => {
             onAlert('불러오기 중 에러발생')
             onLoading(false)
+            setLoading(false)
         })
 
     },[type])
 
     useEffect(() => {
         onLoading(true)
+        setLoading(true)
         const unsubscribe = navigation.addListener('focus', () => {
             axios.get(`https://hameat.onrender.com/store/list/${type}`)
             .then(res => {
                 setStores(res.data)
                 onLoading(false)
+                setLoading(false)
             })
             .catch(() => {
                 onAlert('불러오기 중 에러발생')
                 onLoading(false)
+                setLoading(false)
             })
         });
         return unsubscribe;
@@ -80,7 +88,7 @@ const HamburgerStore = (props) => {
     },[burgerDTO])
 
     return (
-        <View>
+        <View style={{flex:1}}>
             <View style={{height: '7%',justifyContent: 'center'}}>
             <Pressable onPress={() => onBack()}>
                 <Image source={backImg} style={{height:'95%',aspectRatio: 1/1, alignSelf:'center'}}/>
@@ -90,7 +98,7 @@ const HamburgerStore = (props) => {
             <TextInput value={search} onChangeText={(text) => setSearch(text)} 
                 style={styles.searchBox} placeholder='가게 검색'/>
             </View>
-            <ScrollView style={styles.storeList}>
+            {!loading && <ScrollView style={styles.storeList}>
                 {stores.filter(str => str.name.includes(search)).map((item, index) => <Pressable key={index} 
                     onPress={() => storeTouch && onStore(item.storeSeq)} style={({pressed})  => [styles.storeBut,
                         {backgroundColor: pressed ? 'whitesmoke' : upStoreSeq === item.storeSeq ? 'lightgray' : 'white'}
@@ -111,7 +119,7 @@ const HamburgerStore = (props) => {
                     <Text style={{fontSize: 16,fontWeight: 'bold',color: 'darkgray',verticalAlign:'middle'}}>매장 추가</Text>
                     <Image source={addImg} style={{width: 30, height: 30}}/>
                 </Pressable>}
-            </ScrollView>
+            </ScrollView>}
             <Modal
                 animationType="fade"
                 visible={mapModal}
@@ -145,7 +153,7 @@ const styles = StyleSheet.create({
         paddingVertical: 3,
         alignSelf: 'center',
         width: '95%',
-        overflow:'hidden'
+        overflow:'hidden',
     },
     addBut : {
         flexDirection:'row',

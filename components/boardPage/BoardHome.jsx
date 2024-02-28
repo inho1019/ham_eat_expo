@@ -34,6 +34,7 @@ const BoardHome = (props) => {
     const [free,setFree] = useState([])
     const [event,setEvent] = useState([])
     const [notice,setNotice] = useState([])
+    const [ask,setAsk] = useState([])
     
     const [bestFree,setBestFree] = useState()
     const [bestEvent,setBestEvent] = useState()
@@ -56,6 +57,7 @@ const BoardHome = (props) => {
                 axios.get(`https://hameat.onrender.com/board/listHome/0`),
                 axios.get(`https://hameat.onrender.com/board/listHome/1`),
                 axios.get(`https://hameat.onrender.com/board/listHome/2`),
+                axios.get(`https://hameat.onrender.com/board/listHome/3`),
                 axios.get(`https://hameat.onrender.com/board/best/0`),
                 axios.get(`https://hameat.onrender.com/board/best/1`)
             ])
@@ -63,8 +65,9 @@ const BoardHome = (props) => {
                 setFree(res[0].data)
                 setEvent(res[1].data)
                 setNotice(res[2].data)
-                setBestFree(res[3].data)
-                setBestEvent(res[4].data)
+                setAsk(res[3].data)
+                setBestFree(res[4].data)
+                setBestEvent(res[5].data)
                 setFirst(false)
             })
             .catch(() => {
@@ -220,6 +223,29 @@ const BoardHome = (props) => {
                     </Pressable>)}
                 </View>
             }
+            <Pressable onPress={() => navigation.navigate('List', { type : 3 } )}
+                style={({pressed}) => [styles.h1Out,{backgroundColor: pressed ? 'whitesmoke' : 'white'}]}>
+                <Text style={styles.h1}>문의/건의 게시판</Text>
+                <Text style={styles.more}>more </Text>
+            </Pressable>
+            {first ?
+                <View style={{width:'95%',aspectRatio:7/2,overflow:'hidden',
+                marginLeft:'2.5%', borderRadius:5, marginTop:'5%'}}>
+                    <View style={styles.itemSkel}><Skel height={'100%'} width={windowWidth*0.95}/></View>
+                    <View style={styles.itemSkel}><Skel height={'100%'} width={windowWidth*0.95}/></View>
+                    <View style={styles.itemSkel}><Skel height={'100%'} width={windowWidth*0.95}/></View>
+                </View> 
+                :    <View style={styles.itemBox}>
+                    {ask.map((item,index) => <Pressable key={index}
+                        style={({pressed}) => ({backgroundColor: pressed ? 'whitesmoke' : 'white'})}
+                        onPress={() => (item.secret === 1 && state.user.userSeq !== item.userSeq && state.user.own !== 2) ? 
+                        onAlertTxt('권한이 없습니다') : navigation.navigate('View',{ boardSeq : item.boardSeq })}>
+                        <Text numberOfLines={1} ellipsizeMode="tail" style={styles.item}>
+                            {(item.secret === 1 && state.user.userSeq !== item.userSeq && state.user.own !== 2) ? 
+                            '🔑 비밀글' : item.title}</Text>
+                    </Pressable>)}
+                </View>
+            }
             <Pressable onPress={() => navigation.navigate('List', { type : 2 } )}
                 style={({pressed}) => [styles.h1Out,{backgroundColor: pressed ? 'whitesmoke' : 'white'}]}>
                 <Text style={styles.h1}>공지사항</Text>
@@ -352,7 +378,7 @@ const styles = StyleSheet.create({
         fontSize: 16
     },
     itemBox : {
-        paddingHorizontal: 10,
+        paddingHorizontal: 5,
         marginHorizontal: 10,
         paddingTop: 5,
         marginTop: 5,

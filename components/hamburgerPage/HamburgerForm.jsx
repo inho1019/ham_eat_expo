@@ -147,7 +147,7 @@ const HamburgerForm = (props) => {
                         .then(() => { 
                             onAlertTxt('수정이 완료되었습니다')
                             onLoading(false)
-                            navigation.navigate('Home')
+                            navigation.navigate('View', { burgerSeq : route.params?.updateSeq })
                         })
                         .catch(() => {
                             onAlertTxt('수정 중 에러발생')

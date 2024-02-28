@@ -131,7 +131,9 @@ const HamburgerHome = (props) => {
                                     {width: burger.size === 0 ? '50%' : burger.size === 2 ? '90%' : '70%',
                                     aspectRatio: getIngre.width / getIngre.height + 
                                         (burger.size === 0 ? - 0.3 : burger.size === 2 && + 0.4),
-                                    marginBottom: ((getIngre.type === 2 || getIngre.type === 3) && 
+                                    marginBottom: getIngre.type === 4 ? -(burger.size === 0 ? windowWidth*0.0646 : 
+                                        burger.size === 1 ? windowWidth*0.0837 : windowWidth*0.0978) :
+                                        ((getIngre.type === 2 || getIngre.type === 3) && 
                                         getIngre.height > 170 ? -(windowWidth*0.105) : -(windowWidth*0.084)) + 
                                         (burger.size === 0 ? + (windowWidth*0.015) : burger.size === 2 && + -(windowWidth*0.012)),
                                     zIndex:-index,alignSelf: 'center'}}
@@ -147,7 +149,7 @@ const HamburgerHome = (props) => {
                                 style={{width: burger.size === 0 ? '50%' : burger.size === 2 ? '90%' : '70%',alignSelf:'center',
                                 aspectRatio: 500/(ingres.find(ing => ing.ingreSeq === makeDTO[0]).type !== 0 ? 
                                 ingres.find(ing => ing.ingreSeq === makeDTO[0]).height : 160), 
-                                zIndex: -makeDTO.length,marginTop: burger.size === 0 ? lastMargin * 0.00013 : 
+                                zIndex: -makeDTO.length,marginTop: burger.size === 0 ? lastMargin * 0.00011 : 
                                                                    burger.size === 1 ? lastMargin * 0.000065 : lastMargin * 0.00004}}/>
                         </View>
                         <View style={styles.infoContainer}>

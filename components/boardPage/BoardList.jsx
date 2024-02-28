@@ -53,8 +53,9 @@ const BoardList = (props) => {
                 navigation.setOptions({
                     title: route.params?.type === 0 ? '자유 게시판' : 
                         route.params?.type === 1 ? '행사/이벤트 게시판' :  
-                        route.params?.type === 2 ? '공지사항' : ''
-                });
+                        route.params?.type === 2 ? '공지사항' : 
+                        route.params?.type === 3 ? '문의/건의 게시판' : ''
+                    });
             }
         } else {
             setSearch(searchParam)
@@ -127,11 +128,15 @@ const BoardList = (props) => {
                         search.replace(/\s/g, '').toLowerCase().includes(bdl[0].content.replace(/\s/g, '').toLowerCase()) || 
                         (bdl[1] && search.replace(/\s/g, '').toLowerCase().includes(bdl[1].name.replace(/\s/g, '').toLowerCase()))))}
                 renderItem={(data) => <Pressable
-                    onPress={() =>  (!route.params?.userSeq && searchParam === undefined) ? navigation.navigate('View',{ boardSeq : data.item[0].boardSeq }) 
-                    : onGo(2,data.item[0].boardSeq) }
+                    onPress={() =>  (!route.params?.userSeq && searchParam === undefined) ? 
+                        ((data.item[0].secret === 1 && state.user.userSeq !== data.item[0].userSeq && state.user.own !== 2) ? 
+                        onAlertTxt('권한이 없습니다') : navigation.navigate('View',{ boardSeq : data.item[0].boardSeq }))
+                        : onGo(2,data.item[0].boardSeq) }
                     style={({pressed}) => [styles.item,{backgroundColor: pressed ? 'whitesmoke' : 'white'}]}>
                     <View style={{flexDirection:'row'}}>
-                        <Text style={[styles.h2,{maxWidth:'90%'}]} numberOfLines={1} ellipsizeMode="tail">{data.item[0].title}</Text>
+                        <Text style={[styles.h2,{maxWidth:'90%'}]} numberOfLines={1} ellipsizeMode="tail">
+                            {(data.item[0].secret === 1 && state.user.userSeq !== data.item[0].userSeq && state.user.own !== 2) ? 
+                            '🔑 비밀글' : data.item[0].title}</Text>
                         <Text style={styles.h2c}>{ data.item[2] > 0 && `[${data.item[2]}]` }</Text>
                     </View>
                     <View style={{flexDirection:'row',justifyContent:'space-between'}}>

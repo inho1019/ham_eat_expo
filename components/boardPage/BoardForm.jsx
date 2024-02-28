@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
 import { useAppContext } from '../api/ContextAPI';
 import add from '../../assets/board/board_reg.png'
 import axios from 'axios';
@@ -23,12 +23,15 @@ const BoardForm = (props) => {
     };
     /////////// 키보드 활성화 여부 확인////////
 
+    const [secret,setSecret] = useState(false)
+
     const [boardDTO,setBoardDTO] = useState({
         userSeq : state.user.userSeq,
         type : route.params?.type,
         title : '',
         content : '',
         url : '',
+        secret : 0,
         hit : 0,
         fav : '[]',
     })
@@ -50,7 +53,8 @@ const BoardForm = (props) => {
         if(boardDTO.title.length > 0) {
             if(boardDTO.content.length > 0) {
                 onLoading(true)
-                axios.post('https://hameat.onrender.com/board/write',boardDTO)
+                const dto = {...boardDTO, secret: secret ? 1 : 0 }
+                axios.post('https://hameat.onrender.com/board/write',dto)
                 .then(() => {
                     onLoading(false)
                     navigation.goBack();
@@ -81,6 +85,15 @@ const BoardForm = (props) => {
                     value={boardDTO.url} onChangeText={(text) => onInput('url',text)}
                     onSubmitEditing={() => onSub()}/>
             </View>}
+            { route.params?.type === 3 && <View style={{flexDirection:'row'}}>
+                <Text style={[styles.h2,{verticalAlign:'middle'}]}>비밀글 </Text>
+                <Switch 
+                        trackColor={{ false: "#767577", true: "#81b0ff" }}
+                        thumbColor={'white'}
+                        onValueChange={() => setSecret(!secret)}
+                        value={secret}
+                    />
+            </View> }
             <View style={{flexDirection:'row-reverse',marginLeft:'5%',marginTop:'2%'}}>
                 <Pressable onPress={() => onSub()}>
                     <Image source={add} style={{width:40,height:40}}/>

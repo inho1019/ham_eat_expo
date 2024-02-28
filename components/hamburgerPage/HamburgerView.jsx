@@ -58,6 +58,14 @@ const HamburgerView = (props) => {
             outputRange: [40, 0],
         }),
     };
+
+
+    const ingAni = {
+        marginTop: ingreBox.interpolate({
+            inputRange: [0, 1],
+            outputRange: [0, 40],
+        })
+    };
     ///////////드래그 이벤트////////////
     const [starWidth, setStarWidth] = useState(0);
 
@@ -174,58 +182,78 @@ const HamburgerView = (props) => {
     const [tabModal,setTabModal] = useState(false)
 
     useEffect(() => {
-        if(!status) {
-            if(first) {
-                navigation.setOptions({
-                    title: '',
-                    headerRight: () => (
-                        <Pressable onPress={() => setTabModal(true)}>
-                            <Image source={tab} style={{width:30,height:30}}/>
-                        </Pressable>
-                    )
-                });
-                Promise.all([
-                    axios.get(`https://hameat.onrender.com/rating/listSeq/${route.params?.burgerSeq}`),
-                    axios.get(`https://hameat.onrender.com/ingre/list`),
-                    axios.get(`https://hameat.onrender.com/burger/view/${route.params?.burgerSeq}`),
-                ])
-                .then(res => {
-                    if(res[2].data) {
-                        setRatings(res[0].data)
-                        setIngres(res[1].data)
-                        setBurgerDTO(res[2].data)
-                        setMakeDTO(JSON.parse(res[2].data[0].make))
-                        const inDTO = JSON.parse(res[2].data[0].make).map(md => {
-                            const ingreIt = res[1].data.find(ing => ing.ingreSeq === md);
-                            return ingreIt !== undefined ? ingreIt : res[1].data[0]
+        const unsubscribe = navigation.addListener('focus', () => {
+            if(!status) {
+                if(first) {
+                    navigation.setOptions({
+                        title: '',
+                        headerRight: () => (
+                            <Pressable onPress={() => setTabModal(true)}>
+                                <Image source={tab} style={{width:27,height:27}}/>
+                            </Pressable>
+                        )
+                    });
+                    Promise.all([
+                        axios.get(`https://hameat.onrender.com/rating/listSeq/${route.params?.burgerSeq}`),
+                        axios.get(`https://hameat.onrender.com/ingre/list`),
+                        axios.get(`https://hameat.onrender.com/burger/view/${route.params?.burgerSeq}`),
+                    ])
+                    .then(res => {
+                        if(res[2].data) {
+                            setRatings(res[0].data)
+                            setIngres(res[1].data)
+                            setBurgerDTO(res[2].data)
+                            setMakeDTO(JSON.parse(res[2].data[0].make))
+                            const inDTO = JSON.parse(res[2].data[0].make).map(md => {
+                                const ingreIt = res[1].data.find(ing => ing.ingreSeq === md);
+                                return ingreIt !== undefined ? ingreIt : res[1].data[0]
+                            });
+                            setLastMargin(windowWidth*inDTO.filter(ing => ing.type !== 4)[inDTO.filter(ing => ing.type !== 4).length - 1].height)
+                            navigation.setOptions({
+                                title: res[2].data[0].name
+                            });
+                            axios.get(`https://hameat.onrender.com/store/getSeq/${res[2].data[0].storeSeq}`)
+                            .then(res => {
+                                setStoreDTO(res.data)
+                                setFirst(false)
+                            })
+                            .catch(() => {
+                                onAlertTxt('불러오기 중 에러발생')
+                                setFirst(false)
+                            })
+                        } else {
+                            onAlertTxt('삭제된 버거입니다')
+                            navigation.goBack(-1)
+                        }
+                    })
+                    .catch(() => {
+                        onAlertTxt('불러오기 중 에러발생')
+                        setFirst(false)
+                    })
+                } else {
+                    onLoading(true)
+                    axios.get(`https://hameat.onrender.com/burger/view/${route.params?.burgerSeq}`)
+                    .then(res => {
+                        onLoading(false)
+                        setBurgerDTO(res.data)
+                        setMakeDTO(JSON.parse(res.data[0].make))
+                        const inDTO = JSON.parse(res.data[0].make).map(md => {
+                            const ingreIt = ingres.find(ing => ing.ingreSeq === md);
+                            return ingreIt !== undefined ? ingreIt : ingres[0]
                         });
                         setLastMargin(windowWidth*inDTO.filter(ing => ing.type !== 4)[inDTO.filter(ing => ing.type !== 4).length - 1].height)
-                        navigation.setOptions({
-                            title: res[2].data[0].name
-                        });
-                        axios.get(`https://hameat.onrender.com/store/getSeq/${res[2].data[0].storeSeq}`)
-                        .then(res => {
-                            setStoreDTO(res.data)
-                            setFirst(false)
-                        })
-                        .catch(() => {
-                            onAlertTxt('불러오기 중 에러발생')
-                            setFirst(false)
-                        })
-                    } else {
-                        onAlertTxt('삭제된 버거입니다')
-                        navigation.goBack(-1)
-                    }
-                })
-                .catch(() => {
-                    onAlertTxt('불러오기 중 에러발생')
-                    setFirst(false)
-                })
+                    })
+                    .catch(() => {
+                        onAlertTxt('불러오기 중 에러발생')
+                        onLoading(false)
+                        setFirst(false)
+                    })
+                }
             } else {
                 onLoading(true)
-                axios.get(`https://hameat.onrender.com/burger/view/${route.params?.burgerSeq}`)
+                axios.get(`https://hameat.onrender.com/status/list/${route.params?.burgerSeq}`)
                 .then(res => {
-                    setBurgerDTO(res.data)
+                    setPriceList(res.data)
                     onLoading(false)
                 })
                 .catch(() => {
@@ -234,19 +262,9 @@ const HamburgerView = (props) => {
                     setFirst(false)
                 })
             }
-        } else {
-            onLoading(true)
-            axios.get(`https://hameat.onrender.com/status/list/${route.params?.burgerSeq}`)
-            .then(res => {
-                setPriceList(res.data)
-                onLoading(false)
-            })
-            .catch(() => {
-                onAlertTxt('불러오기 중 에러발생')
-                onLoading(false)
-                setFirst(false)
-            })
-        }
+        })
+        
+        return unsubscribe;
     },[route,status])
 
     const onSub = () => {
@@ -432,7 +450,7 @@ const HamburgerView = (props) => {
 
     return (
         <View>
-            <ScrollView style={{height:'95%'}}>
+            <ScrollView style={{height:'95%',marginBottom:20}}>
                 {!first && <Animated.View style={[styles.ingreOut,ingreAni]} ref={ingreBox}>
                     <Pressable style={styles.ingreInfo} onPress={() => setFold(true)}>
                         {ingres.sort((a, b) => a.type - b.type).map((item,index) => makeDTO.includes(item.ingreSeq) && 
@@ -456,28 +474,31 @@ const HamburgerView = (props) => {
                         style={styles.makeContainer}>
                         {makeDTO.map((item,index) => {
                             const getIngre = ingres.find(ing => ing.ingreSeq === item)
-                            return <Image key={index} style={
-                                {width: burgerDTO[0].size === 0 ? '50%' : burgerDTO[0].size === 2 ? '90%' : '70%',
+                            return <Animated.Image key={index} style={
+                                [ingAni,{width: burgerDTO[0].size === 0 ? '50%' : burgerDTO[0].size === 2 ? '90%' : '70%',
                                 aspectRatio: getIngre.width / getIngre.height + 
                                     (burgerDTO[0].size === 0 ? - 0.3 : burgerDTO[0].size === 2 && + 0.4),
-                                marginBottom: fold ? (((getIngre.type === 2 || getIngre.type === 3) && 
+                                marginBottom: getIngre.type === 4 ? -(burgerDTO[0].size === 0 ? windowWidth*0.0955 : 
+                                    burgerDTO[0].size === 1 ? windowWidth*0.1233 : windowWidth*0.1443) :
+                                     ((getIngre.type === 2 || getIngre.type === 3) && 
                                     getIngre.height > 170 ? -(windowWidth*0.158) : -(windowWidth*0.126)) + 
-                                    (burgerDTO[0].size === 0 ? + (windowWidth*0.023) : burgerDTO[0].size === 2 && + -(windowWidth*0.019))) : 0,
-                                zIndex:-index,alignSelf: 'center'}}
+                                    (burgerDTO[0].size === 0 ? + (windowWidth*0.023) : burgerDTO[0].size === 2 && + -(windowWidth*0.019)),
+                                zIndex:-index,alignSelf: 'center'}]}
                                 source={{ uri : getIngre.image}}
                                 resizeMode='stretch'/>
                             })}
-                        <Image 
-                        source={{ uri : ingres.find(ing => ing.ingreSeq === makeDTO[0]).type !== 0 ? 
-                            ingres.find(ing => ing.ingreSeq === makeDTO[0]).image :
-                            ingres.find(ing => ing.ingreSeq === makeDTO[0]).name === '먹물 번' ? 
-                            'https://postfiles.pstatic.net/MjAyNDAyMjVfMTY4/MDAxNzA4ODQxNDg2OTk0.9RaLSfxW7Tzloqsvz40r1omqWehGg7bZbh7st9OBmQkg.2JdsHC1yle6BINWRnsSUQib_A5GWvLE3mh2HhqXoQ9Ig.PNG/ink_bun.png?type=w966'
-                            : 'https://postfiles.pstatic.net/MjAyNDAyMjVfNiAg/MDAxNzA4ODM5MDMxNzQ5.-eK1dABinObEUaWkHVMu03zQ818I4VUbkhhdwf7AlQIg.xFI7_6ktqqav2Uj-iqp-yy4F_b6WR9xbopK5xWIP0p4g.PNG/normal_bun.png?type=w966'}}
-                            style={{width: burgerDTO[0].size === 0 ? '50%' : burgerDTO[0].size === 2 ? '90%' : '70%',alignSelf:'center',
-                            aspectRatio: 500/(ingres.find(ing => ing.ingreSeq === makeDTO[0]).type !== 0 ? 
-                            ingres.find(ing => ing.ingreSeq === makeDTO[0]).height : 160), 
-                            zIndex: -makeDTO.length, marginTop: burgerDTO[0].size === 0 ? lastMargin * 0.00018 : 
-                                                                burgerDTO[0].size === 1 ? lastMargin * 0.00007 : lastMargin * 0.00005}}/>
+                        <Animated.View ref={ingreBox} style={[ingAni,{zIndex: -makeDTO.length}]}>
+                            <Image 
+                            source={{ uri : ingres.find(ing => ing.ingreSeq === makeDTO[0]).type !== 0 ? 
+                                ingres.find(ing => ing.ingreSeq === makeDTO[0]).image :
+                                ingres.find(ing => ing.ingreSeq === makeDTO[0]).name === '먹물 번' ? 
+                                'https://postfiles.pstatic.net/MjAyNDAyMjVfMTY4/MDAxNzA4ODQxNDg2OTk0.9RaLSfxW7Tzloqsvz40r1omqWehGg7bZbh7st9OBmQkg.2JdsHC1yle6BINWRnsSUQib_A5GWvLE3mh2HhqXoQ9Ig.PNG/ink_bun.png?type=w966'
+                                : 'https://postfiles.pstatic.net/MjAyNDAyMjVfNiAg/MDAxNzA4ODM5MDMxNzQ5.-eK1dABinObEUaWkHVMu03zQ818I4VUbkhhdwf7AlQIg.xFI7_6ktqqav2Uj-iqp-yy4F_b6WR9xbopK5xWIP0p4g.PNG/normal_bun.png?type=w966'}}
+                                style={{width: burgerDTO[0].size === 0 ? '50%' : burgerDTO[0].size === 2 ? '90%' : '70%',alignSelf:'center',
+                                aspectRatio: 500/(ingres.find(ing => ing.ingreSeq === makeDTO[0]).type !== 0 ? 
+                                ingres.find(ing => ing.ingreSeq === makeDTO[0]).height : 160), 
+                                marginTop: burgerDTO[0].size === 0 ? lastMargin * 0.00018 : burgerDTO[0].size === 1 ? lastMargin * 0.00007 : lastMargin * 0.00005}}/>
+                        </Animated.View>
                     </Pressable>}
                 </View>
                 {first && <View style={{width:150,height:50,overflow:'hidden',
@@ -544,18 +565,18 @@ const HamburgerView = (props) => {
                         <Image source={ratings.length > 0 ? star : starNone } style={styles.starImg}/>
                     </View>
                 </Pressable>
-                {first && 
+                {first ? 
                     <View style={{width:'90%',height:80 ,overflow:'hidden', marginVertical: '5%',
                         marginLeft:'5%', borderRadius:10}}>
                             <Skel width={windowWidth*0.9} height={80}/>
-                    </View>}
-                {!first && burgerDTO[0] && <Text style={styles.content}>{burgerDTO[0].content}</Text>}
-                {first && 
+                    </View>
+                    : <Text style={styles.content}>{burgerDTO[0].content}</Text>}
+                {first ? 
                     <View style={{width:250, height:250, overflow:'hidden', marginVertical: '3%',
-                        alignSelf:'center' , borderRadius:5}}>
-                            <Skel width={250} height={250}/>
-                    </View>}
-                {burgerDTO[0] && <View style={styles.nut}>
+                    alignSelf:'center' , borderRadius:5}}>
+                        <Skel width={250} height={250}/>
+                    </View>
+                : <View style={styles.nut}>
                     <Text style={styles.nutTitle}>예상 영양 정보</Text>
                     <Text style={styles.nutTxt}>탄수화물&nbsp;
                         {((makeDTO.reduce((acc, cur) => acc + ingres.find(ing => ing.ingreSeq === cur).carbohydrates, 0) +
@@ -582,8 +603,8 @@ const HamburgerView = (props) => {
                         (burgerDTO[0].size === 0 ? 0.85 : burgerDTO[0].size === 2 ? 1.19 : burgerDTO[0].size === 1 && 1 ))}
                     Kcal</Text>
                 </View>}
+                <View style={{paddingBottom:30}}/>
             </ScrollView>
-                <Text></Text>
             <View {...panResponder3.panHandlers} style={styles.reviewOpen}>
                 <Image style={styles.dragImg} source={drag}/>
             </View>

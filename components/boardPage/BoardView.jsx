@@ -285,10 +285,10 @@ const BoardView = (props) => {
                     <View style={{padding:5,borderBottomColor:'lightgray',borderBottomWidth:1}}>
                     <View style={{flexDirection:'row',justifyContent:'space-between'}}>
                     <View style={{flexDirection:'row'}}>
-                        <Text style={{fontSize:16,fontWeight:'bold',color:'gray'}}>{data.item[1].name}</Text>
+                        <Text style={{fontSize:16,fontWeight:'bold',color:'gray'}}>{data.item[1] ? data.item[1].name : '탈퇴 회원'}</Text>
                         <Text style={{fontSize:14,textAlignVertical:'center',color:'gray'}}> | {getToday(data.item[0].logTime)}</Text>
                     </View>
-                        {data.item[1].userSeq === state.user.userSeq && 
+                        {data.item[1] && data.item[1].userSeq === state.user.userSeq && 
                         <Pressable onPress={ () => onDeleteCom(data.item[0].commentSeq) }>
                             <Image source={deleteImg} style={{width:25,height:25}}/>
                         </Pressable>}

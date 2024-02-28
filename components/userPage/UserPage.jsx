@@ -52,6 +52,22 @@ const UserPage = (props) => {
         }
     },[pwd,pwdCheck])
 
+    const [policyTxt,setPolicyTxt] = useState('')
+    const [policyModal,setPolicyModal] = useState(false)
+
+    useEffect(() => {
+        onLoading(true)
+        axios.get('https://hameat.onrender.com/policy')
+        .then(res => {
+          setPolicyTxt(res.data.replace(/<br>/g, '\n'))
+          onLoading(false)
+        })
+        .catch(() => {
+          onAlertTxt('정책 불러오기 중 에러발생')
+          onLoading(false)
+      })
+    },[])
+
     const onChangePwd = async () => {
         onLoading(true)
         axios.put(`https://hameat.onrender.com/user/update`, 
@@ -249,8 +265,29 @@ const UserPage = (props) => {
                     })}>
                     <Text style={styles.myBut}>캐러셀 관리</Text>
                 </Pressable>
+                <Pressable onPress={() => navigation.navigate('List')}
+                    style={({ pressed }) => ({
+                        backgroundColor: pressed ? 'whitesmoke' : 'white',
+                    })}>
+                    <Text style={styles.myBut}>유저 관리</Text>
+                </Pressable>
                 <Text/>
             </View>}
+            <Text style={styles.h2}>이용안내</Text>
+            <Pressable
+                style={({ pressed }) => ({
+                    backgroundColor: pressed ? 'whitesmoke' : 'white',
+                  })}>
+                <Text style={styles.myBut}>앱 버전 :: {state.version}</Text>
+            </Pressable>
+            <Pressable
+                onPress={() => setPolicyModal(true)}
+                style={({ pressed }) => ({
+                    backgroundColor: pressed ? 'whitesmoke' : 'white',
+                  })}>
+                <Text style={styles.myBut}>개인정보 처리 방침</Text>
+            </Pressable>
+            <Text/>
             <Text style={styles.h2}>계정</Text>
             <Pressable onPress={() => setNameModal(true)}
                 style={({ pressed }) => ({
@@ -280,6 +317,21 @@ const UserPage = (props) => {
                 <Text style={{textAlign:'center',fontSize:15,color:'darkgray',fontWeight:'bold',marginVertical:20}}>
                 Images Designed By FreePik</Text>
             </Pressable>
+            <Modal
+                animationType="fade"
+                visible={policyModal}
+                transparent={true}>
+                <View style={styles.policyModal}>
+                    <ScrollView style={styles.policyScroll}>
+                        <Text>{policyTxt}</Text>
+                    </ScrollView>
+                    <View style={{position:'absolute',right: 5,top:5}}>
+                        <Pressable onPress={() => setPolicyModal(false)}>
+                            <Image source={deleteImg} style={{width:30,height:30}}/>
+                        </Pressable>
+                    </View>
+                </View>
+            </Modal>
             <Modal
                 animationType="fade"
                 visible={nameModal}
@@ -426,6 +478,17 @@ const styles = StyleSheet.create({
         borderBottomColor: 'gray',
         marginHorizontal: '1%',
         marginVertical: 3
+    },
+    //policyModal
+    policyModal : {
+        marginHorizontal: '5%',
+        marginVertical: '10%',
+        paddingHorizontal: '2%',
+        paddingVertical: '1%',
+        backgroundColor:'white',
+        borderWidth: 2,
+        borderColor: 'lightgray',
+        borderRadius: 20
     },
     //nickname변경
     nameModal : {

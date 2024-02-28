@@ -1,12 +1,12 @@
 import React, { useEffect, useRef } from 'react';
-import { Animated, Dimensions, Easing, Image, Pressable, StyleSheet, View } from 'react-native';
+import { Animated, Dimensions, Easing, Pressable, StyleSheet, View } from 'react-native';
 import home from '../assets/navbar/home_tab.png'
 import burger from '../assets/navbar/burger_tab.png'
 import board from '../assets/navbar/board_tab.png'
 import mypage from '../assets/navbar/mypage_tab.png'
 import { useAppContext } from './api/ContextAPI';
 
-const NavBar = ({onPage, page}) => {
+const NavBar = ({onPage, page, navref, keyBool}) => {
 
     const screenWidth = Dimensions.get('window').width * 0.89;
 
@@ -28,26 +28,26 @@ const NavBar = ({onPage, page}) => {
    
     return (
         <View style={styles.container}>
-            <Animated.View style={[styles.moves, { transform: [{ translateX: mvs}] }]}/>
+            {!keyBool && <Animated.View style={[styles.moves, { transform: [{ translateX: mvs}] }]}/>}
             <Pressable 
                 onPress={()=> onPage(0)}
                 style={styles.tabBut}>
-                <Image source={home} style={styles.tabImg}/>
+                <Animated.Image source={home} style={[styles.tabImg,{opacity:navref}]}/>
             </Pressable>
             <Pressable 
                 onPress={()=> onPage(1)}
                 style={styles.tabBut}>
-                <Image source={burger} style={styles.tabImg}/>
+                <Animated.Image source={burger} style={[styles.tabImg,{opacity:navref}]}/>
             </Pressable>
             <Pressable 
                 onPress={()=> onPage(2)}
                 style={styles.tabBut}>
-                <Image source={board} style={styles.tabImg}/>
+                <Animated.Image source={board} style={[styles.tabImg,{opacity:navref}]}/>
             </Pressable>
             <Pressable 
                 onPress={()=> onPage(state.user.userSeq === -1 ? 3 : 4)}
                 style={styles.tabBut}>
-                <Image source={mypage} style={styles.tabImg}/>
+                <Animated.Image source={mypage} style={[styles.tabImg,{opacity:navref}]}/>
             </Pressable>
         </View>
     );

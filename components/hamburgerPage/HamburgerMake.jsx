@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useRef, useState } from 'react';
-import { Dimensions, Image, Modal, PanResponder, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Animated, Dimensions, Easing, Image, Modal, PanResponder, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import foldT from '../../assets/burger/fold_true.png'
 import foldF from '../../assets/burger/fold_false.png'
 import reset from '../../assets/burger/reset.png'
@@ -20,6 +20,24 @@ import min from '../../assets/main/min.png'
 const HamburgerMake = (props) => {
     const{onBack,onAlert,route,onLoading,onMakes,updateBool,burgerDTO} = props
 
+///////////애니메이션///////////////
+    const ingreBox = useRef(new Animated.Value(0)).current;
+
+    const aniIng = (num) => {
+        Animated.timing(ingreBox, {
+            toValue: num,
+            duration: 500,
+            useNativeDriver: false,
+            easing: Easing.out(Easing.ease)
+        }).start();
+    }
+
+    const ingAni = {
+        marginTop: ingreBox.interpolate({
+            inputRange: [0, 1],
+            outputRange: [0, 50],
+        })
+    };
 ///////////드래그 이벤트////////////
     const [resc,setResc] = useState(true)
     const [action,setAction] = useState(false)
@@ -67,6 +85,7 @@ const HamburgerMake = (props) => {
     const [fillBox,setFillBox] = useState(true)
     const [sauBox,setSauBox] = useState(true)
 
+    const [lastMargin,setLastMargin] = useState(0)
     const [first,setFirst] = useState(true)
 
     const windowWidth = Dimensions.get('window').width;
@@ -104,6 +123,20 @@ const HamburgerMake = (props) => {
         })
     },[route])
 
+    useEffect(() => {
+        if(makeDTO.length > 1) {
+            const inDTO = makeDTO.map(md => {
+                const ingreIt = ingres.find(ing => ing.ingreSeq === md);
+                return ingreIt !== undefined ? ingreIt : ingres[0]
+            });
+            setLastMargin(windowWidth*inDTO.filter(ing => ing.type !== 4)[inDTO.filter(ing => ing.type !== 4).length - 1].height)
+        }
+    },[makeDTO])
+
+    useEffect(() => {
+        aniIng(fold ? 0 : 1)
+    },[fold])
+
     return (
         <View style={{flex:1}}>
             <View style={[styles.arrowBut,{top: 0}]}>
@@ -126,24 +159,25 @@ const HamburgerMake = (props) => {
                             const getIngre = ingres.find(ing => ing.ingreSeq === item)
 
                             return <Pressable key={index} disabled={fold}
-                                onPress={() => !fold && (index !== 0 || makeDTO.length === 1)&&  setMakeDTO(prevMakeDTO => {
+                                onPress={() => !fold && (index !== 0 || makeDTO.length === 1) &&  setMakeDTO(prevMakeDTO => {
                                     const newMakeDTO = [...prevMakeDTO.slice(0, index), ...prevMakeDTO.slice(index + 1)];
                                     return newMakeDTO;
                                 })}
                                 style={{zIndex:-index,alignSelf:'center'}}>
-                                <Image style={
+                                <Animated.Image ref={ingreBox} style={[ingAni,
                                 {width: size === 0 ? '50%' : size === 2 ? '90%' : '70%',
                                 aspectRatio: getIngre.width / getIngre.height + 
                                     (size === 0 ? - 0.3 : size === 2 && + 0.4),
-                                marginBottom: fold ? (((getIngre.type === 2 || getIngre.type === 3) && 
+                                marginBottom: ((getIngre.type === 2 || getIngre.type === 3) && 
                                     getIngre.height > 170 ? -(windowWidth*0.15) : -(windowWidth*0.12)) + 
-                                    (size === 0 ? + (windowWidth*0.025) : size === 2 && + -(windowWidth*0.015))) : 0,
-                                }}
+                                    (size === 0 ? + (windowWidth*0.025) : size === 2 && + -(windowWidth*0.015)),
+                                }]}
                                 source={{ uri : getIngre.image}}
                                 resizeMode='stretch'/>
                             </Pressable>})}
-                        {makeDTO.length > 0 && <Image 
-                        source={{ uri : ingres.find(ing => ing.ingreSeq === makeDTO[0]).type !== 0 ? 
+                        {makeDTO.length > 0 && <Animated.View ref={ingreBox} style={[ingAni,{zIndex: -makeDTO.length}]}>
+                            <Image 
+                            source={{ uri : ingres.find(ing => ing.ingreSeq === makeDTO[0]).type !== 0 ? 
                             ingres.find(ing => ing.ingreSeq === makeDTO[0]).image :
                             ingres.find(ing => ing.ingreSeq === makeDTO[0]).name === '먹물 번' ? 
                             'https://postfiles.pstatic.net/MjAyNDAyMjVfMTY4/MDAxNzA4ODQxNDg2OTk0.9RaLSfxW7Tzloqsvz40r1omqWehGg7bZbh7st9OBmQkg.2JdsHC1yle6BINWRnsSUQib_A5GWvLE3mh2HhqXoQ9Ig.PNG/ink_bun.png?type=w966'
@@ -151,7 +185,8 @@ const HamburgerMake = (props) => {
                             style={{width: size === 0 ? '50%' : size === 2 ? '90%' : '70%',alignSelf:'center',
                             aspectRatio: 500/(ingres.find(ing => ing.ingreSeq === makeDTO[0]).type !== 0 ? 
                             ingres.find(ing => ing.ingreSeq === makeDTO[0]).height : 160), 
-                            zIndex: -makeDTO.length,marginTop: size === 0 ? 7 : size === 1 ? 3 : 0}} />}
+                            marginTop: size === 0 ? lastMargin * 0.00009 : size === 1 ? lastMargin * 0.00007 : lastMargin * 0.00002}} />
+                        </Animated.View>}
                         </Pressable>
                     </View>
                     <View style={styles.infoContainer}> 
@@ -199,9 +234,12 @@ const HamburgerMake = (props) => {
                 </View>
             </ScrollView>
 
-                <View style={{height: '1%',backgroundColor: action ? 'gray' : 'darkgray'}} 
+                <View style={{height: '5%',marginVertical:'-2%'}} 
                     {...panResponder.current.panHandlers}>
-                    <Image source={action ? holdingGif : holding} style={styles.hold}/>
+                        <View style={{height:'33%'}}/>
+                        <View style={{backgroundColor: action ? 'lightgray' : 'whitesmoke',height:'33%'}}/>
+                        <View style={{height:'33%'}}/>
+                        <Image source={action ? holdingGif : holding} style={styles.hold}/>
                 </View>
 
             <ScrollView 
@@ -389,8 +427,8 @@ const HamburgerMake = (props) => {
 
 const styles = StyleSheet.create({
     hold : {
-        marginTop: '-2.65%',
-        height: '405%',
+        marginTop: '-8.6%',
+        height: '100%',
         aspectRatio: 1/1,
         alignSelf: 'center',
     },
