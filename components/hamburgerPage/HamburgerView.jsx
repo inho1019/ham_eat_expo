@@ -182,86 +182,85 @@ const HamburgerView = (props) => {
     const [tabModal,setTabModal] = useState(false)
 
     useEffect(() => {
-        const unsubscribe = navigation.addListener('focus', () => {
-            if(!status) {
-                if(first) {
-                    navigation.setOptions({
-                        title: '',
-                        headerRight: () => (
-                            <Pressable onPress={() => setTabModal(true)}>
-                                <Image source={tab} style={{width:27,height:27}}/>
-                            </Pressable>
-                        )
-                    });
-                    Promise.all([
-                        axios.get(`https://hameat.onrender.com/rating/listSeq/${route.params?.burgerSeq}`),
-                        axios.get(`https://hameat.onrender.com/ingre/list`),
-                        axios.get(`https://hameat.onrender.com/burger/view/${route.params?.burgerSeq}`),
-                    ])
-                    .then(res => {
-                        if(res[2].data) {
-                            setRatings(res[0].data)
-                            setIngres(res[1].data)
-                            setBurgerDTO(res[2].data)
-                            setMakeDTO(JSON.parse(res[2].data[0].make))
-                            const inDTO = JSON.parse(res[2].data[0].make).map(md => {
-                                const ingreIt = res[1].data.find(ing => ing.ingreSeq === md);
-                                return ingreIt !== undefined ? ingreIt : res[1].data[0]
-                            });
-                            setLastMargin(windowWidth*inDTO.filter(ing => ing.type !== 4)[inDTO.filter(ing => ing.type !== 4).length - 1].height)
-                            navigation.setOptions({
-                                title: res[2].data[0].name
-                            });
-                            axios.get(`https://hameat.onrender.com/store/getSeq/${res[2].data[0].storeSeq}`)
-                            .then(res => {
-                                setStoreDTO(res.data)
-                                setFirst(false)
-                            })
-                            .catch(() => {
-                                onAlertTxt('불러오기 중 에러발생')
-                                setFirst(false)
-                            })
-                        } else {
-                            onAlertTxt('삭제된 버거입니다')
-                            navigation.goBack(-1)
-                        }
-                    })
-                    .catch(() => {
-                        onAlertTxt('불러오기 중 에러발생')
-                        setFirst(false)
-                    })
-                } else {
-                    onLoading(true)
-                    axios.get(`https://hameat.onrender.com/burger/view/${route.params?.burgerSeq}`)
-                    .then(res => {
-                        onLoading(false)
-                        setBurgerDTO(res.data)
-                        setMakeDTO(JSON.parse(res.data[0].make))
-                        const inDTO = JSON.parse(res.data[0].make).map(md => {
-                            const ingreIt = ingres.find(ing => ing.ingreSeq === md);
-                            return ingreIt !== undefined ? ingreIt : ingres[0]
-                        });
-                        setLastMargin(windowWidth*inDTO.filter(ing => ing.type !== 4)[inDTO.filter(ing => ing.type !== 4).length - 1].height)
-                    })
-                    .catch(() => {
-                        onAlertTxt('불러오기 중 에러발생')
-                        onLoading(false)
-                        setFirst(false)
-                    })
-                }
-            } else {
+        if(status) {
+            onLoading(true)
+            axios.get(`https://hameat.onrender.com/status/list/${route.params?.burgerSeq}`)
+            .then(res => {
+                setPriceList(res.data)
+                onLoading(false)
+            })
+            .catch(() => {
+                onAlertTxt('불러오기 중 에러발생')
+                onLoading(false)
+                setFirst(false)
+            })
+        } else {
+            if(!first) {{
                 onLoading(true)
-                axios.get(`https://hameat.onrender.com/status/list/${route.params?.burgerSeq}`)
+                axios.get(`https://hameat.onrender.com/burger/view/${route.params?.burgerSeq}`)
                 .then(res => {
-                    setPriceList(res.data)
                     onLoading(false)
+                    setBurgerDTO(res.data)
+                    setMakeDTO(JSON.parse(res.data[0].make))
+                    const inDTO = JSON.parse(res.data[0].make).map(md => {
+                        const ingreIt = ingres.find(ing => ing.ingreSeq === md);
+                        return ingreIt !== undefined ? ingreIt : ingres[0]
+                    });
+                    setLastMargin(windowWidth*inDTO.filter(ing => ing.type !== 4)[inDTO.filter(ing => ing.type !== 4).length - 1].height)
                 })
                 .catch(() => {
                     onAlertTxt('불러오기 중 에러발생')
                     onLoading(false)
                     setFirst(false)
                 })
-            }
+            }}
+        }
+        const unsubscribe = navigation.addListener('focus', () => {
+            navigation.setOptions({
+                title: '',
+                headerRight: () => (
+                    <Pressable onPress={() => setTabModal(true)}>
+                        <Image source={tab} style={{width:27,height:27}}/>
+                    </Pressable>
+                )
+            });
+            Promise.all([
+                axios.get(`https://hameat.onrender.com/rating/listSeq/${route.params?.burgerSeq}`),
+                axios.get(`https://hameat.onrender.com/ingre/list`),
+                axios.get(`https://hameat.onrender.com/burger/view/${route.params?.burgerSeq}`),
+            ])
+            .then(res => {
+                if(res[2].data) {
+                    setRatings(res[0].data)
+                    setIngres(res[1].data)
+                    setBurgerDTO(res[2].data)
+                    setMakeDTO(JSON.parse(res[2].data[0].make))
+                    const inDTO = JSON.parse(res[2].data[0].make).map(md => {
+                        const ingreIt = res[1].data.find(ing => ing.ingreSeq === md);
+                        return ingreIt !== undefined ? ingreIt : res[1].data[0]
+                    });
+                    setLastMargin(windowWidth*inDTO.filter(ing => ing.type !== 4)[inDTO.filter(ing => ing.type !== 4).length - 1].height)
+                    navigation.setOptions({
+                        title: res[2].data[0].name
+                    });
+                    axios.get(`https://hameat.onrender.com/store/getSeq/${res[2].data[0].storeSeq}`)
+                    .then(res => {
+                        setStoreDTO(res.data)
+                        setFirst(false)
+                    })
+                    .catch(() => {
+                        onAlertTxt('불러오기 중 에러발생')
+                        setFirst(false)
+                    })
+                } else {
+                    onAlertTxt('삭제된 버거입니다')
+                    navigation.goBack(-1)
+                }
+            })
+            .catch(() => {
+                onAlertTxt('불러오기 중 에러발생')
+                setFirst(false)
+            })
         })
         
         return unsubscribe;
@@ -497,7 +496,7 @@ const HamburgerView = (props) => {
                                 style={{width: burgerDTO[0].size === 0 ? '50%' : burgerDTO[0].size === 2 ? '90%' : '70%',alignSelf:'center',
                                 aspectRatio: 500/(ingres.find(ing => ing.ingreSeq === makeDTO[0]).type !== 0 ? 
                                 ingres.find(ing => ing.ingreSeq === makeDTO[0]).height : 160), 
-                                marginTop: burgerDTO[0].size === 0 ? lastMargin * 0.00018 : burgerDTO[0].size === 1 ? lastMargin * 0.00007 : lastMargin * 0.00005}}/>
+                                marginTop: burgerDTO[0].size === 0 ? lastMargin * 0.00015 : burgerDTO[0].size === 1 ? lastMargin * 0.00007 : lastMargin * 0.00005}}/>
                         </Animated.View>
                     </Pressable>}
                 </View>
@@ -533,7 +532,7 @@ const HamburgerView = (props) => {
                     <View style={{flexDirection:'row',marginHorizontal: '5%',justifyContent:'space-between',marginBottom: 5}}>
                         {burgerDTO[0].type !== 2 &&<Text style={styles.h3}>{storeDTO ? storeDTO.name : '없는 매장'}</Text>}
                         {burgerDTO[0].type === 2 && <Text style={styles.h3}>{burgerDTO[1] ? burgerDTO[1].name : '탈퇴 회원'}</Text>}
-                        {storeDTO && <View style={{flexDirection:'row',backgroundColor:'whitesmoke',borderRadius:5,padding:3}}>    
+                        {storeDTO ? <View style={{flexDirection:'row',backgroundColor:'whitesmoke',borderRadius:5,padding:3}}>    
                             {storeDTO.type === 1 && <Pressable onPress={() => onMapStore()}
                             style={{marginHorizontal:5}}>
                                 <Image source={mapIcon} style={{height:30,width:30}}/>
@@ -542,6 +541,12 @@ const HamburgerView = (props) => {
                             onPress={() => navigation.navigate('List',{ type : storeDTO.type, search: storeDTO.name })}>
                                 <Image source={searchIcon} style={{height:30,width:30}}/>
                             </Pressable>}
+                        </View> : burgerDTO[0].type === 2 && burgerDTO[1] && 
+                        <View style={{flexDirection:'row',backgroundColor:'whitesmoke',borderRadius:5,padding:3}}>
+                            <Pressable style={{marginHorizontal:5}}
+                            onPress={() => navigation.navigate('List',{ type : 2, search: burgerDTO[1].name })}>
+                                <Image source={searchIcon} style={{height:30,width:30}}/>
+                            </Pressable>
                         </View>}
                     </View>
                 </View>}
@@ -787,7 +792,7 @@ const HamburgerView = (props) => {
                                         <Text style={styles.tabButTxt}>버거 삭제</Text>
                                     </Pressable>}      
                                 </View>}
-                                <Pressable
+                                {burgerDTO[0].type !== 2 && <Pressable
                                     style={({pressed}) => [styles.tabBut,{backgroundColor: pressed ? 'whitesmoke' : 'white'}]}
                                     onPress={() => {
                                         if(state.user.userSeq === -1) onAlertTxt('로그인 후 이용가능') 
@@ -796,7 +801,7 @@ const HamburgerView = (props) => {
                                         setTabModal(false)
                                     }}}>
                                     <Text style={styles.tabButTxt}>변동 신청</Text>
-                                </Pressable>
+                                </Pressable>}
                                 {storeDTO && <View>    
                                     {storeDTO.type === 1 && <Pressable onPress={() => {
                                         onMapStore()
@@ -814,6 +819,14 @@ const HamburgerView = (props) => {
                                         <Text style={styles.tabButTxt}>매장 검색</Text>
                                     </Pressable>}
                                 </View>}
+                                {burgerDTO[0].type === 2 && burgerDTO[1] && <Pressable 
+                                style={({pressed}) => [styles.tabBut,{backgroundColor: pressed ? 'whitesmoke' : 'white'}]}
+                                onPress={() => {
+                                    navigation.navigate('List',{ type : 2 , search: burgerDTO[1].name })
+                                    setTabModal(false)
+                                }}>
+                                    <Text style={styles.tabButTxt}>유저 검색</Text>
+                                </Pressable>}
                             </View>}
                         </View>
                     </TouchableWithoutFeedback>

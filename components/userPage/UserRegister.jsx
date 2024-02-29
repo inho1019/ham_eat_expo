@@ -66,6 +66,7 @@ const UserRegister = (props) => {
 
     const [policy,setPolicy] = useState(true)
     const [policyTxt,setPolicyTxt] = useState('')
+    const [termsTxt,setTermsTxt] = useState('')
     
     const [cal,setCal] = useState(false)
 
@@ -111,15 +112,19 @@ const UserRegister = (props) => {
 
     useEffect(() => {
       onLoading(true)
-      axios.get('https://hameat.onrender.com/policy')
-      .then(res => {
-        setPolicyTxt(res.data.replace(/<br>/g, '\n'))
-        onLoading(false)
+        Promise.all([
+            axios.get('https://hameat.onrender.com/policy'),
+            axios.get('https://hameat.onrender.com/terms'),
+        ])
+        .then(res => {
+          setPolicyTxt(res[0].data.replace(/<br>/g, '\n'))
+          setTermsTxt(res[1].data.replace(/<br>/g, '\n'))
+          onLoading(false)
+        })
+        .catch(() => {
+          onAlertTxt('약관 및 정책 불러오기 중 에러발생')
+          onLoading(false)
       })
-      .catch(() => {
-        onAlertTxt('정책 불러오기 중 에러발생')
-        onLoading(false)
-    })
     },[])
 
     useEffect(() => {
@@ -192,13 +197,17 @@ const UserRegister = (props) => {
     return (
       <View style={{ flex: 1}}>
         {policy ? <View>
-          <View style={{ flexDirection : 'row' , marginVertical: 10}}><Text style={styles.h3}>개인정보 처리 방침</Text></View>
+          <View style={{ flexDirection : 'row' , marginVertical: 15}}><Text style={styles.h3}>이용약관</Text></View>
+          <ScrollView style={styles.policyScroll}>
+              <Text style={{flexWrap: 'wrap',paddingBottom: 100}}>{termsTxt}</Text>
+          </ScrollView>
+          <View style={{ flexDirection : 'row' , marginVertical: 15}}><Text style={styles.h3}>개인정보 처리 방침</Text></View>
           <ScrollView style={styles.policyScroll}>
               <Text style={{flexWrap: 'wrap',paddingBottom: 100}}>{policyTxt}</Text>
           </ScrollView>
           <Pressable style={styles.but} onPress={() => {
             setPolicy(false)
-            onAlertTxt('개인정보 처리 방침에 동의하셨습니다')
+            onAlertTxt('이용약관 및 개인정보 처리 방침에 동의하셨습니다')
           }}>
             <Text style={styles.butTxt}>동의</Text>
           </Pressable>
@@ -309,7 +318,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderWidth: 1,
     borderColor: 'darkgray',
-    height: '70%',
+    height: '30%',
     marginHorizontal: '4%',
   },
   h3 : {

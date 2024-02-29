@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Image, Linking, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Button, Image, Keyboard, Linking, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAppContext } from '../api/ContextAPI';
 import deleteImg from '../../assets/burger/delete.png';
@@ -53,17 +53,23 @@ const UserPage = (props) => {
     },[pwd,pwdCheck])
 
     const [policyTxt,setPolicyTxt] = useState('')
+    const [termsTxt,setTermsTxt] = useState('')
     const [policyModal,setPolicyModal] = useState(false)
+    const [termsModal,setTermsModal] = useState(false)
 
     useEffect(() => {
         onLoading(true)
-        axios.get('https://hameat.onrender.com/policy')
+        Promise.all([
+            axios.get('https://hameat.onrender.com/policy'),
+            axios.get('https://hameat.onrender.com/terms'),
+        ])
         .then(res => {
-          setPolicyTxt(res.data.replace(/<br>/g, '\n'))
+          setPolicyTxt(res[0].data.replace(/<br>/g, '\n'))
+          setTermsTxt(res[1].data.replace(/<br>/g, '\n'))
           onLoading(false)
         })
         .catch(() => {
-          onAlertTxt('정책 불러오기 중 에러발생')
+          onAlertTxt('약관 및 정책 불러오기 중 에러발생')
           onLoading(false)
       })
     },[])
@@ -176,6 +182,10 @@ const UserPage = (props) => {
     const [secret,setSecret] = useState(false)
     const [rePwd,setRePwd] = useState('')
     const [pwdTxt,setPwdTxt] = useState('')
+    const [variDTO,setVariDTO] = useState({
+        name: '',
+        valu: ''
+    })
 
     const onLogout = () => {
         onUser({
@@ -217,6 +227,28 @@ const UserPage = (props) => {
         Linking.openURL(url)
         .catch((err) => console.error('Error opening external link:', err));
     };
+
+    const onValu = () => {
+        Keyboard.dismiss()
+        if(variDTO.name.length > 0 && variDTO.valu.length) {
+            onLoading(true)
+            axios.post(`https://hameat.onrender.com/vari/set`,variDTO)
+            .then(() => {
+                setVariDTO({
+                    name: '',
+                    valu: ''
+                })
+                onLoading(false)
+                onAlertTxt('설정 완료')
+            })
+            .catch(() => {
+                onAlertTxt('오류 발생')
+                onLoading(false)
+            })
+        } else {
+            onAlertTxt('값을 입력해주세요')
+        }
+    }
 
     return (
         <ScrollView style={{flex: 1, padding:'5%'}}>
@@ -271,6 +303,18 @@ const UserPage = (props) => {
                     })}>
                     <Text style={styles.myBut}>유저 관리</Text>
                 </Pressable>
+                <Text style={[styles.h3,{marginTop:15}]}>환경 변수</Text>
+                <View style={{flexDirection:'row'}}>
+                    <Text style={[styles.myBut,{borderBottomWidth:0}]}>이름</Text>
+                    <TextInput style={[styles.txtBox,{width:'20%'}]} value={variDTO.name}
+                        onChangeText={(text) => setVariDTO({...variDTO,name : text})}/>
+                    <Text style={[styles.myBut,{borderBottomWidth:0}]}>값</Text>
+                    <TextInput style={[styles.txtBox,{width:'20%'}]} value={variDTO.valu}
+                        onChangeText={(text) => setVariDTO({...variDTO,valu : text})}/>
+                    <Pressable style={styles.changeBut} onPress={ onValu }>
+                        <Text>설정</Text>
+                    </Pressable>
+                </View>
                 <Text/>
             </View>}
             <Text style={styles.h2}>이용안내</Text>
@@ -286,6 +330,13 @@ const UserPage = (props) => {
                     backgroundColor: pressed ? 'whitesmoke' : 'white',
                   })}>
                 <Text style={styles.myBut}>개인정보 처리 방침</Text>
+            </Pressable>
+            <Pressable
+                onPress={() => setTermsModal(true)}
+                style={({ pressed }) => ({
+                    backgroundColor: pressed ? 'whitesmoke' : 'white',
+                  })}>
+                <Text style={styles.myBut}>이용약관</Text>
             </Pressable>
             <Text/>
             <Text style={styles.h2}>계정</Text>
@@ -314,19 +365,23 @@ const UserPage = (props) => {
                 <Text style={styles.myBut}>로그아웃</Text>
             </Pressable>
             <Pressable onPress={() => openLink('https://kr.freepik.com/')}>
-                <Text style={{textAlign:'center',fontSize:15,color:'darkgray',fontWeight:'bold',marginVertical:20}}>
+                <Text style={{textAlign:'center',fontSize:15,color:'darkgray',fontWeight:'bold',marginVertical:30}}>
                 Images Designed By FreePik</Text>
             </Pressable>
             <Modal
                 animationType="fade"
-                visible={policyModal}
+                visible={policyModal || termsModal}
                 transparent={true}>
                 <View style={styles.policyModal}>
                     <ScrollView style={styles.policyScroll}>
-                        <Text>{policyTxt}</Text>
+                        <Text>{policyModal && policyTxt}</Text>
+                        <Text>{termsModal && termsTxt}</Text>
                     </ScrollView>
                     <View style={{position:'absolute',right: 5,top:5}}>
-                        <Pressable onPress={() => setPolicyModal(false)}>
+                        <Pressable onPress={() => {
+                                setPolicyModal(false)
+                                setTermsModal(false)
+                            }}>
                             <Image source={deleteImg} style={{width:30,height:30}}/>
                         </Pressable>
                     </View>
@@ -440,6 +495,15 @@ const styles = StyleSheet.create({
     h3 : {
         fontSize: 18,
         fontWeight: 'bold',
+    },
+    h6 : {
+        borderTopColor: 'white',
+        borderTopWidth: 10,
+        backgroundColor: '#c7c7c7',
+        fontSize: 17,
+        fontWeight: 'bold',
+        paddingHorizontal: 5,
+        marginLeft: 5
     },
     txtBox : {
         fontSize: 15,

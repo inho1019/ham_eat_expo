@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Easing, Image, Keyboard, Modal, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
+import { Animated, Easing, Image, Keyboard, Linking, Modal, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
 import { DefaultTheme } from '@react-navigation/native';
 import NavBar from './NavBar';
 import Main from './mainPage/Main';
@@ -9,6 +9,7 @@ import UserMain from './userPage/UserMain';
 import loadingImg from '../assets/loading.gif'
 import UserMypageMain from './userPage/UserMypageMain';
 import BoardMain from './boardPage/BoardMain';
+import axios from 'axios';
 
 const Index = () => {
     const navTheme = {
@@ -69,6 +70,16 @@ const Index = () => {
         
         const keyShowListner = Keyboard.addListener('keyboardDidShow', keyShow);
         const keyHideListner = Keyboard.addListener('keyboardDidHide', keyHide);
+
+        axios.get(`https://hameat.onrender.com/vari/get/version`)
+        .then(res => {
+            if(res.data !== state.version) {
+                onAlertTxt('업데이트가 존재합니다')
+                setTimeout(() => {
+                    Linking.openURL('https://play.google.com/store/apps/details?id=com.burger.HamEat')
+                },2000)
+            }
+        })
         
         return () => {
             keyShowListner.remove();

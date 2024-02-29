@@ -100,7 +100,7 @@ const UserList = (props) => {
     return (
         <View>
             <TextInput value={search} onChangeText={(text) => setSearch(text)} 
-                style={styles.searchBox} placeholder={'글 검색'}/>
+                style={styles.searchBox} placeholder={'유저 검색'}/>
             <FlatList
                 data={userList.filter(item => 
                     item.name.replace(/\s/g, '').toLowerCase().includes(search.replace(/\s/g, '').toLowerCase()) 
@@ -109,7 +109,7 @@ const UserList = (props) => {
                     <View style={{flexDirection:'row',justifyContent:'space-between'}}>
                         <View style={{flexDirection:'row'}}>
                             <Text style={{fontSize: 17,fontWeight: 'bold'}}>{data.item.name}</Text>
-                            <Text style={{fontSize: 17}}> | {data.item.own === 0 ? '일반 유저' : data.item.own === 1 ? '사업자' : '관리자'}</Text>
+                            <Text style={{fontSize: 17}}> | {data.item.own === 0 ? '일반 유저' : data.item.own === 1 ? '매니저' : '관리자'}</Text>
                         </View>
                         {data.item.own !== 2  && <View style={{flexDirection:'row'}}>
                             <Pressable onPress={() => onOwn(data.item.userSeq,data.item.own + 1)}
