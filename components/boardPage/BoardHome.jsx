@@ -138,6 +138,7 @@ const BoardHome = (props) => {
                 <Text style={styles.noticeTxt} numberOfLines={1} ellipsizeMode="tail">
                     {notice[0].title}</Text>
             </Pressable>}
+            <View style={styles.line}/>
             <View style={styles.h1Out}>
                 <Text style={styles.h1}>실시간 인기글</Text>
             </View>
@@ -147,7 +148,7 @@ const BoardHome = (props) => {
                         <Skel height={'100%'} width={windowWidth*0.95}/>
                     </View>
                 </View>
-                :<Pressable style={styles.recomContainer}
+                :<Pressable style={({pressed}) => [styles.recomContainer,{elevation: pressed ? 2 : 10}]}
                 onPress={() => navigation.navigate('View',{ boardSeq : bestFree.boardSeq })}>
                 <Text style={styles.h2}>{bestFree.title}</Text>
                 <Text style={styles.recomInfo}>
@@ -160,7 +161,7 @@ const BoardHome = (props) => {
                         <Skel height={'100%'} width={windowWidth*0.95}/>
                     </View>
                 </View>
-                :<View style={styles.eventContainer}>
+                :<Pressable style={styles.eventContainer}>
                 {imageArray.length > 0 &&
                 <Pressable
                     style={styles.eventImgBox}
@@ -182,15 +183,15 @@ const BoardHome = (props) => {
                         <Text numberOfLines={2} ellipsizeMode="tail" style={styles.recomTxt}>{ bestEvent.content }</Text>
                     </Pressable>
                 </View>
-            </View>}
+            </Pressable>}
             <Pressable onPress={() => navigation.navigate('List', { type : 0 } )}
                 style={({pressed}) => [styles.h1Out,{backgroundColor: pressed ? 'whitesmoke' : 'white'}]}>
                 <Text style={styles.h1}>자유 게시판</Text>
-                <Text style={styles.more}>more </Text>
+                <Text style={styles.more}>more</Text>
             </Pressable>
             {first ?
                 <View style={{width:'95%',aspectRatio:7/2,overflow:'hidden',
-                marginLeft:'2.5%', borderRadius:5, marginTop:'5%'}}>
+                marginLeft:'2.5%', borderRadius:5, marginTop:'3%'}}>
                     <View style={styles.itemSkel}><Skel height={'100%'} width={windowWidth*0.95}/></View>
                     <View style={styles.itemSkel}><Skel height={'100%'} width={windowWidth*0.95}/></View>
                     <View style={styles.itemSkel}><Skel height={'100%'} width={windowWidth*0.95}/></View>
@@ -206,11 +207,11 @@ const BoardHome = (props) => {
             <Pressable onPress={() => navigation.navigate('List', { type : 1 } )}
                 style={({pressed}) => [styles.h1Out,{backgroundColor: pressed ? 'whitesmoke' : 'white'}]}>
                 <Text style={styles.h1}>행사/이벤트 게시판</Text>
-                <Text style={styles.more}>more </Text>
+                <Text style={styles.more}>more</Text>
             </Pressable>
             {first ?
                 <View style={{width:'95%',aspectRatio:7/2,overflow:'hidden',
-                marginLeft:'2.5%', borderRadius:5, marginTop:'5%'}}>
+                marginLeft:'2.5%', borderRadius:5, marginTop:'3%'}}>
                     <View style={styles.itemSkel}><Skel height={'100%'} width={windowWidth*0.95}/></View>
                     <View style={styles.itemSkel}><Skel height={'100%'} width={windowWidth*0.95}/></View>
                     <View style={styles.itemSkel}><Skel height={'100%'} width={windowWidth*0.95}/></View>
@@ -226,11 +227,11 @@ const BoardHome = (props) => {
             <Pressable onPress={() => navigation.navigate('List', { type : 3 } )}
                 style={({pressed}) => [styles.h1Out,{backgroundColor: pressed ? 'whitesmoke' : 'white'}]}>
                 <Text style={styles.h1}>문의/건의 게시판</Text>
-                <Text style={styles.more}>more </Text>
+                <Text style={styles.more}>more</Text>
             </Pressable>
             {first ?
                 <View style={{width:'95%',aspectRatio:7/2,overflow:'hidden',
-                marginLeft:'2.5%', borderRadius:5, marginTop:'5%'}}>
+                marginLeft:'2.5%', borderRadius:5, marginTop:'3%'}}>
                     <View style={styles.itemSkel}><Skel height={'100%'} width={windowWidth*0.95}/></View>
                     <View style={styles.itemSkel}><Skel height={'100%'} width={windowWidth*0.95}/></View>
                     <View style={styles.itemSkel}><Skel height={'100%'} width={windowWidth*0.95}/></View>
@@ -249,11 +250,11 @@ const BoardHome = (props) => {
             <Pressable onPress={() => navigation.navigate('List', { type : 2 } )}
                 style={({pressed}) => [styles.h1Out,{backgroundColor: pressed ? 'whitesmoke' : 'white'}]}>
                 <Text style={styles.h1}>공지사항</Text>
-                <Text style={styles.more}>more </Text>
+                <Text style={styles.more}>more</Text>
             </Pressable>
             {first ?
                 <View style={{width:'95%',aspectRatio:7/2,overflow:'hidden',
-                marginLeft:'2.5%', borderRadius:5, marginTop:'5%'}}>
+                marginLeft:'2.5%', borderRadius:5, marginTop:'3%'}}>
                     <View style={styles.itemSkel}><Skel height={'100%'} width={windowWidth*0.95}/></View>
                     <View style={styles.itemSkel}><Skel height={'100%'} width={windowWidth*0.95}/></View>
                     <View style={styles.itemSkel}><Skel height={'100%'} width={windowWidth*0.95}/></View>
@@ -273,14 +274,14 @@ const BoardHome = (props) => {
 const styles = StyleSheet.create({
     noticeBox : {
         flexDirection:'row',
-        marginHorizontal: 10,
+        marginHorizontal: 5,
         borderColor: 'lightgray',
         backgroundColor:'whitesmoke',
-        borderWidth : 2,
-        borderRadius: 10,
+        borderWidth : 1,
+        borderRadius: 4,
         paddingVertical: 5,
         paddingHorizontal: 10,
-        marginTop : 20
+        marginTop : 10
     },
     noticeTxt : {
         color: 'black',
@@ -297,7 +298,6 @@ const styles = StyleSheet.create({
         margin: 10,
         marginVertical: 15,
         padding: 10,
-        elevation: 10,
     },
     h2 : {
         marginHorizontal: 5,
@@ -352,7 +352,7 @@ const styles = StyleSheet.create({
         paddingVertical: 3,
         marginVertical: 3,
         marginHorizontal: '1%',
-        borderRadius: 8,
+        borderRadius: 5,
         fontWeight:'bold',
         color:'white',
         backgroundColor:'#2E8DFF'
@@ -361,11 +361,11 @@ const styles = StyleSheet.create({
     h1Out : {
         flexDirection:'row',
         justifyContent:'space-between',
-        borderBottomColor:'black',
-        borderBottomWidth:2,
-        paddingBottom:3,
+        borderBottomColor: 'lightgray',
+        borderBottomWidth: 3,
         marginHorizontal: 10,
         paddingTop: 10,
+        paddingBottom: 2,
         marginTop: 10,
     },
     h1 : {
@@ -375,13 +375,12 @@ const styles = StyleSheet.create({
     more : {
         textAlignVertical:'bottom',
         color:'darkgray',
+        fontWeight:'bold',
         fontSize: 16
     },
     itemBox : {
-        paddingHorizontal: 5,
         marginHorizontal: 10,
         paddingTop: 5,
-        marginTop: 5,
         paddingBottom: 10
     },
     itemContent : {
@@ -393,7 +392,6 @@ const styles = StyleSheet.create({
         borderBottomWidth : 1,
         fontSize: 17,
         color: 'gray',
-        fontWeight: 'bold',
         marginVertical: 3,
         paddingHorizontal: 5
     },

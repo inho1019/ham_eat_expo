@@ -303,7 +303,12 @@ const UserPage = (props) => {
                     })}>
                     <Text style={styles.myBut}>유저 관리</Text>
                 </Pressable>
-                <Text style={[styles.h3,{marginTop:15}]}>환경 변수</Text>
+                <View style={{flexDirection:'row',marginTop:15}}>
+                    <Text style={[styles.h3,{marginVertical:5}]}>환경 변수</Text>
+                    <Pressable style={styles.changeBut} onPress={ onValu }>
+                        <Text>설정</Text>
+                    </Pressable>
+                </View>
                 <View style={{flexDirection:'row'}}>
                     <Text style={[styles.myBut,{borderBottomWidth:0}]}>이름</Text>
                     <TextInput style={[styles.txtBox,{width:'20%'}]} value={variDTO.name}
@@ -311,9 +316,6 @@ const UserPage = (props) => {
                     <Text style={[styles.myBut,{borderBottomWidth:0}]}>값</Text>
                     <TextInput style={[styles.txtBox,{width:'20%'}]} value={variDTO.valu}
                         onChangeText={(text) => setVariDTO({...variDTO,valu : text})}/>
-                    <Pressable style={styles.changeBut} onPress={ onValu }>
-                        <Text>설정</Text>
-                    </Pressable>
                 </View>
                 <Text/>
             </View>}
@@ -374,8 +376,10 @@ const UserPage = (props) => {
                 transparent={true}>
                 <View style={styles.policyModal}>
                     <ScrollView style={styles.policyScroll}>
-                        <Text>{policyModal && policyTxt}</Text>
-                        <Text>{termsModal && termsTxt}</Text>
+                        {policyModal &&<Text style={[styles.h2,{marginVertical:20}]}>개인정보 처리 방침</Text>}
+                        {termsModal && <Text style={[styles.h2,{marginVertical:20}]}>이용약관</Text>}
+                        {policyModal && <Text>{policyTxt}</Text>}
+                        {termsModal && <Text>{termsTxt}</Text>}
                     </ScrollView>
                     <View style={{position:'absolute',right: 5,top:5}}>
                         <Pressable onPress={() => {
@@ -483,7 +487,7 @@ const styles = StyleSheet.create({
     h1 : {
         fontSize: 40,
         fontFamily: 'esamanruMedium',
-        marginBottom: 15,
+        marginBottom: 30,
         borderBottomWidth: 5,
         paddingVertical: 10,
         borderBottomColor:'gray'
@@ -546,13 +550,14 @@ const styles = StyleSheet.create({
     //policyModal
     policyModal : {
         marginHorizontal: '5%',
-        marginVertical: '10%',
+        marginBottom: '20%',
+        marginTop: '5%',
         paddingHorizontal: '2%',
         paddingVertical: '1%',
         backgroundColor:'white',
         borderWidth: 2,
-        borderColor: 'lightgray',
-        borderRadius: 20
+        borderColor: 'black',
+        borderRadius: 5
     },
     //nickname변경
     nameModal : {

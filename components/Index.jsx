@@ -88,7 +88,7 @@ const Index = () => {
     }, []);
     ///////////////////////////////////////////
     useEffect(() => {
-        if(key) aniNav(0)
+        if(key) aniNav(0.7)
         else aniNav(1)
     },[key])
     
@@ -113,7 +113,7 @@ const Index = () => {
                     }
                 </View>
                 <View style={{height: '8%'}}>
-                    <NavBar onPage={onPage} page={state.page} navref={navref} keyBool={key}/>
+                    <NavBar onPage={onPage} page={state.page} navref={navref}/>
                 </View>
                 <Modal
                     animationType="fade"

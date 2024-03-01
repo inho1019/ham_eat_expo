@@ -111,15 +111,15 @@ const UserList = (props) => {
                             <Text style={{fontSize: 17,fontWeight: 'bold'}}>{data.item.name}</Text>
                             <Text style={{fontSize: 17}}> | {data.item.own === 0 ? '일반 유저' : data.item.own === 1 ? '매니저' : '관리자'}</Text>
                         </View>
-                        {data.item.own !== 2  && <View style={{flexDirection:'row'}}>
+                        {data.item.own < 2  && <View style={{flexDirection:'row'}}>
                             <Pressable onPress={() => onOwn(data.item.userSeq,data.item.own + 1)}
                                 style={[styles.itemBut,{backgroundColor:'#2E8DFF'}]}>
                                 <Text style={styles.itemButTxt}>승급</Text>
                             </Pressable>
-                            <Pressable onPress={() => onOwn(data.item.userSeq,data.item.own - 1)}
+                        {data.item.own > 0 &&  <Pressable onPress={() => onOwn(data.item.userSeq,data.item.own - 1)}
                                 style={[styles.itemBut,{backgroundColor:'tomato'}]}>
                                 <Text style={styles.itemButTxt}>강등</Text>
-                            </Pressable>
+                            </Pressable>}
                             <Pressable onPress={() => onDelete(data.item.userSeq)}
                                 style={[styles.itemBut,{backgroundColor:'gray'}]}>
                                 <Text style={styles.itemButTxt}>탈퇴</Text>

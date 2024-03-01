@@ -122,7 +122,7 @@ const HamburgerHome = (props) => {
                     </View>
                 </View> :
                 <View>{makeDTO.length > 0 &&
-                    <Pressable style={styles.recomContainer}
+                    <Pressable style={({pressed}) => [styles.recomContainer,{backgroundColor:pressed ? 'whitesmoke' : 'white'}]}
                         onPress={() => navigation.navigate('View', { burgerSeq : burger.burgerSeq })}>
                         <View style={styles.makeContainer}>
                             {makeDTO.map((item,index) => {
@@ -153,9 +153,9 @@ const HamburgerHome = (props) => {
                                                                    burger.size === 1 ? lastMargin * 0.000065 : lastMargin * 0.00004}}/>
                         </View>
                         <View style={styles.infoContainer}>
-                            <Text style={{fontWeight:'bold',fontSize:22,textAlign:'center'}}>{burger.name}</Text>
+                            <Text style={{fontSize:20,textAlign:'center',fontFamily: 'esamanruMedium'}}>{burger.name}</Text>
                             <View style={styles.recomContent}>
-                                <Text style={{padding: 8,fontSize:16,textAlign:'center',color:'gray'}} >"{burger.content}"</Text>
+                                <Text style={{paddingVertical:8,fontSize:15,textAlign:'center',color:'gray'}} >"{burger.content}"</Text>
                             </View>
 
                                <View style={styles.starBox}>
@@ -266,7 +266,7 @@ const HamburgerHome = (props) => {
                 <Text style={styles.h1}>새로운 평가</Text>
             </View>
             {first ?
-                <View style={{width:'95%',aspectRatio:5/2,overflow:'hidden',justifyContent:'space-evenly',
+                <View style={{width:'95%',aspectRatio:5/2,overflow:'hidden',justifyContent:'space-evenly',marginTop:10,
                 marginHorizontal:'2.5%', borderRadius:5, marginTop:'2%', flexDirection:'row',flexWrap:'wrap'}}>
                     <View style={[styles.itemSkel,{height:'18%'}]}><Skel height={'100%'} width={windowWidth*0.45}/></View>
                     <View style={[styles.itemSkel,{height:'18%'}]}><Skel height={'100%'} width={windowWidth*0.45}/></View>
@@ -277,7 +277,7 @@ const HamburgerHome = (props) => {
                     <View style={[styles.itemSkel,{height:'18%'}]}><Skel height={'100%'} width={windowWidth*0.45}/></View>
                     <View style={[styles.itemSkel,{height:'18%'}]}><Skel height={'100%'} width={windowWidth*0.45}/></View>
                 </View> 
-                : <View style={{flexDirection:'row',flexWrap:'wrap'}}>
+                : <View style={{flexDirection:'row',flexWrap:'wrap',marginTop:10}}>
                     {newRating.map((item,index) =>
                         <Pressable key={index}
                             onPress={() => navigation.navigate('View', { burgerSeq : item.burgerSeq })}
@@ -295,6 +295,7 @@ const HamburgerHome = (props) => {
 const styles = StyleSheet.create({
     recomContainer : {
         flexDirection: 'row',
+        borderRadius: 5,
         width: '95%',
         alignSelf: 'center',
         marginTop: 10,
@@ -306,7 +307,12 @@ const styles = StyleSheet.create({
     },
     infoContainer : {
         width: '50%',
-        paddingRight: 10
+        padding:20,
+        borderWidth: 1,
+        borderRadius: 5,
+        backgroundColor:'white',
+        borderColor: 'lightgray',
+        justifyContent:'center'
     },
 /////////평점///////////////
     starImg : {
@@ -331,9 +337,9 @@ const styles = StyleSheet.create({
     h1Out : {
         flexDirection:'row',
         justifyContent:'space-between',
-        borderBottomColor:'black',
-        borderBottomWidth: 2,
-        paddingBottom: 3,
+        borderBottomColor: 'lightgray',
+        borderBottomWidth: 3,
+        paddingBottom: 2,
         marginHorizontal: 10,
         marginTop: 20,
     },
@@ -375,7 +381,7 @@ const styles = StyleSheet.create({
     },
 //////////////////////////
     buttonContainer : {
-        flex: 1,
+        flex: 1
     },
     burgerBut : {
         width: '85%',

@@ -109,7 +109,7 @@ const BoardView = (props) => {
     }
 
     const onDelete = () => {
-        if(boardDTO[1].userSeq === state.user.userSeq) {
+        if(state.user.own === 2 || boardDTO[1].userSeq === state.user.userSeq) {
             onLoading(true)
             axios.delete(`https://hameat.onrender.com/board/delete/${boardDTO[0].boardSeq}`)
             .then(() => {
@@ -218,9 +218,9 @@ const BoardView = (props) => {
                             <View style={{width:'100%'}}>
                                 <View style={{flexDirection:'row',justifyContent:'space-between'}}>
                                     <Text style={styles.h2}>{boardDTO[1] ? boardDTO[1].name : '탈퇴 회원'}</Text>
-                                    {(boardDTO[1] && 
-                                        boardDTO[1].userSeq === state.user.userSeq || state.user.own === 2) && <View style={{flexDirection:'row'}}>
-                                        {boardDTO[1].userSeq === state.user.userSeq && 
+                                    {(boardDTO[1] && boardDTO[1].userSeq === state.user.userSeq || state.user.own === 2) && 
+                                    <View style={{flexDirection:'row'}}>
+                                        {boardDTO[1] && boardDTO[1].userSeq === state.user.userSeq && 
                                         <View style={{flexDirection:'column'}}>
                                             <Pressable onPress={onUpdate}
                                                 style={[styles.itemBut,{backgroundColor:'#2E8DFF'}]}>

@@ -199,7 +199,7 @@ const HamburgerForm = (props) => {
                     onPressOut={() => aniFren(1)}
                 >
                     <Animated.Text style={[styles.handText,{ transform: [{scale : fren}], 
-                        color : updateBool && burgerDTO.type === 0 ? 'darkgray' : 'black' }]}>프렌차이즈 버거</Animated.Text>
+                        color : updateBool ? burgerDTO.type === 0 ? 'black' : 'darkgray' : 'black' }]}>프렌차이즈 버거</Animated.Text>
                 </Pressable>
                 <Pressable style={{marginVertical:'7%'}}
                     onPress={() => onType(1)}
@@ -207,7 +207,7 @@ const HamburgerForm = (props) => {
                     onPressOut={() => aniHand(1)}
                 >
                     <Animated.Text style={[styles.handText,{ transform: [{scale : hand}], 
-                        color : updateBool && burgerDTO.type === 1 ? 'darkgray' : 'black' }]}>수제 버거</Animated.Text>
+                        color : updateBool ? burgerDTO.type === 1 ? 'black' : 'darkgray' : 'black' }]}>수제 버거</Animated.Text>
                 </Pressable>
                 <Pressable style={{marginVertical:'7%'}}
                     onPress={() => onType(2)}
@@ -215,7 +215,7 @@ const HamburgerForm = (props) => {
                     onPressOut={() => aniMine(1)}
                 >
                     <Animated.Text style={[styles.handText,{ transform: [{scale : mine}], 
-                        color : updateBool && burgerDTO.type === 2 ? 'darkgray' : 'black' }]}>DIY 버거</Animated.Text>
+                        color : updateBool ? burgerDTO.type === 2 ? 'black' : 'darkgray' : 'black' }]}>DIY 버거</Animated.Text>
                 </Pressable>
             </View>
             <View style={{height:windowHeight,paddingVertical: '1%'}}>

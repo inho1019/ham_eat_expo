@@ -69,21 +69,21 @@ const Search = (props) => {
 
     return (
         <View style={{flex:1,padding:5}}>
-            <View style={styles.titleBox}>
+            <View style={styles.h1Out}>
                 <Text style={styles.h1}>게시판</Text>
                 <Pressable
                     onPressIn={() => !aning && onBoard()}>
-                    <Image source={ ani !== 2 ? max : min } style={{width: 27, height: 27, marginTop: 2}}/>
+                    <Image source={ ani !== 2 ? max : min } style={{width: 26, height: 26}}/>
                 </Pressable>
             </View>
             <Animated.View style={[boardHeight,{marginVertical: '1%'}]}>
                 <BoardList navigation={navigation} searchParam={route.params?.search} route={route}/>
             </Animated.View>
-            <View style={styles.titleBox}>
+            <View style={styles.h1Out}>
                 <Text style={styles.h1}>햄버거</Text>
                 <Pressable
                     onPressIn={() => !aning && onBurger()}>
-                    <Image source={ ani !== 0 ? max : min  } style={{width: 27, height: 27, marginTop: 2}}/>
+                    <Image source={ ani !== 0 ? max : min  } style={{width: 26, height: 26}}/>
                 </Pressable>
             </View>
             <Animated.View style={[burgerHeight,{marginVertical: '1%',overflow:'hidden'}]}>
@@ -91,7 +91,7 @@ const Search = (props) => {
             </Animated.View>
             <View style={{flexDirection:'row'}}>
             <View style={{width:'50%'}}>
-                <View style={styles.titleBox}>
+                <View style={styles.h1Out}>
                     <Text style={styles.h1}>매장</Text>
                 </View>
                 <View style={{height: '20%'}}>
@@ -101,7 +101,7 @@ const Search = (props) => {
                 </View>
             </View>
             <View style={{width:'50%'}}>
-                <View style={styles.titleBox}>
+                <View style={styles.h1Out}>
                 <Text style={styles.h1}>평가</Text>
                 </View>
                 <View style={{height: '20%'}}>
@@ -116,19 +116,18 @@ const Search = (props) => {
 }; 
 
 const styles = StyleSheet.create({
-    h1 : {
-        fontSize: 21,
-        fontWeight: 'bold',
-    },
-    titleBox : {
+    h1Out : {
+        flexDirection:'row',
+        justifyContent:'space-between',
+        borderBottomColor: 'lightgray',
+        borderBottomWidth: 3,
         backgroundColor:'white',
         marginHorizontal:5,
-        paddingBottom: 3,
-        borderBottomColor:'black',
-        borderBottomWidth:2,
-        flexDirection:'row',
-        justifyContent: 'space-between'
-    }
+    },
+    h1 : {
+        fontSize: 21,
+        fontFamily:'esamanruMedium',
+    },
 })
 
 export default Search

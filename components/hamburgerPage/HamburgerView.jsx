@@ -25,6 +25,26 @@ const HamburgerView = (props) => {
     const [rate,setRate] = useState(0)
     const [content,setContent] = useState('')
     const [first,setFirst] = useState(true)
+    /////////// 키보드 활성화 여부 확인////////
+    const [key,setKey] = useState(false)
+
+    useEffect(() => {
+        const keyShow = () => {
+            setKey(true)
+        };
+        
+        const keyHide = () => {
+            setKey(false)
+        };
+        
+        const keyShowListner = Keyboard.addListener('keyboardDidShow', keyShow);
+        const keyHideListner = Keyboard.addListener('keyboardDidHide', keyHide);
+
+        return () => {
+            keyShowListner.remove();
+            keyHideListner.remove();
+        };
+    }, []);
     ///////////애니메이션///////////////
     const ingreBox = useRef(new Animated.Value(0)).current;
 
@@ -679,7 +699,8 @@ const HamburgerView = (props) => {
                     animationType="slide"
                     transparent={true}
                     visible={review}>
-                    <View style={{flex : 1, flexDirection:'column-reverse'}}>                          
+                    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()} disabled={!key}>
+                    <View style={{flex : 1, flexDirection:'column-reverse'}}>     
                         <View style={styles.review}>
                             <View {...panResponder2.panHandlers}>
                                 <Image style={styles.dragImg} source={drag}/>
@@ -707,7 +728,7 @@ const HamburgerView = (props) => {
                                             setPlaceDTO()
                                         }}
                                         value={store}
-                                    />
+                                        />
                                     {placeDTO && <Text 
                                         style={{fontSize:14,verticalAlign:'middle',marginLeft:5,color:'gray',fontWeight:'bold'}}>
                                         #{placeDTO.placeName.split(' ')[placeDTO.placeName.split(' ').length-1]}</Text>}
@@ -744,7 +765,7 @@ const HamburgerView = (props) => {
                                         <View style={styles.reviewStar}>
                                         <Image source={starOne} style={{width:18,height:18}}/>
                                         <Text style={{fontSize: 15,fontWeight: 'bold'}}> {data.item[0].rate} </Text></View>
-                                        <Text style={styles.reviewName}>{data.item[1] ? data.item[1].name : '탈퇴한 회원'}</Text>
+                                        <Text style={styles.reviewName}>{data.item[1] ? data.item[1].name : '탈퇴 회원'}</Text>
                                         <Text style={styles.reviewTime}> | {getToday(data.item[0].logTime)}</Text>
                                         {data.item[0].placeName && <Pressable style={{flexDirection:'row'}}
                                             onPress={() => onMapPlace(data.item[0])}>
@@ -768,6 +789,7 @@ const HamburgerView = (props) => {
                                 <View style={{flex: 1}}/>
                         </TouchableWithoutFeedback>  
                     </View>
+                    </TouchableWithoutFeedback>                     
                 </Modal>
                 <Modal
                     animationType="fade"
@@ -846,8 +868,8 @@ const styles = StyleSheet.create({
     h1 : {
         textAlign : 'center',
         fontSize: 25,
-        fontWeight: 'bold',
-        marginVertical: 5
+        fontFamily: 'esamanruMedium',
+        marginTop:5
     },
     h2 : {
         borderTopColor: 'white',

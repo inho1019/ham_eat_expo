@@ -189,7 +189,7 @@ const HamburgerList = (props) => {
                                 style={{width: data.item[0].size === 0 ? '50%' : data.item[0].size === 2 ? '90%' : '70%',alignSelf:'center',
                                 aspectRatio: 500/(ingres.find(ing => ing.ingreSeq === makeDTO[0]).type !== 0 ? 
                                 ingres.find(ing => ing.ingreSeq === makeDTO[0]).height : 160), 
-                                zIndex: -makeDTO.length+999, marginTop: data.item[0].size === 0 ? lastMargin * 0.00008 : 
+                                zIndex: -makeDTO.length+999, marginTop: data.item[0].size === 0 ? lastMargin * 0.00007 : 
                                                                         data.item[0].size === 1 ? lastMargin * 0.00004 : lastMargin * 0.00001}}/>
                         </View>
                     <View style={styles.infoContainer}>

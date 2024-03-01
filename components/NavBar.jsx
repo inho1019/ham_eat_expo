@@ -6,7 +6,7 @@ import board from '../assets/navbar/board_tab.png'
 import mypage from '../assets/navbar/mypage_tab.png'
 import { useAppContext } from './api/ContextAPI';
 
-const NavBar = ({onPage, page, navref, keyBool}) => {
+const NavBar = ({onPage, page, navref}) => {
 
     const screenWidth = Dimensions.get('window').width * 0.89;
 
@@ -28,26 +28,26 @@ const NavBar = ({onPage, page, navref, keyBool}) => {
    
     return (
         <View style={styles.container}>
-            {!keyBool && <Animated.View style={[styles.moves, { transform: [{ translateX: mvs}] }]}/>}
+            <Animated.View style={[styles.moves, { transform: [{ translateX: mvs}] }]}/>
             <Pressable 
                 onPress={()=> onPage(0)}
                 style={styles.tabBut}>
-                <Animated.Image source={home} style={[styles.tabImg,{opacity:navref}]}/>
+                <Animated.Image source={home} style={[styles.tabImg,{ transform: [{ scale: navref }] }]}/>
             </Pressable>
             <Pressable 
                 onPress={()=> onPage(1)}
                 style={styles.tabBut}>
-                <Animated.Image source={burger} style={[styles.tabImg,{opacity:navref}]}/>
+                <Animated.Image source={burger} style={[styles.tabImg,{ transform: [{ scale: navref }] }]}/>
             </Pressable>
             <Pressable 
                 onPress={()=> onPage(2)}
                 style={styles.tabBut}>
-                <Animated.Image source={board} style={[styles.tabImg,{opacity:navref}]}/>
+                <Animated.Image source={board} style={[styles.tabImg,{ transform: [{ scale: navref }] }]}/>
             </Pressable>
             <Pressable 
                 onPress={()=> onPage(state.user.userSeq === -1 ? 3 : 4)}
                 style={styles.tabBut}>
-                <Animated.Image source={mypage} style={[styles.tabImg,{opacity:navref}]}/>
+                <Animated.Image source={mypage} style={[styles.tabImg,{ transform: [{ scale: navref }] }]}/>
             </Pressable>
         </View>
     );
@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
     tabImg: {
         width:30, 
         height:30,
-        opacity: 0.8
+        opacity: 0.9
     },
     moves:{
         zIndex: 1,
