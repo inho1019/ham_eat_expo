@@ -135,7 +135,7 @@ const HamburgerHome = (props) => {
                     </View>
                 </View> :
                 <View>{makeDTO.length > 0 &&
-                    <Pressable style={({pressed}) => [styles.recomContainer,{backgroundColor:pressed ? 'whitesmoke' : 'white'}]}
+                    <Pressable style={({pressed}) => [styles.recomContainer,{borderColor:pressed ? 'gray' : 'lightgray'}]}
                         onPress={() => navigation.navigate('View', { burgerSeq : burger.burgerSeq })}>
                         <View style={styles.makeContainer}>
                             {makeDTO.map((item,index) => {
@@ -214,10 +214,10 @@ const HamburgerHome = (props) => {
                     {fren.map((item,index) => <View style={styles.item} key={index}>
                         <View style={{flexDirection: 'row'}}>
                             <Text style={styles.itemNew}>new</Text>
-                        <View style={{width : '90%'}}>
-                            <Text style={styles.itemName}>{item.name}</Text>
-                            <Text numberOfLines={1} ellipsizeMode="tail" style={styles.itemContent}>{item.content}</Text>
-                        </View>
+                            <View style={{width : '90%'}}>
+                                <Text style={styles.itemName}>{item.name}</Text>
+                                <Text numberOfLines={1} ellipsizeMode="tail" style={styles.itemContent}>{item.content}</Text>
+                            </View>
                         </View>
                     </View>)}
                 </View>}
@@ -314,8 +314,7 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         marginTop: 10,
         paddingVertical: 20,
-        borderWidth: 1,
-        borderColor: 'lightgray',
+        borderWidth: 2,
         marginBottom: 15
     },
     makeContainer : {
@@ -326,7 +325,7 @@ const styles = StyleSheet.create({
         width: '45%',
         marginRight: '5%',
         padding:20,
-        borderRadius: 5,
+        borderRadius: 15,
         backgroundColor:'white',
         justifyContent:'center'
     },
@@ -386,10 +385,6 @@ const styles = StyleSheet.create({
     itemContent : {
         paddingHorizontal: 10,
         color: 'gray'
-    },
-    item : {
-        borderBottomColor : 'lightgray',
-        borderBottomWidth : 1 
     },
     itemName : {
         fontSize: 17,

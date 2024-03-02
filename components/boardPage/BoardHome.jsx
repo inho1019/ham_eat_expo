@@ -198,9 +198,13 @@ const BoardHome = (props) => {
                 </View> 
                 :   <View style={styles.itemBox}>
                     {free.map((item,index) => <Pressable key={index}
-                        style={({pressed}) => ({backgroundColor: pressed ? 'whitesmoke' : 'white'})}
+                        style={({pressed}) => ([styles.item,{backgroundColor: pressed ? 'whitesmoke' : 'white'}])}
                         onPress={() => navigation.navigate('View',{ boardSeq : item.boardSeq })}>
-                        <Text numberOfLines={1} ellipsizeMode="tail" style={styles.item}>{item.title}</Text>
+                            <Text style={styles.itemNew}>new</Text>
+                            <View style={{width : '90%'}}>
+                                <Text numberOfLines={1} ellipsizeMode="tail" 
+                                style={{fontSize: 16,marginLeft:5}}>{item.title}</Text>
+                            </View>
                     </Pressable>)}
                 </View>
             }
@@ -218,9 +222,13 @@ const BoardHome = (props) => {
                 </View> 
                 :    <View style={styles.itemBox}>
                     {event.map((item,index) => <Pressable key={index}
-                        style={({pressed}) => ({backgroundColor: pressed ? 'whitesmoke' : 'white'})}
+                        style={({pressed}) => ([styles.item,{backgroundColor: pressed ? 'whitesmoke' : 'white'}])}
                         onPress={() => navigation.navigate('View',{ boardSeq : item.boardSeq })}>
-                        <Text numberOfLines={1} ellipsizeMode="tail" style={styles.item}>{item.title}</Text>
+                            <Text style={styles.itemNew}>new</Text>
+                            <View style={{width : '90%'}}>
+                                <Text numberOfLines={1} ellipsizeMode="tail" 
+                                style={{fontSize: 16,marginLeft:5}}>{item.title}</Text>
+                            </View>
                     </Pressable>)}
                 </View>
             }
@@ -238,12 +246,14 @@ const BoardHome = (props) => {
                 </View> 
                 :    <View style={styles.itemBox}>
                     {ask.map((item,index) => <Pressable key={index}
-                        style={({pressed}) => ({backgroundColor: pressed ? 'whitesmoke' : 'white'})}
-                        onPress={() => (item.secret === 1 && state.user.userSeq !== item.userSeq && state.user.own !== 2) ? 
-                        onAlertTxt('권한이 없습니다') : navigation.navigate('View',{ boardSeq : item.boardSeq })}>
-                        <Text numberOfLines={1} ellipsizeMode="tail" style={styles.item}>
-                            {(item.secret === 1 && state.user.userSeq !== item.userSeq && state.user.own !== 2) ? 
-                            '🔑 비밀글' : item.title}</Text>
+                        style={({pressed}) => ([styles.item,{backgroundColor: pressed ? 'whitesmoke' : 'white'}])}
+                        onPress={() => navigation.navigate('View',{ boardSeq : item.boardSeq })}>
+                            <Text style={styles.itemNew}>new</Text>
+                            <View style={{width : '90%'}}>
+                                <Text numberOfLines={1} ellipsizeMode="tail" 
+                                style={{fontSize: 16,marginLeft:5}}> {(item.secret === 1 && 
+                                    state.user.userSeq !== item.userSeq && state.user.own !== 2) ? '🔑 비밀글' : item.title}</Text>
+                            </View>
                     </Pressable>)}
                 </View>
             }
@@ -261,9 +271,13 @@ const BoardHome = (props) => {
                 </View> 
                 :    <View style={styles.itemBox}>
                     {notice.map((item,index) => <Pressable key={index}
-                        style={({pressed}) => ({backgroundColor: pressed ? 'whitesmoke' : 'white'})}
+                        style={({pressed}) => ([styles.item,{backgroundColor: pressed ? 'whitesmoke' : 'white'}])}
                         onPress={() => navigation.navigate('View',{ boardSeq : item.boardSeq })}>
-                        <Text numberOfLines={1} ellipsizeMode="tail" style={styles.item}>{item.title}</Text>
+                            <Text style={styles.itemNew}>new</Text>
+                            <View style={{width : '90%'}}>
+                                <Text numberOfLines={1} ellipsizeMode="tail" 
+                                style={{fontSize: 16,marginLeft:5}}>{item.title}</Text>
+                            </View>
                     </Pressable>)}
                 </View>
             }
@@ -386,12 +400,19 @@ const styles = StyleSheet.create({
         color: 'gray'
     },
     item : {
-        borderBottomColor : 'lightgray',
-        borderBottomWidth : 1,
-        fontSize: 17,
-        color: 'gray',
+        flexDirection: 'row',
         marginVertical: 3,
-        paddingHorizontal: 5
+        paddingVertical: 2
+    },
+    itemNew : {
+        borderRadius: 5,
+        borderWidth: 1,
+        borderColor: 'black',
+        marginRight: 5,
+        width: 35,
+        height:22,
+        alignSelf:'center',
+        textAlign:'center'
     },
     itemSkel : {
         height: '25%',
