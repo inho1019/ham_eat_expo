@@ -68,7 +68,7 @@ const Search = (props) => {
     }
 
     return (
-        <View style={{flex:1,padding:5}}>
+        <View style={{flex:1,paddingHorizontal:5,paddingVertical:2}}>
             <View style={styles.h1Out}>
                 <Text style={styles.h1}>게시판</Text>
                 <Pressable
@@ -119,10 +119,11 @@ const styles = StyleSheet.create({
     h1Out : {
         flexDirection:'row',
         justifyContent:'space-between',
-        borderBottomColor: 'lightgray',
-        borderBottomWidth: 3,
-        backgroundColor:'white',
+        backgroundColor:'#e5e5e5',
+        borderRadius: 5,
+        paddingHorizontal: 5,
         marginHorizontal:5,
+        paddingVertical:2,
     },
     h1 : {
         fontSize: 21,

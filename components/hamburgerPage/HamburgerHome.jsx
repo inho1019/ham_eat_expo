@@ -3,6 +3,7 @@ import { Dimensions, Image, Pressable, ScrollView, StyleSheet, Text, View } from
 import burgerAdd from '../../assets/burger/burger_add.png'
 import star from '../../assets/burger/star.png'
 import starNone from '../../assets/burger/star_none.png'
+import whatImg from '../../assets/burger/what.png'
 import axios from 'axios';
 import { useAppContext } from '../api/ContextAPI';
 import { Skel } from 'react-native-ui-skel-expo'
@@ -36,6 +37,10 @@ const HamburgerHome = (props) => {
 
     const onAlertTxt = (txt) => {
         dispatch({ type: 'SET_ALERTTXT' , payload : txt });
+    };
+
+    const onLoading = (bool) => {
+        dispatch({ type: 'SET_LOADING' , payload : bool });
     };
     ////////////////////////////////////////////
 
@@ -96,29 +101,37 @@ const HamburgerHome = (props) => {
         });
         return unsubscribe;
     },[navigation,route])
+
+    const randomBurger = () => {
+        onLoading(true)
+        axios.get('https://hameat.onrender.com/burger/random')
+        .then(res => {
+            onLoading(false)
+            navigation.navigate('View',{ burgerSeq : res.data.burgerSeq })
+        })
+        .catch(() => {
+            onAlertTxt('불러오기 중 에러발생')   
+            setFirst(false)
+        })
+    }
     
     return (
         <ScrollView style={{flex:1}}>
+            <Pressable 
+                onPress={ randomBurger }
+                style={({pressed}) => [styles.whatBox,{backgroundColor : pressed ? 'whitesmoke' : '#e5e5e5'}]}>
+                <Image source={whatImg} style={{width:30,height:30}}/>
+                <Text style={styles.whatTxt}>뭐먹지...</Text>
+            </Pressable>
             <View
                 style={styles.h1Out}>
                 <Text style={styles.h1}>신규 추천 버거</Text>
             </View>
                 {first ? 
-                <View style={{width:'95%',aspectRatio:5/2, marginLeft:'2.5%', marginVertical:'5%'}}>
+                <View style={{width:'95%',aspectRatio:7/3, marginLeft:'2.5%', marginTop:'2%',marginBottom:'5%'}}>
                     <View style={{flexDirection:'row'}}>
-                        <View style={[styles.itemSkel,{height:'100%'}]}>
-                        <Skel height={'100%'} width={windowWidth*0.45}/></View>
-                        <View style={{marginLeft:'5%'}}>
-                            <View style={[styles.itemSkel,{height:'32%'}]}>
-                                <Skel height={'100%'} width={windowWidth*0.45}/>
-                            </View>
-                            <View style={[styles.itemSkel,{height:'26%',marginVertical:'4%'}]}>
-                                <Skel height={'100%'} width={windowWidth*0.45}/>
-                            </View>
-                            <View style={[styles.itemSkel,{height:'27%'}]}>
-                                <Skel height={'100%'} width={windowWidth*0.45}/>
-                            </View>
-                        </View>
+                        <View style={[styles.itemSkel,{height:'100%',borderRadius:20}]}>
+                        <Skel height={'100%'} width={windowWidth*0.95}/></View>
                     </View>
                 </View> :
                 <View>{makeDTO.length > 0 &&
@@ -192,7 +205,7 @@ const HamburgerHome = (props) => {
                 </View>       
                 {first  ? 
                 <View style={{width:'95%',aspectRatio:5/2,overflow:'hidden',
-                    marginLeft:'2.5%', borderRadius:5, marginTop:'5%'}}>
+                    marginLeft:'2.5%', borderRadius:5, marginTop:'2%'}}>
                         <View style={styles.itemSkel}><Skel height={'100%'} width={windowWidth*0.95}/></View>
                         <View style={styles.itemSkel}><Skel height={'100%'} width={windowWidth*0.95}/></View>
                         <View style={styles.itemSkel}><Skel height={'100%'} width={windowWidth*0.95}/></View>
@@ -218,7 +231,7 @@ const HamburgerHome = (props) => {
                 </View>
                 {first  ? 
                 <View style={{width:'95%',aspectRatio:5/2,overflow:'hidden',
-                    marginLeft:'2.5%', borderRadius:5, marginTop:'5%'}}>
+                    marginLeft:'2.5%', borderRadius:5, marginTop:'2%'}}>
                         <View style={styles.itemSkel}><Skel height={'100%'} width={windowWidth*0.95}/></View>
                         <View style={styles.itemSkel}><Skel height={'100%'} width={windowWidth*0.95}/></View>
                         <View style={styles.itemSkel}><Skel height={'100%'} width={windowWidth*0.95}/></View>
@@ -244,7 +257,7 @@ const HamburgerHome = (props) => {
                 </View>
                 {first  ? 
                 <View style={{width:'95%',aspectRatio:5/2,overflow:'hidden',
-                    marginLeft:'2.5%', borderRadius:5, marginTop:'5%'}}>
+                    marginLeft:'2.5%', borderRadius:5, marginTop:'2%'}}>
                         <View style={styles.itemSkel}><Skel height={'100%'} width={windowWidth*0.95}/></View>
                         <View style={styles.itemSkel}><Skel height={'100%'} width={windowWidth*0.95}/></View>
                         <View style={styles.itemSkel}><Skel height={'100%'} width={windowWidth*0.95}/></View>
@@ -277,7 +290,7 @@ const HamburgerHome = (props) => {
                     <View style={[styles.itemSkel,{height:'18%'}]}><Skel height={'100%'} width={windowWidth*0.45}/></View>
                     <View style={[styles.itemSkel,{height:'18%'}]}><Skel height={'100%'} width={windowWidth*0.45}/></View>
                 </View> 
-                : <View style={{flexDirection:'row',flexWrap:'wrap',marginTop:10}}>
+                : <View style={{flexDirection:'row',flexWrap:'wrap',marginTop:5}}>
                     {newRating.map((item,index) =>
                         <Pressable key={index}
                             onPress={() => navigation.navigate('View', { burgerSeq : item.burgerSeq })}
@@ -295,24 +308,44 @@ const HamburgerHome = (props) => {
 const styles = StyleSheet.create({
     recomContainer : {
         flexDirection: 'row',
-        borderRadius: 5,
+        borderRadius: 20,
+        overflow:'hidden',
         width: '95%',
         alignSelf: 'center',
         marginTop: 10,
-        paddingVertical: 15,
+        paddingVertical: 20,
+        borderWidth: 1,
+        borderColor: 'lightgray',
+        marginBottom: 15
     },
     makeContainer : {
         width: '50%',
         justifyContent: 'center',
     },
     infoContainer : {
-        width: '50%',
+        width: '45%',
+        marginRight: '5%',
         padding:20,
-        borderWidth: 1,
         borderRadius: 5,
         backgroundColor:'white',
-        borderColor: 'lightgray',
         justifyContent:'center'
+    },
+    whatBox : {
+        flexDirection:'row',
+        marginHorizontal: 10,
+        backgroundColor:'#e5e5e5',
+        borderRadius: 4,
+        paddingVertical: 5,
+        paddingHorizontal: 10,
+        marginTop : 10
+    },
+    whatTxt : {
+        color: 'gray',
+        textAlignVertical:'center',
+        marginLeft: 10,
+        fontSize: 16,
+        maxWidth:'90%',
+        fontWeight:'bold',
     },
 /////////평점///////////////
     starImg : {
@@ -337,8 +370,6 @@ const styles = StyleSheet.create({
     h1Out : {
         flexDirection:'row',
         justifyContent:'space-between',
-        borderBottomColor: 'lightgray',
-        borderBottomWidth: 3,
         paddingBottom: 2,
         marginHorizontal: 10,
         marginTop: 20,
@@ -348,8 +379,9 @@ const styles = StyleSheet.create({
         fontFamily: 'esamanruMedium',
     },
     itemBox : {
-        padding: 10,
-        paddingBottom: 10
+        paddingBottom: 10,
+        paddingHorizontal: 10,
+        marginTop:5
     },
     itemContent : {
         paddingHorizontal: 10,

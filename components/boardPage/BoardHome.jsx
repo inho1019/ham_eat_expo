@@ -125,16 +125,16 @@ const BoardHome = (props) => {
     return (
         <ScrollView>
             { (first || notice.length === 0) ? 
-                <View style={{width:'95%',aspectRatio:10/1, marginLeft:'2.5%', marginTop:'5%'}}>
+                <View style={{width:'95%',aspectRatio:10/1, marginLeft:'2.5%', marginTop:'2%'}}>
                     <View style={[styles.itemSkel,{height:'100%'}]}>
                         <Skel height={'100%'} width={windowWidth*0.95}/>
                     </View>
                 </View>
                 :<Pressable 
                 onPress={() => navigation.navigate('View',{ boardSeq : notice[0].boardSeq })}
-                style={styles.noticeBox}>
+                style={({pressed}) => [styles.noticeBox,{backgroundColor : pressed ? 'whitesmoke' : '#e5e5e5'}]}>
                 <Image source={noticeImg} style={{width:30,height:30}}/>
-                <Text style={[styles.noticeTxt,{color:'gray'}]}>공지</Text>
+                <Text style={[styles.noticeTxt,{color:'darkgray'}]}>공지</Text>
                 <Text style={styles.noticeTxt} numberOfLines={1} ellipsizeMode="tail">
                     {notice[0].title}</Text>
             </Pressable>}
@@ -254,7 +254,7 @@ const BoardHome = (props) => {
             </Pressable>
             {first ?
                 <View style={{width:'95%',aspectRatio:7/2,overflow:'hidden',
-                marginLeft:'2.5%', borderRadius:5, marginTop:'3%'}}>
+                marginLeft:'2.5%', borderRadius:5, marginTop:'1%'}}>
                     <View style={styles.itemSkel}><Skel height={'100%'} width={windowWidth*0.95}/></View>
                     <View style={styles.itemSkel}><Skel height={'100%'} width={windowWidth*0.95}/></View>
                     <View style={styles.itemSkel}><Skel height={'100%'} width={windowWidth*0.95}/></View>
@@ -274,17 +274,15 @@ const BoardHome = (props) => {
 const styles = StyleSheet.create({
     noticeBox : {
         flexDirection:'row',
-        marginHorizontal: 5,
-        borderColor: 'lightgray',
-        backgroundColor:'whitesmoke',
-        borderWidth : 1,
+        marginHorizontal: 10,
+        backgroundColor:'#e5e5e5',
         borderRadius: 4,
         paddingVertical: 5,
         paddingHorizontal: 10,
         marginTop : 10
     },
     noticeTxt : {
-        color: 'black',
+        color: 'gray',
         textAlignVertical:'center',
         marginLeft: 10,
         fontSize: 16,
@@ -295,7 +293,7 @@ const styles = StyleSheet.create({
     recomContainer : {
         backgroundColor: 'white',
         borderRadius: 10,
-        margin: 10,
+        marginHorizontal: 10,
         marginVertical: 15,
         padding: 10,
     },
@@ -361,8 +359,6 @@ const styles = StyleSheet.create({
     h1Out : {
         flexDirection:'row',
         justifyContent:'space-between',
-        borderBottomColor: 'lightgray',
-        borderBottomWidth: 3,
         marginHorizontal: 10,
         paddingTop: 10,
         paddingBottom: 2,
@@ -375,13 +371,15 @@ const styles = StyleSheet.create({
     more : {
         textAlignVertical:'bottom',
         color:'darkgray',
+        borderBottomColor:'gray',
+        borderBottomWidth: 2,
         fontWeight:'bold',
         fontSize: 16
     },
     itemBox : {
         marginHorizontal: 10,
-        paddingTop: 5,
-        paddingBottom: 10
+        paddingBottom: 10,
+        marginTop: 5
     },
     itemContent : {
         paddingHorizontal: 10,
