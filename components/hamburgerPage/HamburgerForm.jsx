@@ -167,7 +167,7 @@ const HamburgerForm = (props) => {
                             .then(() => {
                                 onLoading(false)
                                 onAlertTxt('등록이 완료되었습니다')
-                                navigation.navigate('Home')
+                                navigation.goBack(-1)
                             })
                             .catch(() => {
                                 onAlertTxt('평가 등록 중 에러발생')
@@ -176,7 +176,7 @@ const HamburgerForm = (props) => {
                         } else {
                             onLoading(false)
                             onAlertTxt('등록이 완료되었습니다')
-                            navigation.navigate('Home')
+                            navigation.goBack(-1)
                         }
                     })
                     .catch(() => {

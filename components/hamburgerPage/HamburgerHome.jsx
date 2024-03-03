@@ -121,7 +121,7 @@ const HamburgerHome = (props) => {
                 onPress={ randomBurger }
                 style={({pressed}) => [styles.whatBox,{backgroundColor : pressed ? 'whitesmoke' : '#e5e5e5'}]}>
                 <Image source={whatImg} style={{width:30,height:30}}/>
-                <Text style={styles.whatTxt}>뭐먹지...</Text>
+                <Text style={styles.whatTxt}>뭐 먹지... 아무거나 추천 받기</Text>
             </Pressable>
             <View
                 style={styles.h1Out}>
@@ -324,9 +324,7 @@ const styles = StyleSheet.create({
     infoContainer : {
         width: '45%',
         marginRight: '5%',
-        padding:20,
-        borderRadius: 15,
-        backgroundColor:'white',
+        paddingHorizontal:10,
         justifyContent:'center'
     },
     whatBox : {

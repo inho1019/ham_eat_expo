@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { Dimensions, FlatList, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import burgerWrite from '../../assets/burger/burger_write.png';
 import star from '../../assets/burger/star.png';
 import starNone from '../../assets/burger/star_none.png';
 import won from '../../assets/burger/won.png';
@@ -12,7 +13,7 @@ const HamburgerList = (props) => {
 
     const windowWidth = Dimensions.get('window').width;
 
-    const { dispatch } = useAppContext();
+    const { state, dispatch } = useAppContext();
 
     const onLoading = (bool) => {
         dispatch({ type: 'SET_LOADING' , payload : bool });
@@ -222,6 +223,13 @@ const HamburgerList = (props) => {
                 ListFooterComponent={() => <View style={{paddingBottom:10}}/>}
                 alwaysBounceVertical={false}
             />}
+            { (!route.params?.userSeq && searchParam === undefined) && 
+                (route.params?.type !== 2 || state.user.own === 2) && 
+                <Pressable style={styles.writeBut}
+                    onPress={() => state.user.userSeq === -1 ? onPage(3)
+                    : navigation.navigate('Form')}>
+                <Image source={burgerWrite} style={{width: 50, height: 50}}/>
+            </Pressable>}
         </View>
     );
 };
@@ -332,6 +340,12 @@ const styles = StyleSheet.create({
         fontWeight:'bold',
         color:'white',
         marginLeft: 10
+    },
+    writeBut : {
+        position:'absolute',
+        bottom: 10,
+        right: 10,
+        opacity : 0.9
     },
 });
 

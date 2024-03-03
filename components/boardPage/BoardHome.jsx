@@ -401,7 +401,7 @@ const styles = StyleSheet.create({
     },
     item : {
         flexDirection: 'row',
-        marginVertical: 3,
+        marginVertical: 2,
         paddingVertical: 2
     },
     itemNew : {

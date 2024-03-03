@@ -77,7 +77,7 @@ const Index = () => {
                 onAlertTxt('업데이트가 존재합니다')
                 setTimeout(() => {
                     Linking.openURL('https://play.google.com/store/apps/details?id=com.burger.HamEat')
-                },2000)
+                },1500)
             }
         })
         
@@ -88,7 +88,7 @@ const Index = () => {
     }, []);
     ///////////////////////////////////////////
     useEffect(() => {
-        if(key) aniNav(0.7)
+        if(key) aniNav(0.5)
         else aniNav(1)
     },[key])
     

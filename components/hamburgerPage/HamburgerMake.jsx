@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Dimensions, Easing, Image, Modal, PanResponder, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Animated, Dimensions, Easing, Image, Modal, PanResponder, Pressable, ScrollView, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
 import foldT from '../../assets/burger/fold_true.png'
 import foldF from '../../assets/burger/fold_false.png'
 import reset from '../../assets/burger/reset.png'
@@ -68,8 +68,37 @@ const HamburgerMake = (props) => {
             },
         })
     },[burCon,ingCon,resc])
+//////////햄버거 추가 애니메이션//////////////
+    const [ingX,setIngX] = useState(0)
+    const [ingY,setIngY] = useState(0)
+    const [moveImg,setMoveImg] = useState('')
+    const [move,setMove] = useState(false)
 
-///////////////////
+    const [moveBox,setMoveBox]= useState(new Animated.Value(0));
+
+    const aniMove = (e,src,seq) => {
+        if(!move) {
+            const x = e.nativeEvent.pageX;
+            const y = e.nativeEvent.pageY;
+            setIngX(x-50),
+            setIngY(y-90)
+            setMoveImg(src)
+            setMove(true)
+            Animated.timing(moveBox, {
+                delay: 200,
+                toValue: 1,
+                duration: 600,
+                useNativeDriver: false,
+                easing: Easing.in(Easing.ease)
+            }).start(() => {
+                onMake(seq)
+                setMoveBox(new Animated.Value(0));
+                setMove(false);
+                setMoveImg('');
+            })        
+        }
+    }
+////////////////////////////////////////////
     const [ingres,setIngres] = useState([])
     const [size,setSize] = useState(-1)
     const [sizeModal,setSizeModal] = useState(false)
@@ -90,8 +119,11 @@ const HamburgerMake = (props) => {
 
     const windowWidth = Dimensions.get('window').width;
 
+    const scrollRef = useRef();
+
     const onMake = (num) => {
         setMakeDTO([...makeDTO,num])
+        if(!fold) scrollRef.current.scrollToEnd({ animated: true });
     }
 
     const onCheck = () => {
@@ -145,6 +177,7 @@ const HamburgerMake = (props) => {
                 </Pressable>
             </View>
              <ScrollView 
+                ref={ scrollRef }
                 onScroll={() => setAction(false)}
                 style={[styles.burgerContainer,{height:burCon + '%'}]}>
                 <View style={styles.totalContainer}>
@@ -234,11 +267,11 @@ const HamburgerMake = (props) => {
                 </View>
             </ScrollView>
 
-                <View style={{height: '5%',marginVertical:'-2%'}} 
+                <View style={{height: '5%',marginVertical:'-3.5%'}} 
                     {...panResponder.current.panHandlers}>
-                        <View style={{height:'33%'}}/>
-                        <View style={{backgroundColor: action ? 'lightgray' : 'whitesmoke',height:'33%'}}/>
-                        <View style={{height:'33%'}}/>
+                        <View style={{height:'38%'}}/>
+                        <View style={{backgroundColor: action ? 'lightgray' : 'whitesmoke',height:'24%'}}/>
+                        <View style={{height:'38%'}}/>
                         <Image source={action ? holdingGif : holding} style={styles.hold}/>
                 </View>
 
@@ -272,7 +305,7 @@ const HamburgerMake = (props) => {
                         .map((item,index) => 
                         <Pressable key={index}
                             style={styles.ingreItem}
-                            onPress={() => onMake(item.ingreSeq)}>
+                            onPress={(e) => aniMove(e,item.image,item.ingreSeq)}>
                             <Image source={{ uri: item.image }} style={styles.ingreImage} resizeMode='contain'/>
                             <Text style={{fontSize:15}}>{item.name}</Text>
                         </Pressable>
@@ -283,7 +316,7 @@ const HamburgerMake = (props) => {
                             <Pressable 
                                 key={index}
                                 style={styles.ingreItem}
-                                onPress={() => onMake(item.ingreSeq)}>
+                                onPress={(e) => aniMove(e,item.image,item.ingreSeq)}>
                                 <Image source={{ uri: item.image }} style={styles.ingreImage} resizeMode='contain'/>
                                 <Text style={{fontSize:15}}>추가 번</Text>
                             </Pressable>
@@ -302,7 +335,7 @@ const HamburgerMake = (props) => {
                     {ingres.filter(ing => ing.type === 1).map((item,index) => 
                         <Pressable key={index}
                             style={styles.ingreItem}
-                            onPress={() => onMake(item.ingreSeq)}>
+                            onPress={(e) => aniMove(e,item.image,item.ingreSeq)}>
                             <Image source={{ uri: item.image }} style={styles.ingreImage} resizeMode='contain'/>
                             <Text style={{fontSize:15}}>{item.name}</Text>
                         </Pressable>
@@ -320,7 +353,7 @@ const HamburgerMake = (props) => {
                     {ingres.filter(ing => ing.type === 2).map((item,index) => 
                         <Pressable key={index}
                             style={styles.ingreItem}
-                            onPress={() => onMake(item.ingreSeq)}>
+                            onPress={(e) => aniMove(e,item.image,item.ingreSeq)}>
                             <Image source={{ uri: item.image }} style={styles.ingreImage} resizeMode='contain'/>
                             <Text style={{fontSize:15}}>{item.name}</Text>
                         </Pressable>
@@ -339,7 +372,7 @@ const HamburgerMake = (props) => {
                         {ingres.filter(ing => ing.type === 3).map((item,index) => 
                             <Pressable key={index}
                                 style={styles.ingreItem}
-                                onPress={() => onMake(item.ingreSeq)}>
+                                onPress={(e) => aniMove(e,item.image,item.ingreSeq)}>
                                 <Image source={{ uri: item.image }} style={styles.ingreImage} resizeMode='contain'/>
                                 <Text style={{fontSize:15}}>{item.name}</Text>
                             </Pressable>
@@ -357,7 +390,7 @@ const HamburgerMake = (props) => {
                         {ingres.filter(ing => ing.type === 4).map((item,index) => 
                             <Pressable key={index}
                                 style={styles.ingreItem}
-                                onPress={() => onMake(item.ingreSeq)}>
+                                onPress={(e) => aniMove(e,item.image,item.ingreSeq)}>
                                 <Image source={{ uri: item.image }} style={styles.ingreImage} resizeMode='contain'/>
                                 <Text style={{fontSize:15}}>{item.name}</Text>
                             </Pressable>
@@ -421,6 +454,29 @@ const HamburgerMake = (props) => {
                     <Image source={nextImg} style={{height:'95%',aspectRatio: 1/1, alignSelf:'center'}}/>
                 </Pressable>
             </View> 
+            {move && 
+                <Animated.Image source={{ uri: moveImg }} 
+                resizeMode='contain'
+                style={{position:'absolute', 
+                width:90, height:50,
+                transform: [{
+                    scale : moveBox.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [1, 2.1*(windowWidth/411)*(size === 0 ? 0.7 : size === 1 ? 1 : 1.3)],
+                })}],
+                opacity: moveBox.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [1, 0],
+                }),
+                left: moveBox.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [ingX, windowWidth*0.25],
+                }),
+                top: moveBox.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [ingY, 150],
+                })}}/>
+            }
         </View>
     );
 };
