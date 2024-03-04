@@ -5,6 +5,7 @@ import burgerWrite from '../../assets/burger/burger_write.png';
 import star from '../../assets/burger/star.png';
 import starNone from '../../assets/burger/star_none.png';
 import won from '../../assets/burger/won.png';
+import people from '../../assets/burger/people.png'
 import { useAppContext } from '../api/ContextAPI';
 import { Skel } from 'react-native-ui-skel-expo'
 
@@ -205,17 +206,24 @@ const HamburgerList = (props) => {
                             <Text style={[styles.status,{backgroundColor:data.item[0].status === 0 ? '#2E8DFF' : 'tomato'}]}>
                                 {data.item[0].status === 0 ? '판매중' : '단종' }</Text>
                         </View>}
-                        <View style={[styles.starBox,{ width: data.item[0].type === 2 ? '80%' : '70%', margin: data.item[0].type === 2 ? 12 : 2 }]}>
-                            <View style={[styles.starBack,{width : 
-                                ratings.find(rat =>  ( (!route.params?.userSeq && searchParam === undefined) ? rat[0].burgerSeq : rat.burgerSeq ) 
+                        <View style={{flexDirection:'row',justifyContent:'center'}}>
+                            <View style={{flexDirection:'row',borderWidth:1,borderColor:'darkgray',borderRadius:5,marginRight:5,alignItems:'center',padding:3}}>
+                                <Image source={people} style={{width:22,height:22,marginRight:1}}/>
+                                <Text style={{fontWeight:'bold',fontSize:15,color:'gray'}}>{ratings.filter(rat => ( (!route.params?.userSeq && searchParam === undefined) ? 
+                                rat[0].burgerSeq : rat.burgerSeq ) === data.item[0].burgerSeq).length}</Text>
+                            </View>
+                            <View style={[styles.starBox,{ width: data.item[0].type === 2 ? '80%' : '70%', margin: data.item[0].type === 2 ? 12 : 2 }]}>
+                                <View style={[styles.starBack,{width : 
+                                    ratings.find(rat =>  ( (!route.params?.userSeq && searchParam === undefined) ? rat[0].burgerSeq : rat.burgerSeq ) 
                                     === data.item[0].burgerSeq) !== undefined &&
-                                parseFloat(ratings.filter(rat => ( (!route.params?.userSeq && searchParam === undefined) ? rat[0].burgerSeq : rat.burgerSeq ) 
+                                    parseFloat(ratings.filter(rat => ( (!route.params?.userSeq && searchParam === undefined) ? rat[0].burgerSeq : rat.burgerSeq ) 
                                     === data.item[0].burgerSeq)
-                                .reduce((acc, cur) => acc + ( (!route.params?.userSeq && searchParam === undefined) ? cur[0].rate : cur.rate ) , 0)) * 20 / 
-                                ratings.filter(rat => ( (!route.params?.userSeq && searchParam === undefined) ? rat[0].burgerSeq : rat.burgerSeq )
+                                    .reduce((acc, cur) => acc + ( (!route.params?.userSeq && searchParam === undefined) ? cur[0].rate : cur.rate ) , 0)) * 20 / 
+                                    ratings.filter(rat => ( (!route.params?.userSeq && searchParam === undefined) ? rat[0].burgerSeq : rat.burgerSeq )
                                     === data.item[0].burgerSeq).length + '%'}]}/>
-                            <Image source={ratings.find(rat => ( (!route.params?.userSeq && searchParam === undefined) ? rat[0].burgerSeq : rat.burgerSeq )
-                                    === data.item[0].burgerSeq) !== undefined ? star : starNone} style={styles.starImg}/>
+                                <Image source={ratings.find(rat => ( (!route.params?.userSeq && searchParam === undefined) ? rat[0].burgerSeq : rat.burgerSeq )
+                                        === data.item[0].burgerSeq) !== undefined ? star : starNone} style={styles.starImg}/>
+                            </View>
                         </View>
                     </View>
             </Pressable>}}

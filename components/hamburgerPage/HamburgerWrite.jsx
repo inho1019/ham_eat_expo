@@ -176,6 +176,7 @@ const styles = StyleSheet.create({
         borderBottomColor: 'black',
         borderBottomWidth: 1,
         marginHorizontal:15,
+        marginBottom:2,
         padding: 3
     },
     starBox : {

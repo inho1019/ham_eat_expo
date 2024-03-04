@@ -126,7 +126,8 @@ const HamburgerRating = (props) => {
                             </Pressable>}
                             {route.params?.userSeq && <Text style={styles.reviewTime}> | {getToday(data.item.logTime)}</Text>}
                         </View>
-                        {data.item && state.user.userSeq === data.item.userSeq && 
+                        {((data.item && state.user.userSeq === data.item.userSeq) || 
+                            (state.user.own === 2 || state.user.own === 1)) && 
                             <Pressable 
                                 onPressIn={() => setTouchActive(false)}
                                 onPressOut={() => setTouchActive(true)}

@@ -247,12 +247,13 @@ const BoardHome = (props) => {
                 :    <View style={styles.itemBox}>
                     {ask.map((item,index) => <Pressable key={index}
                         style={({pressed}) => ([styles.item,{backgroundColor: pressed ? 'whitesmoke' : 'white'}])}
-                        onPress={() => navigation.navigate('View',{ boardSeq : item.boardSeq })}>
+                        onPress={() => ((item.secret === 1 && state.user.userSeq !== item.userSeq && state.user.own !== 2 && state.user.own !== 1) ? 
+                            onAlertTxt('권한이 없습니다') : navigation.navigate('View',{ boardSeq : item.boardSeq }))}>
                             <Text style={styles.itemNew}>new</Text>
                             <View style={{width : '90%'}}>
                                 <Text numberOfLines={1} ellipsizeMode="tail" 
-                                style={{fontSize: 16,marginLeft:5}}> {(item.secret === 1 && 
-                                    state.user.userSeq !== item.userSeq && state.user.own !== 2) ? '🔑 비밀글' : item.title}</Text>
+                                style={{fontSize: 16,marginLeft:5}}> {(item.secret === 1 && state.user.userSeq !== item.userSeq && 
+                                    state.user.own !== 2 && state.user.own !== 1) ? '🔑 비밀글' : item.title}</Text>
                             </View>
                     </Pressable>)}
                 </View>

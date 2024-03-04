@@ -169,7 +169,7 @@ const UserLogin = (props) => {
         <TextInput style={styles.txtBox} placeholder='이메일 입력' value={loginDTO.email} onChangeText={(text) => onInput('email',text)}/>
         <View style={{ flexDirection: 'row' }}><Text style={styles.h3}>비밀번호</Text></View>
         <TextInput style={styles.txtBox} placeholder='비밀번호 입력' secureTextEntry={true} 
-          value={loginDTO.pwd} onChangeText={(text) => onInput('pwd',text)}/>
+          value={loginDTO.pwd} onChangeText={(text) => onInput('pwd',text)} onSubmitEditing={() => onSub()}/> 
         <View style={{flexDirection: 'row-reverse'}}>
           <Switch 
               trackColor={{ false: "#767577", true: "#81b0ff" }}

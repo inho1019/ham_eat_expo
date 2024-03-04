@@ -121,11 +121,11 @@ const HamburgerHome = (props) => {
                 onPress={ randomBurger }
                 style={({pressed}) => [styles.whatBox,{backgroundColor : pressed ? 'whitesmoke' : '#e5e5e5'}]}>
                 <Image source={whatImg} style={{width:30,height:30}}/>
-                <Text style={styles.whatTxt}>뭐 먹지... 아무거나 추천 받기</Text>
+                <Text style={styles.whatTxt}>오늘 뭐 먹지...?</Text>
             </Pressable>
             <View
                 style={styles.h1Out}>
-                <Text style={styles.h1}>신규 추천 버거</Text>
+                <Text style={styles.h1}>신규 버거</Text>
             </View>
                 {first ? 
                 <View style={{width:'95%',aspectRatio:7/3, marginLeft:'2.5%', marginTop:'2%',marginBottom:'5%'}}>

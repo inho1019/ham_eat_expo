@@ -4,6 +4,7 @@ import { FlatList, Image, Keyboard, Linking, Pressable, StyleSheet, Text, TextIn
 import commentAdd from '../../assets/board/comment_reg.png'
 import favImg from '../../assets/board/fav.png'
 import deleteImg from '../../assets/burger/delete.png';
+import lockImg from '../../assets/board/lock.png';
 import { useAppContext } from '../api/ContextAPI';
 import ImageModal from '../ImageModal';
 
@@ -109,7 +110,7 @@ const BoardView = (props) => {
     }
 
     const onDelete = () => {
-        if(state.user.own === 2 || boardDTO[1].userSeq === state.user.userSeq) {
+        if((state.user.own === 2 || state.user.own === 2 ) || boardDTO[1].userSeq === state.user.userSeq) {
             onLoading(true)
             axios.delete(`https://hameat.onrender.com/board/delete/${boardDTO[0].boardSeq}`)
             .then(() => {
@@ -213,12 +214,15 @@ const BoardView = (props) => {
                 ListHeaderComponent={() => boardDTO && <TouchableWithoutFeedback>
                     <View style={{flexDirection:'column', borderBottomWidth:10,borderBottomColor:'whitesmoke'}}>
                     <View style={{borderBottomWidth:2,borderBottomColor:'lightgray',padding: 5}}>
-                        <Text style={styles.h1}>{boardDTO[0].title}</Text>
+                        <View style={{flexDirection:'row'}}>
+                            {boardDTO[0].secret === 1 && <Image source={lockImg} style={{width:25,height:25,marginRight:5,marginVertical: 5}}/>}
+                            <Text style={styles.h1}>{boardDTO[0].title}</Text>
+                        </View>
                         <View style={{flexDirection:'row'}}>
                             <View style={{width:'100%'}}>
                                 <View style={{flexDirection:'row',justifyContent:'space-between'}}>
                                     <Text style={styles.h2}>{boardDTO[1] ? boardDTO[1].name : '탈퇴 회원'}</Text>
-                                    {(boardDTO[1] && boardDTO[1].userSeq === state.user.userSeq || state.user.own === 2) && 
+                                    {((boardDTO[1] && boardDTO[1].userSeq === state.user.userSeq) || (state.user.own === 2 || state.user.own === 1)) && 
                                     <View style={{flexDirection:'row'}}>
                                         {boardDTO[1] && boardDTO[1].userSeq === state.user.userSeq && 
                                         <View style={{flexDirection:'column'}}>
@@ -288,7 +292,8 @@ const BoardView = (props) => {
                         <Text style={{fontSize:16,fontWeight:'bold',color:'gray'}}>{data.item[1] ? data.item[1].name : '탈퇴 회원'}</Text>
                         <Text style={{fontSize:14,textAlignVertical:'center',color:'gray'}}> | {getToday(data.item[0].logTime)}</Text>
                     </View>
-                        {data.item[1] && data.item[1].userSeq === state.user.userSeq && 
+                        {((data.item[1] && data.item[1].userSeq === state.user.userSeq) || 
+                            (state.user.own === 2 || state.user.own === 1)) && 
                         <Pressable onPress={ () => onDeleteCom(data.item[0].commentSeq) }>
                             <Image source={deleteImg} style={{width:25,height:25}}/>
                         </Pressable>}

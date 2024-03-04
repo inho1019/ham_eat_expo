@@ -85,9 +85,8 @@ const HamburgerMake = (props) => {
             setMoveImg(src)
             setMove(true)
             Animated.timing(moveBox, {
-                delay: 200,
                 toValue: 1,
-                duration: 600,
+                duration: 500,
                 useNativeDriver: false,
                 easing: Easing.in(Easing.ease)
             }).start(() => {

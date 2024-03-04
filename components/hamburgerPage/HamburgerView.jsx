@@ -774,7 +774,7 @@ const HamburgerView = (props) => {
                                             <Image source={mapIcon} style={{height:22,width:22}}/>
                                         </Pressable>}
                                     </View>
-                                    {data.item[0] && state.user.userSeq === data.item[0].userSeq && 
+                                    {((data.item[0] && state.user.userSeq === data.item[0].userSeq) || (state.user.own === 2 || state.user.own === 1)) && 
                                         <Pressable onPress={() => onDelete(data.item[0].ratingSeq)}>
                                             <Image source={deleteImg} style={{width:30,height:30}}/>
                                         </Pressable>
@@ -800,7 +800,7 @@ const HamburgerView = (props) => {
                             {!first && 
                             <View style={styles.tabBox}>
                                 <Text style={styles.num}>NO.{burgerDTO[0].burgerSeq} {burgerDTO[0].name}</Text>
-                                {((burgerDTO[1] && burgerDTO[1].userSeq === state.user.userSeq) || state.user.own === 2) && <View>
+                                {((burgerDTO[1] && burgerDTO[1].userSeq === state.user.userSeq) || ((state.user.own === 2 || state.user.own === 1))) && <View>
                                     <Pressable onPress={() => {
                                             setTabModal(false)
                                             navigation.navigate('Update', { updateSeq : burgerDTO[0].burgerSeq })
@@ -808,7 +808,7 @@ const HamburgerView = (props) => {
                                         style={({pressed}) => [styles.tabBut,{backgroundColor: pressed ? 'whitesmoke' : 'white'}]}>
                                         <Text style={styles.tabButTxt}>버거 수정</Text>
                                     </Pressable>
-                                    {(burgerDTO[0].type === 2 || state.user.own === 2) &&
+                                    {(burgerDTO[0].type === 2 || (state.user.own === 2 || state.user.own === 1)) &&
                                     <Pressable onPress={ onBurgerDelete }
                                         style={({pressed}) => [styles.tabBut,{backgroundColor: pressed ? 'whitesmoke' : 'white'}]}>
                                         <Text style={styles.tabButTxt}>버거 삭제</Text>

@@ -129,14 +129,14 @@ const BoardList = (props) => {
                         (bdl[1] && search.replace(/\s/g, '').toLowerCase().includes(bdl[1].name.replace(/\s/g, '').toLowerCase()))))}
                 renderItem={(data) => <Pressable
                     onPress={() =>  (!route.params?.userSeq && searchParam === undefined) ? 
-                        ((data.item[0].secret === 1 && state.user.userSeq !== data.item[0].userSeq && state.user.own !== 2) ? 
+                        ((data.item[0].secret === 1 && state.user.userSeq !== data.item[0].userSeq && state.user.own !== 2 && state.user.own !== 1) ? 
                         onAlertTxt('권한이 없습니다') : navigation.navigate('View',{ boardSeq : data.item[0].boardSeq }))
                         : onGo(2,data.item[0].boardSeq) }
                     style={({pressed}) => [styles.item,{backgroundColor: pressed ? 'whitesmoke' : 'white'}]}>
                     <View style={{flexDirection:'row'}}>
                         <Text style={[styles.h2,{maxWidth:'90%'}]} numberOfLines={1} ellipsizeMode="tail">
-                            {(data.item[0].secret === 1 && state.user.userSeq !== data.item[0].userSeq && state.user.own !== 2) ? 
-                            '🔑 비밀글' : data.item[0].title}</Text>
+                            {(data.item[0].secret === 1 && state.user.userSeq !== data.item[0].userSeq && 
+                            state.user.own !== 2 && state.user.own !== 1) ? '🔑 비밀글' : data.item[0].title}</Text>
                         <Text style={styles.h2c}>{ data.item[2] > 0 && `[${data.item[2]}]` }</Text>
                     </View>
                     <View style={{flexDirection:'row',justifyContent:'space-between'}}>
@@ -154,7 +154,7 @@ const BoardList = (props) => {
                 alwaysBounceVertical={false}
             />
             { (!route.params?.userSeq && searchParam === undefined) && 
-                (route.params?.type !== 2 || state.user.own === 2) && <Pressable style={styles.writeBut}
+                (route.params?.type !== 2 || (state.user.own === 2 || state.user.own === 1)) && <Pressable style={styles.writeBut}
                 onPress={() => state.user.userSeq === -1 ? onPage(3)
                 : navigation.navigate('Form',{ type : route.params?.type })}>
                 <Image source={writeImg} style={{width: 50, height: 50}}/>
