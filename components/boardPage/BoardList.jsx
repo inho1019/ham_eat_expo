@@ -134,10 +134,10 @@ const BoardList = (props) => {
                         : onGo(2,data.item[0].boardSeq) }
                     style={({pressed}) => [styles.item,{backgroundColor: pressed ? 'whitesmoke' : 'white'}]}>
                     <View style={{flexDirection:'row'}}>
-                        <Text style={[styles.h2,{maxWidth:'90%'}]} numberOfLines={1} ellipsizeMode="tail">
+                        <Text style={[styles.h2,{maxWidth: data.item[2] > 0 ? '90%' : '100%'}]} numberOfLines={1} ellipsizeMode="tail">
                             {(data.item[0].secret === 1 && state.user.userSeq !== data.item[0].userSeq && 
                             state.user.own !== 2 && state.user.own !== 1) ? '🔑 비밀글' : data.item[0].title}</Text>
-                        <Text style={styles.h2c}>{ data.item[2] > 0 && `[${data.item[2]}]` }</Text>
+                        { data.item[2] > 0 &&<Text style={styles.h2c}>{`[${data.item[2]}]`}</Text>}
                     </View>
                     <View style={{flexDirection:'row',justifyContent:'space-between'}}>
                         <View style={{flexDirection:'row'}}>

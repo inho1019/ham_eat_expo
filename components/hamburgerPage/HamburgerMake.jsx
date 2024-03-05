@@ -269,9 +269,10 @@ const HamburgerMake = (props) => {
                 <View style={{height: '5%',marginVertical:'-3.5%'}} 
                     {...panResponder.current.panHandlers}>
                         <View style={{height:'38%'}}/>
-                        <View style={{backgroundColor: action ? 'lightgray' : 'whitesmoke',height:'24%'}}/>
+                        <View style={{backgroundColor: action ? 'lightgray' : 'whitesmoke',height:'24%',justifyContent:'center'}}>
+                            <Image source={action ? holdingGif : holding} style={styles.hold}/>
+                        </View>
                         <View style={{height:'38%'}}/>
-                        <Image source={action ? holdingGif : holding} style={styles.hold}/>
                 </View>
 
             <ScrollView 
@@ -482,8 +483,7 @@ const HamburgerMake = (props) => {
 
 const styles = StyleSheet.create({
     hold : {
-        marginTop: '-8.6%',
-        height: '100%',
+        height: '400%',
         aspectRatio: 1/1,
         alignSelf: 'center',
     },
