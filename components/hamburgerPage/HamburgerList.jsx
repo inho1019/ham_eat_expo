@@ -207,8 +207,8 @@ const HamburgerList = (props) => {
                                 {data.item[0].status === 0 ? '판매중' : '단종' }</Text>
                         </View>}
                         <View style={{flexDirection:'row',justifyContent:'center', marginVertical: data.item[0].type === 2 ? 20 : 2,marginHorizontal: 5 }}>
-                            <View style={{flexDirection:'row',borderWidth:1,borderColor:'darkgray',borderRadius:5,alignItems:'center',padding:5}}>
-                                <Image source={people} style={{width:22,height:22,marginRight:1}}/>
+                            <View style={{flexDirection:'row',borderWidth:1,borderColor:'darkgray',borderRadius:5,alignItems:'center',paddingHorizontal:5}}>
+                                <Image source={people} style={{width:20,height:20,marginRight:1}}/>
                                 <Text style={{fontWeight:'bold',fontSize:15,color:'gray'}}>{ratings.filter(rat => ( (!route.params?.userSeq && searchParam === undefined) ? 
                                 rat[0].burgerSeq : rat.burgerSeq ) === data.item[0].burgerSeq).length}</Text>
                             </View>

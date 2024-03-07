@@ -44,7 +44,7 @@ const Home = (props) => {
             onLoading(false)
         })
         .catch(() => {
-            alert('불러오기 중 에러발생')
+            onAlertTxt('불러오기 중 에러발생')
             onLoading(false)
         })
     },[])
