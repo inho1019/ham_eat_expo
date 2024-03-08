@@ -7,7 +7,7 @@ import { Dimensions, Image, Text, View } from 'react-native';
 // 초기 상태
 const initialState = {
   loading : false,
-  version : '0.1.7',
+  version : '0.1.8',
   page: 0,
   alertTxt: '',
   date: new Date(),
