@@ -1,10 +1,18 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { Image, Keyboard, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
-import { Calendar } from "react-native-calendars";
+import { Image, Keyboard, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableWithoutFeedback, View } from 'react-native';
+import { Calendar, LocaleConfig } from "react-native-calendars";
 import { useAppContext } from '../api/ContextAPI';
 import deleteImg from '../../assets/burger/delete.png'
 
+LocaleConfig.locales['ko'] = {
+  monthNames: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+  monthNamesShort: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+  dayNames: ['일', '월', '화', '수', '목', '금', '토'],
+  dayNamesShort: ['일', '월', '화', '수', '목', '금', '토'],
+};
+
+LocaleConfig.defaultLocale = 'ko';
 
 const UserRegister = (props) => {
     const {navigation} = props;
@@ -155,24 +163,14 @@ const UserRegister = (props) => {
       }
     },[userDTO.name])
 
-    const [year,setYear] = useState(new Date().getFullYear())
-    const [month,setMonth] = useState(new Date().getMonth() + 1)
-    const [day,setDay] = useState(new Date().getDate())
-
-    const onYear = (num) => {
-      Keyboard.dismiss()
-      setYear(num)
-      setCal(false)
-      requestAnimationFrame(()=>setCal(true))
-    }
-
+    
     const onSub = () => {
       Keyboard.dismiss()
       if (pwdPattern(userDTO.pwd)){
         if (pwdCheck === userDTO.pwd) {
           if (nameCheck) {
             onLoading(true)
-            const dto = {...userDTO, birth : `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`, email : email}
+            const dto = {...userDTO, birth : `${datec.getFullYear()}-${(datec.getMonth()+1).toString().padStart(2, '0')}-${datec.getDate().toString().padStart(2, '0')}`, email : email}
             axios.post(`https://hameat.onrender.com/user/register`, dto )
             .then(res => {
               onLoading(false)
@@ -193,6 +191,28 @@ const UserRegister = (props) => {
         onAlertTxt('비밀번호 형식이 올바르지 않습니다')
       }
     }
+    
+    const [datec,setDatec] = useState(new Date())
+    const [yearModal,setYearModal] = useState(false)
+
+    let yearList = []
+    for(let i = 0; i < 100; i++) {
+        let year = new Date().getFullYear();
+        yearList.push(year - i)
+    }
+
+    const calendarHeader = (date) => {
+      const year = date.getFullYear();
+      
+      return (
+        <Pressable
+        onPress={() => {
+          setYearModal(true)
+          setDatec(date)
+        }}>
+            <Text style={{fontSize:18,fontWeight:'bold'}}>{year}년 {date.getMonth() + 1}월</Text>
+        </Pressable>
+  )}
 
     return (
       <View style={{ flex: 1}}>
@@ -269,7 +289,7 @@ const UserRegister = (props) => {
               setCal(true)
               Keyboard.dismiss()
             }}>
-              <Text style={styles.txtBox}>{year}-{month.toString().padStart(2, '0')}-{day.toString().padStart(2, '0')}</Text>
+              <Text style={styles.txtBox}>{`${datec.getFullYear()}-${(datec.getMonth()+1).toString().padStart(2, '0')}-${datec.getDate().toString().padStart(2, '0')}`}</Text>
             </Pressable>
             <Pressable style={styles.but} onPress={() => onSub()}>
               <Text style={styles.butTxt}>회원가입</Text>
@@ -286,27 +306,37 @@ const UserRegister = (props) => {
                   <Image source={deleteImg} style={{width:30,height:30}}/>
                 </Pressable>
               </View>
-              <View style={{flexDirection: 'row',justifyContent:'space-around',paddingBottom: 10,backgroundColor:'white'}}>
-                <Pressable onPress={() => onYear(year-10)}><Text style={styles.yearTxt}>-10</Text></Pressable>
-                <Pressable onPress={() => onYear(year-1)}><Text style={styles.yearTxt}>-1</Text></Pressable>
-                <Pressable onPress={() => onYear(new Date().getFullYear())}>
-                  <Text style={styles.yearTxt}>YEAR</Text>
-                </Pressable>
-                <Pressable onPress={() => onYear(year+1)}><Text style={styles.yearTxt}>+1</Text></Pressable>
-                <Pressable onPress={() => onYear(year+10)}><Text style={styles.yearTxt}>+10</Text></Pressable>
-              </View>
                 <Calendar 
-                  current={`${year}-${month}-${day}`}
+                  current={`${datec.getFullYear()}-${(datec.getMonth()+1).toString().padStart(2, '0')}-${datec.getDate().toString().padStart(2, '0')}`}
                   style={{borderBottomWidth:1,borderColor:'black'}}
                   onDayPress={(day) => {
                     setCal(false)
-                    setYear(day.year)
-                    setMonth(day.month)
-                    setDay(day.day)
+                    setDatec(new Date(day.dateString))
                   }}
-                  />
+                  renderHeader={calendarHeader}
+                />
               </View>
           </Modal>
+          <Modal 
+                animationType="fade"
+                visible={yearModal}
+                transparent={true}>
+                <TouchableWithoutFeedback onPress={() => setYearModal(false)}>
+                    <View style={styles.yearModal}>         
+                        <ScrollView style={styles.yearScroll}>
+                            {yearList.map((item,index) => <Pressable
+                                key={index}
+                                onPress={() => {
+                                    setYearModal(false)
+                                    setDatec(dat => {
+                                        dat.setFullYear(item)
+                                    return dat})}}>
+                                <Text style={[styles.yearItem,{backgroundColor:datec.getFullYear() === item ? 'lightgray' : 'whitesmoke'}]}>{item}</Text>
+                            </Pressable>)}
+                        </ScrollView>
+                    </View>
+                </TouchableWithoutFeedback>
+            </Modal>
         </ScrollView>}
     </View>
     );
@@ -375,6 +405,24 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'gray'
   },
-  })
+  yearModal : {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  yearScroll : {
+      maxHeight: 150,
+      width:100,
+      backgroundColor:'whitesmoke'
+  },
+  yearItem : {
+      height:50,
+      width:100,
+      textAlign:'center',
+      textAlignVertical:'center',
+      fontSize: 22,
+      fontWeight:'bold'
+  }
+})
 
 export default UserRegister;
