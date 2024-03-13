@@ -210,7 +210,7 @@ const UserRegister = (props) => {
           setYearModal(true)
           setDatec(date)
         }}>
-            <Text style={{fontSize:18,fontWeight:'bold'}}>{year}년 {date.getMonth() + 1}월</Text>
+            <Text style={{fontSize:18,fontWeight:'bold'}}>👉 {year}년 {date.getMonth() + 1}월</Text>
         </Pressable>
   )}
 
@@ -299,43 +299,45 @@ const UserRegister = (props) => {
               animationType="fade"
               visible={cal}
               transparent={true}>
-              <View style={{flex:1,justifyContent:'center',opacity:0.9}}>
-              <View style={{flexDirection: 'row-reverse',padding:5,borderTopWidth:1,
-                borderColor:'black',backgroundColor:'white'}}>
-                <Pressable onPress={() => setCal(false)}>
-                  <Image source={deleteImg} style={{width:30,height:30}}/>
-                </Pressable>
-              </View>
+              <Pressable style={{flex:1,justifyContent:'center',opacity:0.9}}>
                 <Calendar 
+                  style={styles.calendar}
                   current={`${datec.getFullYear()}-${(datec.getMonth()+1).toString().padStart(2, '0')}-${datec.getDate().toString().padStart(2, '0')}`}
-                  style={{borderBottomWidth:1,borderColor:'black'}}
                   onDayPress={(day) => {
                     setCal(false)
                     setDatec(new Date(day.dateString))
                   }}
                   renderHeader={calendarHeader}
+                  theme={{
+                    todayTextColor: 'black',
+                    textDayFontSize: 20,
+                    textDayFontWeight: 'bold',
+                    textMonthFontSize: 20,
+                    textMonthFontWeight: 'bold',
+                    textSectionTitleColor: 'rgba(138, 138, 138, 1)',
+                  }}
                 />
-              </View>
+              </Pressable>
           </Modal>
           <Modal 
-                animationType="fade"
-                visible={yearModal}
-                transparent={true}>
-                <TouchableWithoutFeedback onPress={() => setYearModal(false)}>
-                    <View style={styles.yearModal}>         
-                        <ScrollView style={styles.yearScroll}>
-                            {yearList.map((item,index) => <Pressable
-                                key={index}
-                                onPress={() => {
-                                    setYearModal(false)
-                                    setDatec(dat => {
-                                        dat.setFullYear(item)
-                                    return dat})}}>
-                                <Text style={[styles.yearItem,{backgroundColor:datec.getFullYear() === item ? 'lightgray' : 'whitesmoke'}]}>{item}</Text>
-                            </Pressable>)}
-                        </ScrollView>
-                    </View>
-                </TouchableWithoutFeedback>
+              animationType="fade"
+              visible={yearModal}
+              transparent={true}>
+              <TouchableWithoutFeedback onPress={() => setYearModal(false)}>
+                  <View style={styles.yearModal}>         
+                      <ScrollView style={styles.yearScroll}>
+                          {yearList.map((item,index) => <Pressable
+                              key={index}
+                              onPress={() => {
+                                  setYearModal(false)
+                                  setDatec(dat => {
+                                      dat.setFullYear(item)
+                                  return dat})}}>
+                              <Text style={[styles.yearItem,{backgroundColor:datec.getFullYear() === item ? 'lightgray' : 'whitesmoke'}]}>{item}</Text>
+                          </Pressable>)}
+                      </ScrollView>
+                  </View>
+              </TouchableWithoutFeedback>
             </Modal>
         </ScrollView>}
     </View>
@@ -411,18 +413,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   yearScroll : {
-      maxHeight: 150,
-      width:100,
-      backgroundColor:'whitesmoke'
+    maxHeight: 150,
+    width:100,
+    borderLeftWidth: 3,
+    borderRightWidth: 3,
+    borderColor: 'black',
+    backgroundColor:'darkgray'
   },
   yearItem : {
-      height:50,
-      width:100,
-      textAlign:'center',
-      textAlignVertical:'center',
-      fontSize: 22,
-      fontWeight:'bold'
-  }
+    height:50,
+    width:100,
+    textAlign:'center',
+    textAlignVertical:'center',
+    fontSize: 22,
+    fontWeight:'bold',
+  },
+  calendar: {
+    paddingBottom: 30,
+    borderWidth: 1,
+    borderColor: '#E9E9E9',
+    borderRadius: 20,
+    margin: 30
+  },
 })
 
 export default UserRegister;
