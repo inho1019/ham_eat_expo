@@ -1,9 +1,8 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { Image, Keyboard, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableWithoutFeedback, View } from 'react-native';
+import { Keyboard, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableWithoutFeedback, View } from 'react-native';
 import { Calendar, LocaleConfig } from "react-native-calendars";
 import { useAppContext } from '../api/ContextAPI';
-import deleteImg from '../../assets/burger/delete.png'
 
 LocaleConfig.locales['ko'] = {
   monthNames: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
@@ -299,25 +298,29 @@ const UserRegister = (props) => {
               animationType="fade"
               visible={cal}
               transparent={true}>
-              <Pressable style={{flex:1,justifyContent:'center',opacity:0.9}}>
-                <Calendar 
-                  style={styles.calendar}
-                  current={`${datec.getFullYear()}-${(datec.getMonth()+1).toString().padStart(2, '0')}-${datec.getDate().toString().padStart(2, '0')}`}
-                  onDayPress={(day) => {
-                    setCal(false)
-                    setDatec(new Date(day.dateString))
-                  }}
-                  renderHeader={calendarHeader}
-                  theme={{
-                    todayTextColor: 'black',
-                    textDayFontSize: 20,
-                    textDayFontWeight: 'bold',
-                    textMonthFontSize: 20,
-                    textMonthFontWeight: 'bold',
-                    textSectionTitleColor: 'rgba(138, 138, 138, 1)',
-                  }}
-                />
-              </Pressable>
+              <TouchableWithoutFeedback onPress={() => setCal(false)}>    
+                <View style={{flex:1,justifyContent:'center',opacity:0.9}}>
+                  <Pressable>
+                    <Calendar 
+                      style={styles.calendar}
+                      current={`${datec.getFullYear()}-${(datec.getMonth()+1).toString().padStart(2, '0')}-${datec.getDate().toString().padStart(2, '0')}`}
+                      onDayPress={(day) => {
+                        setCal(false)
+                        setDatec(new Date(day.dateString))
+                      }}
+                      renderHeader={calendarHeader}
+                      theme={{
+                        todayTextColor: 'black',
+                        textDayFontSize: 20,
+                        textDayFontWeight: 'bold',
+                        textMonthFontSize: 20,
+                        textMonthFontWeight: 'bold',
+                        textSectionTitleColor: 'rgba(138, 138, 138, 1)',
+                      }}
+                    />
+                  </Pressable>
+                </View>
+              </TouchableWithoutFeedback>
           </Modal>
           <Modal 
               animationType="fade"
